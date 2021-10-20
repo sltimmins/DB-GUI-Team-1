@@ -63,8 +63,8 @@ import {
       }
 
       return (
-          <div className="container h-100">
-            <div className="h-100 row justify-content-center align-items-center">
+          <div className="container">
+            <div className="row justify-content-center align-items-center">
                 <form className="col-md-4">{form}</form>
             </div>
           </div>

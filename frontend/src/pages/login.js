@@ -10,7 +10,7 @@ export function Login(props) {
 
   return (
     <>
-      <div className="col-12 mb-3 text-center">
+      <div className="text-center">
         <h1>Login</h1>
       </div>
       {props.banner}
@@ -22,10 +22,10 @@ export function Login(props) {
         <label htmlFor="password">Password</label>
         <input name="password" onChange={handleInputChange} value={values.password} type="password" className="form-control" id="password" placeholder="Password" />
       </div>
-      <div className="col-12 text-center">
+      <div className="text-center">
         <button type="button" onClick={() => props.doLogin(values.username, values.password)} className="btn btn-primary mx-auto">Submit</button>
       </div>
-      <div className="col-12 mt-3 text-center">
+      <div className="mt-3 text-center">
         <p>
           Not a member?{" "}
           <a className="text-primary" onClick={() => props.toggleRegisterMode()}>Register</a>
