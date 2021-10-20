@@ -31,7 +31,6 @@ export function App () {
 
   return (
     <AppContext.Provider value={context}>
-      <div class="container">
         <Router>
           <div>
             <Header baseColor={MainBackgroundColor}
@@ -56,7 +55,6 @@ export function App () {
             <Footer mainTitle={MainTitle}/>
           </div>
         </Router>
-      </div>
     </AppContext.Provider>
   );
 }
