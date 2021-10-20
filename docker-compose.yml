@@ -5,7 +5,7 @@ services:
     # location of docker file for node container
     build: ./backend
     # restart on crashes
-    restart: always
+    restart: unless-stopped
     # working directory in container to place files
     working_dir: /usr/src/app
     # startup command
@@ -26,7 +26,7 @@ services:
     # location of docker file for node container
     build: ./frontend
     # restart on crashes
-    restart: always
+    restart: unless-stopped
     # working directory in container to place files
     working_dir: /usr/src/app
     # startup command 
