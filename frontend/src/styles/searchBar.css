@@ -1,0 +1,9 @@
+input[type="text"] {
+    border: 0;
+    border-radius: 7px;
+    font-family: Noto Sans;
+    background-color: white;
+    width: 70%;
+    padding: 20px 15px;
+    filter: drop-shadow(0 0px 30px black);
+}

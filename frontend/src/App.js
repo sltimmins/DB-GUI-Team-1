@@ -87,10 +87,8 @@ function App () {
                 {name: "Maps", href: '/', active: false},
                 {name: "About", href: '/', active: false}
               ]
-            } 
+            }
             mainTitle={MainTitle} mainImage = {{src: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1280px-React-icon.svg.png", width: "70px", height: '50px'}}/>
-        {/* A <Switch> looks through its children <Route>s and
-            renders the first one that matches the current URL. */}
         <Switch>
           <Route path="/">
             <Home />
