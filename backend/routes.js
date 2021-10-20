@@ -101,7 +101,7 @@ module.exports = function routes(app, logger) {
   route to create a new user account and add it to the database
   Uses bcrypt to encrypt the user's password
   accepts formatting:
-  {"name":"ashockley66", "password":"alex66","firstName":"alex","lastName":"shockley","email":"exampleEmail@email.com"} passed in Body
+  {"username":"bSavage", "password":"pass","firstName":"Brennan","lastName":"Savage","email":"bSavage@hotmail.com","candidate":true} passed in Body
   */
 
   //TODO reroute the user to a login page after a successful account creation
@@ -112,18 +112,16 @@ module.exports = function routes(app, logger) {
         try {
           const salt = await bcrypt.genSalt()
           const hashedPassword = await bcrypt.hash(req.body.password, salt)
-          const user = {username:req.body.name, password:hashedPassword, firstName:req.body.firstName, lastName:req.body.lastName, email:req.body.email, candidate:req.body.candidate};
-          res.json({
-            user:user.username,
-            password:user.password,
-            firstName:user.firstName,
-            lastName:user.lastName,
-            email:user.email,
-            candidate:user.candidate
-          })
+          const user = {username:req.body.username, password:hashedPassword, firstName:req.body.firstName, lastName:req.body.lastName, email:req.body.email, candidate:req.body.candidate};
+          
+          
           connection.query("insert into users (firstName, lastName, email, candidate, username, password) VALUES (?, ?, ?, ?, ?, ?)", [user.firstName,user.lastName,user.email,user.candidate,user.username,user.password])
+          res.status(200).send({
+            success: true,
+            msg: 'Please go to 0.0.0.0:8000/users/login to login!'
+          })
         } catch {
-          req.status(500);
+          res.status(500).send('something went wrong...', );
         }
         
     })
@@ -158,10 +156,13 @@ module.exports = function routes(app, logger) {
     
     pool.getConnection(async function(err,connection) {
       const userToFind = {username:req.body.username, password:req.body.password}
-      connection.query("select username,password FROM users WHERE username = ?", userToFind.username , async function(err,result,fields){
+      connection.query("select username,password, accountNumber,candidate FROM users WHERE username = ?", userToFind.username , async function(err,result,fields){
         var usersJSON = JSON.parse(JSON.stringify(result));
         if(usersJSON == null) {
-          return res.status(400).send("Could not find user")
+          return res.status(400).send({
+            success: false,
+            message: 'Invalid Username or Password'
+          })
         }
 
         try {
@@ -169,12 +170,21 @@ module.exports = function routes(app, logger) {
           if ( await bcrypt.compare(userToFind.password, usersJSON[0].password)) {
             //res.send("Logged in!")
             const accessToken = jwt.sign(userToFind, process.env.ACCESS_TOKEN_SECRET)
-            res.json({accesstoken: accessToken})
+            res.status(200).send({
+              success: true,
+              data: {
+                jwt: accessToken,
+                username: usersJSON[0].username,
+                user_id: usersJSON[0].accountNumber,
+                candidate: usersJSON[0].candidate,
+
+              }
+            })
           } else {
-            res.send("You really thought I would let u in without the right password buddy?")
+            res.status(400).send("You really thought I would let u in without the right password buddy?")
           }
         } catch {
-          req.status(500).send();
+          res.status(500).send('Something went wrong...');
         }
       })
       
