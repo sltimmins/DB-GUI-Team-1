@@ -1,0 +1,48 @@
+body {
+    background-color: #f5f5f5;
+}
+
+main {
+    height: 80vh;
+}
+
+.mainImage {
+    /*background-image: url("https://s.abcnews.com/assets/dtci/elections/images/fantasymap-intro.png");*/
+    height: 100%;
+    max-height: 600px;
+    width: 100%;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    filter: blur(5px);
+    -webkit-filter: blur(5px);
+    position: absolute;
+    z-index: -10;
+}
+
+.divForButton{
+    width: 100%;
+    height: fit-content;
+    text-align: center;
+    margin-top: 10%;
+}
+
+.main-description {
+    max-width: 50%;
+    padding-left: 2rem;
+}
+
+@media only screen and (max-width: 768px) {
+    .mainImage{
+        height: 40%;
+    }
+    main {
+        height: 40vh;
+    }
+    .spacer{
+        height: 10vh;
+    }
+    .main-description {
+        max-width: 90%;
+        padding-left: 2rem;
+    }
+}

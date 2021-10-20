@@ -1,0 +1,14 @@
+
+.wideFooter {
+    width : 100%;
+    display: inline-flex;
+    flex-direction: row;
+    background-color: #1a1a1a;
+    min-height: 3rem;
+    position: absolute;
+    bottom: 0;
+}
+
+.footerText {
+    padding-left: 3rem;
+}

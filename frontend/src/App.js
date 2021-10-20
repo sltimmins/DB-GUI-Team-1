@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import axios from 'axios';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+import Home from "./pages/home";
+import Header from "./components/header";
+import Footer from "./components/footer";
+import {MainBackgroundColor, MainTitle} from "./constants/constants";
 
 // React functional component
 function App () {
@@ -47,7 +57,7 @@ function App () {
       fetchVals();
     }).catch(err => {
       console.log(err)
-    });;
+    });
     setNumber("");
   }
 
@@ -58,7 +68,7 @@ function App () {
       fetchVals();
     }).catch(err => {
       console.log(err)
-    });;
+    });
   }
 
   // tell app to fetch values from db on first load (if initialized)
@@ -67,20 +77,29 @@ function App () {
   }, [])
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <button onClick={fetchBase} style={{marginBottom: '1rem'}}> {`GET: http://${url}:8000/`} </button>
-        <button onClick={reset}> Reset DB </button>
-        <form onSubmit={handleSubmit}>
-          <input type="text" value={number} onChange={handleChange}/>
-          <br/>
-          <input type="submit" value="Submit" />
-        </form>
-        <ul>
-          { values.map((value, i) => <li key={i}>{value.value}</li>) }
-        </ul>
-      </header>
-    </div>
+    <>
+      <Router>
+      <div>
+        <Header baseColor={MainBackgroundColor}
+            routes={
+              [
+                {name: "Home", href: '/', active: true},
+                {name: "Maps", href: '/', active: false},
+                {name: "About", href: '/', active: false}
+              ]
+            } 
+            mainTitle={MainTitle} mainImage = {{src: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1280px-React-icon.svg.png", width: "70px", height: '50px'}}/>
+        {/* A <Switch> looks through its children <Route>s and
+            renders the first one that matches the current URL. */}
+        <Switch>
+          <Route path="/">
+            <Home />
+          </Route>
+        </Switch>
+        <Footer mainTitle={MainTitle}/>
+      </div>
+    </Router>
+    </>
   );
 }
 
