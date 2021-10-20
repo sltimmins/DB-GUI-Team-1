@@ -1,8 +1,8 @@
 // import closeUp from '/images/closeUp.JPG'
 import React, { useState } from 'react';
-import '../styles/generic_button.css';
+import '../styles/searchBar.css';
 
-const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVertical, fontSize, fontWeight, dropShadow}) => {
+const SearchBar = ({baseColor, placeHolder, textColor, width, height, fontSize, fontWeight, dropShadow}) => {
     const calcFontColor = () => {
         if(baseColor.length==4){
             baseColor+= baseColor.substring(1, 4);
@@ -21,13 +21,11 @@ const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVerti
             backgroundColor: baseColor,
             color: textColor
         }
-        if(paddingHorizontal){
-            initialStyles.paddingLeft = paddingHorizontal;
-            initialStyles.paddingRight = paddingHorizontal
+        if(width){
+            initialStyles.width = width;
         }
-        if(paddingVertical){
-            initialStyles.paddingTop = paddingVertical;
-            initialStyles.paddingBottom = paddingVertical;
+        if(height){
+            initialStyles.height = height;
         }
         if(fontSize){
             initialStyles.fontSize = fontSize;
@@ -44,9 +42,9 @@ const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVerti
     const [dynamicStyles, setDynamicStyles] = useState(setStyles())
 
     return (
-        <button className={"genericButton"} style={dynamicStyles} type={"button"} role={"button"}>{mainText}</button>
+        <input className={"searchBar"} style={dynamicStyles} type={"text"} placeholder={placeHolder}></input>
     );
   };
 
 
-export default Button;
+export default SearchBar;
