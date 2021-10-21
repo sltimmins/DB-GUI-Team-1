@@ -16,11 +16,11 @@ export function Login(props) {
       {props.banner}
       <div className="form-group mb-3">
         <label htmlFor="username">Username</label>
-        <input name="username" onChange={handleInputChange} value={values.username} type="text" className="form-control" id="username" placeholder="Enter username" />
+        <input name="username" onChange={handleInputChange} value={values.username} type="text" className="form-control input-lg" id="username" placeholder="Enter username" />
       </div>
       <div className="form-group mb-3">
         <label htmlFor="password">Password</label>
-        <input name="password" onChange={handleInputChange} value={values.password} type="password" className="form-control" id="password" placeholder="Password" />
+        <input name="password" onChange={handleInputChange} value={values.password} type="password" className="form-control input-lg" id="password" placeholder="Password" />
       </div>
       <div className="text-center">
         <button type="button" onClick={() => props.doLogin(values.username, values.password)} className="btn btn-primary mx-auto">Submit</button>

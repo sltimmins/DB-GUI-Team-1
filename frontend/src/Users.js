@@ -33,10 +33,21 @@ import {
 
       const doLogin = async (username, password) => {
         setBanner("");
-        // axios.post(baseURL + "/users/login", {username, password})
-        //      .then((res) => {
-
-        //      })
+        axios.post(baseURL + "/users/login", { username: username, password: password }).then((res) => {
+            // Handle success and update state
+            setJWT(res.data.data.jwt)
+            setUser(res.data.data)
+            redirectToHome()
+            sessionStorage.setItem("jwt", res.data.data.jwt)
+            console.log(res.data.data)
+            //console.log(res.data.data)
+        })//.catch((e) => {
+        //     if (e.response) {
+        //         setBanner(e.response.data.msg);
+        //     } else {
+        //         setBanner("We had an issue connecting to the server");
+        //     }
+        // });
       }
 
       const doRegister = async (username, password, user_type) => {
@@ -64,7 +75,7 @@ import {
 
       return (
           <div className="container">
-            <div className="row justify-content-center align-items-center">
+            <div className="row justify-content-center align-items-center form-group">
                 <form className="col-md-4">{form}</form>
             </div>
           </div>
