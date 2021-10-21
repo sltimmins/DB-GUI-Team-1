@@ -1,4 +1,6 @@
-const pool = require('./db')
+const pool = require('./db');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 module.exports = function routes(app, logger) {
   // GET /
@@ -69,7 +71,7 @@ module.exports = function routes(app, logger) {
   });
 
   // GET /checkdb
-  app.get('/values', (req, res) => {
+  app.get('/values',  (req, res) => {
     // obtain a connection from our pool of connections
     pool.getConnection(function (err, connection){
       if(err){
@@ -95,4 +97,117 @@ module.exports = function routes(app, logger) {
       }
     });
   });
+  /*
+  route to create a new user account and add it to the database
+  Uses bcrypt to encrypt the user's password
+  accepts formatting:
+  {"username":"bSavage", "password":"pass","firstName":"Brennan","lastName":"Savage","email":"bSavage@hotmail.com","candidate":true} passed in Body
+  */
+
+  //TODO reroute the user to a login page after a successful account creation
+  app.post('/users/create_account', async(req, res) => {
+      pool.getConnection(async function(err, connection) {
+
+        
+        try {
+          const salt = await bcrypt.genSalt()
+          const hashedPassword = await bcrypt.hash(req.body.password, salt)
+          const user = {username:req.body.username, password:hashedPassword, firstName:req.body.firstName, lastName:req.body.lastName, email:req.body.email, candidate:req.body.candidate};
+          
+          
+          connection.query("insert into users (firstName, lastName, email, candidate, username, password) VALUES (?, ?, ?, ?, ?, ?)", [user.firstName,user.lastName,user.email,user.candidate,user.username,user.password])
+          res.status(200).send({
+            success: true,
+            msg: 'Please go to 0.0.0.0:8000/users/login to login!'
+          })
+        } catch {
+          res.status(500).send('something went wrong...', );
+        }
+        
+    })
+  });
+
+  /*
+    Route that tests the JWT functionality, For future just use middleware authenticateToken
+    and it will work for any route.
+  */
+  app.get('/showMyEmail', authenticateToken, (req,res) => {
+    pool.getConnection(function(err,connection) {
+      connection.query("Select email FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
+        res.send(result);
+      })
+    })
+  })
+  /*Route to login, accepts formatting:
+     {"username":"ashockley66","password":"alex66"} passed in Body
+
+    Querys server to select the users where the username = username,
+    verifies that the password is correct, If so it return a JSON 
+    that contains the users JWT value which allows them to access certain other routes
+    (as of now the test route is /showMyEmail). If the user enters an incorrect password,
+    program will return a screen that just says that the password is incorrect.
+    If there is an error, the route will display a status 500 
+     */
+
+    //TODO figure out how to pass the JWT to frontend without displaying it to the user
+    //TODO handle the case where the user enters the incorrect password better
+    //TODO if the username is correct, move them back to homepage using the JWT
+  app.post('/users/login', async(req,res) => {
+    
+    pool.getConnection(async function(err,connection) {
+      const userToFind = {username:req.body.username, password:req.body.password}
+      connection.query("select username,password, accountNumber,candidate FROM users WHERE username = ?", userToFind.username , async function(err,result,fields){
+        var usersJSON = JSON.parse(JSON.stringify(result));
+        if(usersJSON == null) {
+          return res.status(400).send({
+            success: false,
+            message: 'Invalid Username or Password'
+          })
+        }
+
+        try {
+          
+          if ( await bcrypt.compare(userToFind.password, usersJSON[0].password)) {
+            //res.send("Logged in!")
+            const accessToken = jwt.sign(userToFind, process.env.ACCESS_TOKEN_SECRET)
+            res.status(200).send({
+              success: true,
+              data: {
+                jwt: accessToken,
+                username: usersJSON[0].username,
+                user_id: usersJSON[0].accountNumber,
+                candidate: usersJSON[0].candidate,
+
+              }
+            })
+          } else {
+            res.status(400).send("You really thought I would let u in without the right password buddy?")
+          }
+        } catch {
+          res.status(500).send('Something went wrong...');
+        }
+      })
+      
+    })
+  })
+
+  /*
+    Format of token to pass in headers is as follows:
+      Authorization: Bearer <token_value>
+  */
+
+  //Middleware to authenticate the user's token
+  //Sends a 401 status if the user token does not match
+  function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    if(token == null) return res.sendStatus(401)
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err,user) => {
+      if(err) return res.sendStatus(403)
+      req.user = user
+      next()
+    })
+  }
+
 }
