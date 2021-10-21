@@ -10,5 +10,6 @@
 }
 
 .footerText {
-    padding-left: 3rem;
+    padding-left: 2vh;
+    font-size: calc(1.0rem + .6vw) !important;
 }
