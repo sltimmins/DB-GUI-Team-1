@@ -1,37 +1,82 @@
-import React from 'react'
+import React from 'react';
 
-function UserProfile(props) {
-    return (
-        <div>
-            <nav style={navStyle} >
-                <img src="https://via.placeholder.com/200" alt="" style={image}/>
-                <h1 style={headerStyle}>{props.firstName + " " + props.lastName}</h1>
-            </nav>
-            <main>
-                <h3>Bio:</h3>
-                <p>{props.bio}</p>
-            </main>
-            <footer>
-                <button style={btn}>save</button>
-            </footer>
-        </div>
-    )
+
+class UserProfile extends React.Component {
+
+    render() {
+        return (
+            <div>
+                <nav style={navStyle} >
+                    <img src="https://via.placeholder.com/200" alt="" style={image}/>
+                    <h1 style={headerStyle}>{this.props.firstName + " " + this.props.lastName}</h1>
+                </nav>
+                <main style={{margin: "1rem 10rem", textAlign: "left"}}>      
+                    <form>
+                        <table style={table} style={center}>
+                            <div style={row}>
+                                <div style={cell}>
+                                    <h4>First Name:</h4>  
+                                    <input type="text" id="fName" style={mRight} defaultValue={this.props.firstName}></input>              
+                                    <h4 >Last Name:</h4>
+                                    <input type="text" id="lName" defaultValue={this.props.lastName}></input>
+                                </div>
+                                <div style={cell}>
+                                    <h4>Bio:</h4>
+                                    <input type="text" style={bio} id="bio" defaultValue={this.props.bio}></input>
+                                </div>
+                            </div>
+                        </table>
+                    </form>
+                </main>
+                <footer>
+                    <button id="btn" onClick="save" style={btn}>save</button>
+                    
+                </footer>
+            </div>
+            
+        );
+
+    }
+
+    save() {
+        this.props.firstName = document.getElementById("fName").value;
+        this.props.lastName = document.getElementById("lName").value;
+        this.props.bio = document.getElementById("bio").value;
+    }
 }
-
-document.querySelectorAll('p').forEach(e => {
-    e.style.border = ".1rem solid black";
-    e.style.padding = "2rem 2rem"
-});
-
-document.querySelectorAll('main').forEach(e => {
-    e.style.margin = "1rem 5rem";
-   e.style.textAlign = "left";
-});
 
 UserProfile.defaultProps = {
     firstName: "Paul",
     lastName: "Creenis",
     bio: "SMASHY BROS??? I KNOW THAT GAME!!! FALCON PUNCH ARE YOU OK SHOW ME YA MOVES WOOOOOOO SMASHY BROS LETS GO PIKACHU!"
+}
+
+const table = {
+    display: "table"
+}
+
+const row = {
+    display: "table-row"
+}
+
+const cell = {
+    marginLeft: "10rem",
+    display: "table-cell"
+}
+
+const center = {
+    marginLeft: "auto",
+    marginRight: "auto"
+}
+
+const bio  = {
+    marginRight: "10rem",
+    width: "30rem", 
+    height: "8rem"
+}
+
+const mRight = {
+    marginRight: "1rem",
 }
 
 const image = {
