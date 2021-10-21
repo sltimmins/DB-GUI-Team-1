@@ -1,0 +1,38 @@
+.map-container {
+    height: 40vw;
+    max-width: 40vw;
+    margin-right: auto;
+    margin-left: auto;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.mapWrapper h2 {
+    font-size: calc(1.0rem + .6vw);
+    padding-top: 1rem;
+    text-align: center;
+}
+
+
+.mapMain {
+    height: fit-content;
+}
+
+.assortmentOfMaps {
+    display: inline-flex;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: space-evenly;
+    margin-top: 2rem;
+}
+
+.assortmentOfMaps > * {
+    flex: 1 1 460px;
+}
+
+@media only screen and (max-width: 768px) {
+    .map-container {
+        max-width: 70vw;
+        height: 70vw;
+    }
+}
