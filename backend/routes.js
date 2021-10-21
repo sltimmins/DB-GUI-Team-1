@@ -1,6 +1,6 @@
 const pool = require('./db');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcryptjs");
 
 module.exports = function routes(app, logger) {
   // GET /
@@ -164,9 +164,8 @@ module.exports = function routes(app, logger) {
             message: 'Invalid Username or Password'
           })
         }
-
+        console.log(usersJSON);
         try {
-          
           if ( await bcrypt.compare(userToFind.password, usersJSON[0].password)) {
             //res.send("Logged in!")
             const accessToken = jwt.sign(userToFind, process.env.ACCESS_TOKEN_SECRET)
@@ -177,7 +176,6 @@ module.exports = function routes(app, logger) {
                 username: usersJSON[0].username,
                 user_id: usersJSON[0].accountNumber,
                 candidate: usersJSON[0].candidate,
-
               }
             })
           } else {
