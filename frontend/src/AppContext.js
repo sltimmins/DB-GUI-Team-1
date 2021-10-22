@@ -39,19 +39,19 @@ export function useProvideAppContext() {
 }
 
 export function setupLogin(context) {
-    // let stored = localStorage.getItem('jwt')
-    // if (stored) {
-    //     context.setJWT(stored)
-    //     axios
-    //         .get(context.baseURL + "/users/check", { headers: axiosJWTHeader(stored) })
-    //         .then((res) => {
-    //             //Set the user to the object we just got
-    //             context.setUser(res.data)
-    //             context.setSetup(true);
-    //         }).catch(() => {
-    //             context.setSetup(true);
-    //         })
-    // } else {
-    //     context.setSetup(true);
-    // }
+    let stored = localStorage.getItem('jwt')
+    if (stored) {
+        context.setJWT(stored)
+        axios
+            .get(context.baseURL + "/users/check", { headers: axiosJWTHeader(stored) })
+            .then((res) => {
+                //Set the user to the object we just got
+                context.setUser(res.data)
+                context.setSetup(true);
+            }).catch(() => {
+                context.setSetup(true);
+            })
+    } else {
+        context.setSetup(true);
+    }
 }
