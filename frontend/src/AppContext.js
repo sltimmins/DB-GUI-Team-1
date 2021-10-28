@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { axiosJWTHeader } from './utils/index.js'
 import axios from "axios";
 
 export const AppContext = React.createContext("app");
@@ -13,7 +12,7 @@ export function useProvideAppContext() {
     const baseURL = ec2 ? ec2_url : "http://localhost:8000";
 
     const [JWT, setJWT] = useState(null);
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState({});
 
     const [setup, setSetup] = useState(false);
 
@@ -42,15 +41,15 @@ export function setupLogin(context) {
     let stored = localStorage.getItem('jwt')
     if (stored) {
         context.setJWT(stored)
-        axios
-            .get(context.baseURL + "/users/check", { headers: axiosJWTHeader(stored) })
-            .then((res) => {
-                //Set the user to the object we just got
-                context.setUser(res.data)
-                context.setSetup(true);
-            }).catch(() => {
-                context.setSetup(true);
-            })
+        // axios
+        //     .get(context.baseURL + "/users/check", { headers: axiosJWTHeader(stored) })
+        //     .then((res) => {
+        //         //Set the user to the object we just got
+        //         context.setUser(res.data)
+        //         context.setSetup(true);
+        //     }).catch(() => {
+        //         context.setSetup(true);
+        //     })
     } else {
         context.setSetup(true);
     }

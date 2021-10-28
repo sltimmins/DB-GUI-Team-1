@@ -1,5 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
-import {App} from "./App.css";
+import React, { useContext, useState } from "react";
 import { Login } from "./pages/login.js";
 import { Register } from "./pages/register.js";
 import { AppContext } from "./AppContext.js";
@@ -9,16 +8,15 @@ import {
     useLocation
   } from 'react-router-dom'
   
-  import axios from "axios";
+import axios from "axios";
 
   export default function Users() {
       const [registerMode, setRegister] = useState(false);
       const [bannerMessage, setBanner] = useState("");
 
-      const { baseURL, setUser, setJWT, JWT, user } = useContext(AppContext);
+      const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
 
       const toggleRegisterMode = () => {
-        console.log("stuff")
         setBanner("");
         setRegister(!registerMode);
       }
@@ -33,25 +31,43 @@ import {
 
       const doLogin = async (username, password) => {
         setBanner("");
-        axios.post(baseURL + "/users/login", { username: username, password: password }).then((res) => {
+        axios.post(baseURL + '/users/login', { username: username, password: password }).then((res) => {
+          if(res.data.success) {
             // Handle success and update state
             setJWT(res.data.data.jwt)
             setUser(res.data.data)
             redirectToHome()
-            sessionStorage.setItem("jwt", res.data.data.jwt)
-            console.log(res.data.data)
-            //console.log(res.data.data)
-        })//.catch((e) => {
-        //     if (e.response) {
-        //         setBanner(e.response.data.msg);
-        //     } else {
-        //         setBanner("We had an issue connecting to the server");
-        //     }
-        // });
+            localStorage.setItem("jwt", res.data.data.jwt)
+          } else {
+            setBanner(res.data.message)
+          }
+        }).catch((e) => {
+          if (e.response) {
+            setBanner(e.response.data.message);
+          } else {
+            setBanner("We had an issue connecting to the server");
+          }
+        });
       }
 
-      const doRegister = async (username, password, user_type) => {
+      const doRegister = async (firstName, lastName, username, password, email, user_type, party) => {
+        setBanner("");
+        let cand = false
+        if(user_type === "Candidate") {
+          cand = true
+        }
 
+        if(firstName === "" || lastName === "" || username === "" || password === "" || email === "") {
+          setBanner("Please complete all fields")
+        } else {
+          axios.post(baseURL + '/users/create_account', { firstName: firstName, lastName: lastName, username: username, password: password, email: email, candidate: cand, party: party }).then((res) => {
+            doLogin(username, password)
+          }).catch((e) => {
+            if(e.response) {
+              setBanner(e.response.data.message)
+            }
+          })
+        }
       }
 
       let banner = <></>;
