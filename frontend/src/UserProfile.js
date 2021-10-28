@@ -1,14 +1,49 @@
-import React from 'react';
+import React from "react";
 
 
 class UserProfile extends React.Component {
+    
+    constructor(props) {
+        super(props);
+        this.values = React.createRef(); 
+        this.state = {
+            firstName: props.firstName,
+            lastName: props.lastName,
+            Bio: props.Bio
+        }
+        this.firstName = props.firstName;
+        this.lastName = props.lastName;
+        this.Bio = props.Bio;
+
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleClick() {
+        this.setState({
+            firstName: this.firstName,
+            lastName: this.lastName,
+            Bio: this.Bio
+        });
+    }
+
+    changeFName = e => {
+        this.firstName = e.target.value;
+    }
+
+    changeLName = e => {
+        this.lastName = e.target.value;
+    }
+
+    changeBio = e => {
+        this.Bio = e.target.Bio;
+    }
 
     render() {
         return (
             <div>
                 <nav style={navStyle} >
                     <img src="https://via.placeholder.com/200" alt="" style={image}/>
-                    <h1 style={headerStyle}>{this.props.firstName + " " + this.props.lastName}</h1>
+                    <h1 style={headerStyle}>{this.state.firstName + " " + this.state.lastName}</h1>
                 </nav>
                 <main style={{margin: "1rem 10rem", textAlign: "left"}}>      
                     <form>
@@ -16,39 +51,32 @@ class UserProfile extends React.Component {
                             <div style={row}>
                                 <div style={cell}>
                                     <h4>First Name:</h4>  
-                                    <input type="text" id="fName" style={mRight} defaultValue={this.props.firstName}></input>              
+                                    <input type="text" onChange={this.changeFName} style={mRight} defaultValue={this.firstName}></input>              
                                     <h4 >Last Name:</h4>
-                                    <input type="text" id="lName" defaultValue={this.props.lastName}></input>
-                                </div>
-                                <div style={cell}>
-                                    <h4>Bio:</h4>
-                                    <input type="text" style={bio} id="bio" defaultValue={this.props.bio}></input>
+                                    <input type="text" onChange={this.changeLName} defaultValue={this.props.lastName}></input>
+                                    </div>
+                                    <div style={cell}>
+                                        <h4>Bio:</h4>
+                                        <textarea type="text" onChange={this.changeBio} style={bio} defaultValue={this.props.Bio}></textarea>
                                 </div>
                             </div>
                         </table>
                     </form>
                 </main>
                 <footer>
-                    <button id="btn" onClick="save" style={btn}>save</button>
-                    
+                    <button id="btn" onClick={this.handleClick} style={btn}>save</button>             
                 </footer>
-            </div>
-            
-        );
-
+            </div>    
+        );    
     }
 
-    save() {
-        this.props.firstName = document.getElementById("fName").value;
-        this.props.lastName = document.getElementById("lName").value;
-        this.props.bio = document.getElementById("bio").value;
-    }
+    
 }
 
 UserProfile.defaultProps = {
     firstName: "Paul",
     lastName: "Creenis",
-    bio: "SMASHY BROS??? I KNOW THAT GAME!!! FALCON PUNCH ARE YOU OK SHOW ME YA MOVES WOOOOOOO SMASHY BROS LETS GO PIKACHU!"
+    Bio: "SMASHY BROS??? I KNOW THAT GAME!!! FALCON PUNCH ARE YOU OK SHOW ME YA MOVES WOOOOOOO SMASHY BROS LETS GO PIKACHU!"
 }
 
 const table = {
