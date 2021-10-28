@@ -26,8 +26,8 @@ const Header = ({getOpenOrClose, routes, mainTitle, mainImage, baseColor}) => {
         let elems = [];
         for(const route of routes){
             elems.push(
-                <li>
-                    <a href={route.href} className={(route.active ? " active" : "")} style={{color: fontColor}}>
+                <li key={route.name + route.href}>
+                    <a key={route.name} href={route.href} className={(route.active ? " active" : "")} style={{color: fontColor}}>
                         {route.name}
                     </a>
                 </li>
