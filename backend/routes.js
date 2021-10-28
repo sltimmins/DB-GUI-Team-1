@@ -248,6 +248,7 @@ module.exports = function routes(app, logger) {
           res.send(JSON.stringify(result))
         }
       })
+      connection.release()
     })
 
   })

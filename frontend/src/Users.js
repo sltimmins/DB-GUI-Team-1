@@ -15,6 +15,7 @@ import axios from "axios";
       const [bannerMessage, setBanner] = useState("");
 
       const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
+      
 
       const toggleRegisterMode = () => {
         setBanner("");
