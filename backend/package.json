@@ -15,7 +15,7 @@
     "mysql": "^2.18.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.14"
   },
   "scripts": {
     "start": "node server.js",

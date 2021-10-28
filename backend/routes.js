@@ -164,6 +164,8 @@ module.exports = function routes(app, logger) {
     })
   });
 
+
+
   /*
     Route that tests the JWT functionality, For future just use middleware authenticateToken
     and it will work for any route.
@@ -236,6 +238,27 @@ module.exports = function routes(app, logger) {
       connection.release()
     })
   })
+
+  app.get('/users/webtoken', authenticateToken, (req,res) => {
+    pool.getConnection(function (err,connection) {
+      connection.query("select * from users where username = ?", [req.user.username], function(err,result,fields) {
+        if(err) {
+          res.status(400).send("Error querying database")
+        } else{
+          res.send(JSON.stringify(result))
+        }
+      })
+    })
+
+  })
+  // app.get('/showMyEmail', authenticateToken, (req,res) => {
+  //   pool.getConnection(function(err,connection) {
+  //     connection.query("Select email FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
+  //       res.send(result);
+  //     })
+  //     connection.release()
+  //   })
+  // })
 
   /*
     Format of token to pass in headers is as follows:
