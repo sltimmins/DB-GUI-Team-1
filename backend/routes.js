@@ -232,6 +232,24 @@ module.exports = function routes(app, logger) {
     })
   })
 
+    //Route to search and get information for a user
+    app.get('/users/search_user', async(req,res) => {
+      pool.getConnection(function(err,connection) {
+        const candidate = req.body.userName
+        if(candidate == null){
+          connection.query("Select username, firstName, lastName FROM users", function(err,result,fields) {
+            res.send(result);
+          })
+        }
+        else {
+          connection.query("Select username, firstName, lastName FROM users WHERE candidateID IS NOT NULL", function(err,result,fields){
+            res.send(result);
+          })
+        }
+        connection.release();
+      })
+    })
+
   /*
     Format of token to pass in headers is as follows:
       Authorization: Bearer <token_value>
