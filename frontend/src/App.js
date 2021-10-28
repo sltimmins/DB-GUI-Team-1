@@ -22,6 +22,8 @@ export function App () {
   // Global context
   let context = useProvideAppContext();
 
+  console.log(context.user);
+
   // handle signout
   const signout = () => {
     localStorage.setItem('jwt', "")

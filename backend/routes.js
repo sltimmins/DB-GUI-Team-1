@@ -101,21 +101,58 @@ module.exports = function routes(app, logger) {
   route to create a new user account and add it to the database
   Uses bcrypt to encrypt the user's password
   accepts formatting:
-  {"username":"bSavage", "password":"pass","firstName":"Brennan","lastName":"Savage","email":"bSavage@hotmail.com","candidate":true} passed in Body
+  {"username":"yes", "password":"pass","firstName":"cyborg","lastName":"theThird","email":"bSavage@hotmail.com","candidate":false, "party":"Republican"} passed in Body
   */
-
+  //TODO figure out how to actually await and not just sleep for 250 ms
   //TODO reroute the user to a login page after a successful account creation
   app.post('/users/create_account', async(req, res) => {
+    candidateId = -1;
+    
       pool.getConnection(async function(err, connection) {
-
+        if(err) {
+          console.log(err)
+          console.log("\nConnection Unsuccessful\n")
+        } else {
+          console.log("\nConnection successful\n")
+        }
         
+        if(req.body.candidate) {
+    
+           console.log("VALUES: ",req.body.firstName, req.body.lastName, req.body.party);
+            connection.query("insert into candidates(firstName, lastName, party) values (?, ?,?)", [req.body.firstName, req.body.lastName, req.body.party], function(err,result,fields) {
+              if (err) {
+                logger.error("Error creating the candidate in candidate table (If you see this uhhhhhh good luck)\n", err);
+                res.status(400).send("Error Creating candidate in candidate table");
+              }
+            })
+            connection.query("select candidateId FROM candidates where firstName = ? && lastName = ?", [req.body.firstName, req.body.lastName], function(err,result,fields) {
+              if(err) {
+                logger.error("Error finding the candidate in candidate table", err);
+                res.status(400).send("Error finding candidate")
+              } else {
+                candidateId = Number(result[0].candidateId)
+                console.log("CandidateId: ", candidateId)
+              }
+            })
+          
+        } else {
+        console.log("User is not a candidate, handling accordingly");
+        }
+        await sleep(250);
+        console.log("Now generatying the user with that candidate Id: ", candidateId)
         try {
           const salt = await bcrypt.genSalt()
           const hashedPassword = await bcrypt.hash(req.body.password, salt)
           const user = {username:req.body.username, password:hashedPassword, firstName:req.body.firstName, lastName:req.body.lastName, email:req.body.email, candidate:req.body.candidate};
           
-          
-          connection.query("insert into users (firstName, lastName, email, candidate, username, password) VALUES (?, ?, ?, ?, ?, ?)", [user.firstName,user.lastName,user.email,user.candidate,user.username,user.password])
+          if(candidateId == -1) {
+            candidateId = null;
+          }
+          connection.query("insert into users (firstName, lastName, email, candidateId, username, password) VALUES (?, ?, ?, ?, ?, ?)", [user.firstName,user.lastName,user.email,candidateId,user.username,user.password], function(err,result,fields) {
+            if(err) {
+              logger.error("Error creating user\n",err)
+            }
+          })
           res.status(200).send({
             success: true,
             msg: 'Please go to 0.0.0.0:8000/users/login to login!'
@@ -123,9 +160,11 @@ module.exports = function routes(app, logger) {
         } catch {
           res.status(500).send('something went wrong...', );
         }
-        
+        connection.release();
     })
   });
+
+
 
   /*
     Route that tests the JWT functionality, For future just use middleware authenticateToken
@@ -136,6 +175,7 @@ module.exports = function routes(app, logger) {
       connection.query("Select email FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
         res.send(result);
       })
+      connection.release()
     })
   })
   /*Route to login, accepts formatting:
@@ -156,38 +196,70 @@ module.exports = function routes(app, logger) {
     
     pool.getConnection(async function(err,connection) {
       const userToFind = {username:req.body.username, password:req.body.password}
-      connection.query("select username,password, accountNumber,candidate FROM users WHERE username = ?", userToFind.username , async function(err,result,fields){
+      console.log("user: ", userToFind)
+      connection.query("select username, password, accountNumber, candidateId, firstName, lastName FROM users WHERE username = ?",userToFind.username , async function(err,result,fields){
+        if(!result) {
+          logger.error("Invalid username or Password")
+          res.status(400).send("Invalid username or password")
+        }
         var usersJSON = JSON.parse(JSON.stringify(result));
-        if(usersJSON == null) {
+        console.log(usersJSON);
+        if(usersJSON.length === 0) {
           return res.status(400).send({
             success: false,
             message: 'Invalid Username or Password'
           })
         }
-        console.log(usersJSON);
-        try {
-          if ( await bcrypt.compare(userToFind.password, usersJSON[0].password)) {
-            //res.send("Logged in!")
-            const accessToken = jwt.sign(userToFind, process.env.ACCESS_TOKEN_SECRET)
-            res.status(200).send({
-              success: true,
-              data: {
-                jwt: accessToken,
-                username: usersJSON[0].username,
-                user_id: usersJSON[0].accountNumber,
-                candidate: usersJSON[0].candidate,
-              }
-            })
-          } else {
-            res.status(400).send("You really thought I would let u in without the right password buddy?")
+        else {
+          console.log(usersJSON);
+          try {
+            if ( await bcrypt.compare(userToFind.password, usersJSON[0].password)) {
+              //res.send("Logged in!")
+              const accessToken = jwt.sign(userToFind, process.env.ACCESS_TOKEN_SECRET)
+              res.status(200).send({
+                success: true,
+                data: {
+                  jwt: accessToken,
+                  firstName: usersJSON[0].firstName,
+                  lastName: usersJSON[0].lastName,
+                  username: usersJSON[0].username,
+                  user_id: usersJSON[0].accountNumber,
+                  candidate: usersJSON[0].candidate
+                }
+              })
+            } else {
+              res.status(400).send("You really thought I would let u in without the right password buddy?")
+            }
+          } catch {
+            res.status(500).send('Something went wrong...');
           }
-        } catch {
-          res.status(500).send('Something went wrong...');
         }
       })
-      
+      connection.release()
     })
   })
+
+  app.get('/users/webtoken', authenticateToken, (req,res) => {
+    pool.getConnection(function (err,connection) {
+      connection.query("select * from users where username = ?", [req.user.username], function(err,result,fields) {
+        if(err) {
+          res.status(400).send("Error querying database")
+        } else{
+          res.send(JSON.stringify(result))
+        }
+      })
+      connection.release()
+    })
+
+  })
+  // app.get('/showMyEmail', authenticateToken, (req,res) => {
+  //   pool.getConnection(function(err,connection) {
+  //     connection.query("Select email FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
+  //       res.send(result);
+  //     })
+  //     connection.release()
+  //   })
+  // })
 
   /*
     Format of token to pass in headers is as follows:
@@ -206,6 +278,11 @@ module.exports = function routes(app, logger) {
       req.user = user
       next()
     })
+  }
+  function sleep(ms) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
   }
 
 }
