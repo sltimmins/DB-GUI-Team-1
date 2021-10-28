@@ -2,9 +2,13 @@ import React, { useState } from "react";
 
 export function Register(props) {
   const [values, setValues] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
     username: "",
     password: "",
-    user_type: "",
+    user_type: "Candidate",
+    party: ""
   });
 
   const handleInputChange = (e) => {
@@ -18,6 +22,18 @@ export function Register(props) {
         <h1>Register</h1>
       </div>
       {props.banner}
+      <div className="form-group mb-3">
+        <label htmlFor="firstName">First Name</label>
+        <input name="firstName" value={values.firstName} onChange={handleInputChange} type="text" className="form-control" id="firstName" placeholder="Enter first name" required/>
+      </div>
+      <div className="form-group mb-3">
+        <label htmlFor="lastName">Last Name</label>
+        <input name="lastName" value={values.lastName} onChange={handleInputChange} type="text" className="form-control" id="lastName" placeholder="Enter last name" />
+      </div>
+      <div className="form-group mb-3">
+        <label htmlFor="email">Email Address</label>
+        <input name="email" value={values.email} onChange={handleInputChange} type="text" className="form-control" id="email" placeholder="Enter email" />
+      </div>
       <div className="form-group mb-3">
         <label htmlFor="username">Username</label>
         <input name="username" value={values.username} onChange={handleInputChange} type="text" className="form-control" id="username" placeholder="Enter username" />
@@ -33,8 +49,16 @@ export function Register(props) {
           <option value="Enthusiast">Enthusiast</option>
         </select>
       </div>
+      <div className="form-group mb-3">
+        <label htmlFor="party">I am a...</label>
+        <select className="form-select" name="party" value={values.party} onChange={handleInputChange} >
+          <option value="Republican">Republican</option>
+          <option value="Independent">Independent</option>
+          <option value="Democrat">Democrat</option>
+        </select>
+      </div>
       <div className="col-12 text-center">
-        <button type="button" onClick={() => props.doRegister(values.username, values.password, values.user_type)} className="btn btn-primary mx-auto" >Submit</button>
+        <button type="button" onClick={() => props.doRegister(values.firstName, values.lastName, values.username, values.password, values.email, values.user_type, values.party)} className="btn btn-primary mx-auto" >Submit</button>
       </div>
       <div className="col-12 mt-3 text-center">
         <p>

@@ -13,7 +13,7 @@ export function useProvideAppContext() {
     const baseURL = ec2 ? ec2_url : "http://localhost:8000";
 
     const [JWT, setJWT] = useState(null);
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState({});
 
     const [setup, setSetup] = useState(false);
 
@@ -43,10 +43,10 @@ export function setupLogin(context) {
     if (stored) {
         context.setJWT(stored)
         axios
-            .get(context.baseURL + "/users/check", { headers: axiosJWTHeader(stored) })
+            .get(context.baseURL + "/users/webtoken", { headers: axiosJWTHeader(stored) })
             .then((res) => {
                 //Set the user to the object we just got
-                context.setUser(res.data)
+                context.setUser(res.data[0])
                 context.setSetup(true);
             }).catch(() => {
                 context.setSetup(true);
