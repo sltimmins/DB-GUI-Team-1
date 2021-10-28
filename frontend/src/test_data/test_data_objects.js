@@ -1,0 +1,1 @@
+export const placesPayload = [{"state": "Texas"}, {"state": "California"}];
