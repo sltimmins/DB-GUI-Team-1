@@ -11,6 +11,7 @@ import Users from "./Users.js"
 import Home from "./pages/home";
 import Header from "./components/header";
 import Footer from "./components/footer";
+import Search from "./pages/search";
 import {MainBackgroundColor, MainTitle} from "./constants/constants";
 import { AppContext, useProvideAppContext, setupLogin } from "./AppContext.js";
 import Maps from "./pages/maps";
@@ -50,6 +51,9 @@ export function App () {
             <Switch>
               <Route path="/login">
                 <Users />
+              </Route>
+              <Route path="/candidateSearch">
+                <Search />
               </Route>
               <Route path="/maps">
                 <Maps />

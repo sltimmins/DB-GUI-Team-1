@@ -256,14 +256,14 @@ module.exports = function routes(app, logger) {
   //Route to search and get information for a user
   app.get('/users/search_user', async(req,res) => {
     pool.getConnection(function(err,connection) {
-      const bool = req.body.bool
-      if(bool == null){
+      const bool = req.body.bool;
+      if(bool){
         connection.query("Select username, firstName, lastName FROM users", function(err,result,fields) {
           res.send(result);
         })
       }
       else {
-        connection.query("Select username, firstName, lastName FROM users WHERE candidateID IS NOT NULL", function(err,result,fields){
+        connection.query("Select firstName, lastName, party FROM candidates", function(err,result,fields){
           res.send(result);
         })
       }
