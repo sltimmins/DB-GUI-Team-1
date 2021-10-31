@@ -30,6 +30,7 @@ export default function Maps(props){
     }
     const [placeselection, setplaceselection] = useState(arrToMap())
     useEffect(async() => {
+        console.log("use effect")
         for(let i = 0; i < placesCopy.length; i++){
             const entry = placesCopy[i];
             await axios({
@@ -109,6 +110,7 @@ export default function Maps(props){
                 let newLat = response.data["features"][0]["center"][0]
                 let newLng = response.data["features"][0]["center"][1]
                 console.log(newLat, newLng)
+                setZoom(2);
                 maps.current[0] = new mapboxgl.Map({
                         container: refs.current[0],
                         style: 'mapbox://styles/mapbox/streets-v11',
@@ -154,6 +156,63 @@ export default function Maps(props){
         }
     }
 
+    const handleAllSelection = async() => {
+        const val = "United States"
+        await axios({
+            method: 'get',
+            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${val}.json?types=country&access_token=pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY3BycHdob3oifQ.xuqTng_6PKWKkW59Us5aXA`
+        })
+        .then(function (response) {
+            console.log(refs)
+            let newLat = response.data["features"][0]["center"][0]
+            let newLng = response.data["features"][0]["center"][1]
+            console.log(newLat, newLng)
+            maps.current[0] = new mapboxgl.Map({
+                    container: refs.current[0],
+                    style: 'mapbox://styles/mapbox/streets-v11',
+                    center: [newLat, newLng],
+                    zoom: 2,
+                    setPaintProperty: ('region', 'fill-color', 'rgb(255, 0, 0)')
+                }
+            );
+            maps.current[0].on('load', () => {
+                console.log("Loaded")
+                for(let entry of placesCopy){
+                    for(const stateJS of statesGeoJSON){
+                    let stateName = stateJS.properties.NAME;
+                    if(entry.state == stateName) {
+                        console.log(stateJS.geometry.coordinates)
+                        maps.current[0].addSource(entry.state.toLowerCase(), {
+                            'type': 'geojson',
+                            'data': {
+                                'type': 'Feature',
+                                'geometry': {
+                                    'type': stateJS.geometry.type,
+                                    // These coordinates outline Maine.
+                                    'coordinates': stateJS.geometry.coordinates,
+                                }
+                            }
+                        });
+                        // Add a new layer to visualize the polygon.
+                        maps.current[0].addLayer({
+                            'id': entry.state.toLowerCase(),
+                            'type': 'fill',
+                            'source': entry.state.toLowerCase(), // reference the data source
+                            'layout': {},
+                            'paint': {
+                                'fill-color': entry.status == DEMOCRAT ? '#0080ff' : '#ff2222', // blue color fill
+                                'fill-opacity': 0.5
+                            }
+                        });
+                    }
+
+                }
+                }
+            })
+            setplacesCopy([{"state": val}]);
+        });
+    }
+
     (()=>{console.log(process.env.MAPBOX_ACCESS_TOKEN)})();
 
     const transformArr = () => {
@@ -171,6 +230,9 @@ export default function Maps(props){
                     <div>
                         <SearchBar routes={transformArr()} placeHolder={"Search for Locations"} baseColor={"white"} textColor={"black"} dropShadow={true} onChangeFunc={val => handleSelection(val.target.value)}/>
                     </div>
+                </div>
+                <div className={"divForButton"} id={"USButton"}>
+                    <Button mainText={"United States"} baseColor={"black"} textColor={"white"} onButtonClick={() => {handleAllSelection()}}/>
                 </div>
             </main>
             <section className={"assortmentOfMaps"}>

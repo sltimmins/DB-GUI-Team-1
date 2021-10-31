@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import '../styles/generic_button.css';
 
-const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVertical, fontSize, fontWeight, dropShadow}) => {
+const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVertical, fontSize, fontWeight, dropShadow, onButtonClick}) => {
     const calcFontColor = () => {
         if(baseColor.length==4){
             baseColor+= baseColor.substring(1, 4);
@@ -44,7 +44,7 @@ const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVerti
     const [dynamicStyles, setDynamicStyles] = useState(setStyles())
 
     return (
-        <button className={"genericButton"} style={dynamicStyles} type={"button"} role={"button"}>{mainText}</button>
+        <button className={"genericButton"} style={dynamicStyles} type={"button"} role={"button"} onClick={onButtonClick}>{mainText}</button>
     );
   };
 
