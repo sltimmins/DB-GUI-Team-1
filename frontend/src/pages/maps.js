@@ -6,7 +6,7 @@ import MetaTags from 'react-meta-tags';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import "../styles/maps.css"
 import axios from "axios";
-import {placesPayload} from "../test_data/test_data_objects";
+import {placesPayload, statesGeoJSON, DEMOCRAT, REPUBLICAN} from "../test_data/test_data_objects";
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY3BycHdob3oifQ.xuqTng_6PKWKkW59Us5aXA';
 
@@ -19,6 +19,8 @@ export default function Maps(props){
     const [lat, setLat] = useState(42.35);
     const [zoom, setZoom] = useState(4);
     const [placesCopy, setplacesCopy] = useState(placesPayload)
+    const [setOfStates, setSetOfStates] = useState(new Set())
+    const [numOfOccurrences, setNumOfOccurrences] = useState(0)
     const arrToMap = () => {
         let mapOfNames = new Set();
         for(const place of placesPayload) {
@@ -47,35 +49,56 @@ export default function Maps(props){
                         setPaintProperty: ('region', 'fill-color', 'rgb(255, 0, 0)')
                     }
                 );
-                const poliColors = ["#ff2233", "#0055cc"];
-                for(let x = .1; x < 1; x += .1){
-                    const marker = new mapboxgl.Marker({
-                        color: poliColors[Math.floor(Math.random() * 2)],
-                        draggable: false
-                    }).setLngLat([newLat+x, newLng+x])
-                    .addTo(maps.current[i]);
-                    const marker2 = new mapboxgl.Marker({
-                        color: poliColors[Math.floor(Math.random() * 2)],
-                        draggable: false
-                    }).setLngLat([newLat-x, newLng-x])
-                    .addTo(maps.current[i]);
-                    const marker3 = new mapboxgl.Marker({
-                        color: poliColors[Math.floor(Math.random() * 2)],
-                        draggable: false
-                    }).setLngLat([newLat+x, newLng-x])
-                    .addTo(maps.current[i]);
-                    const marker4 = new mapboxgl.Marker({
-                        color: poliColors[Math.floor(Math.random() * 2)],
-                        draggable: false
-                    }).setLngLat([newLat-x, newLng+x])
-                    .addTo(maps.current[i]);
-                }
+                maps.current[i].on('load', () => {
+                    console.log("Loaded")
+                    for(const stateJS of statesGeoJSON){
+                        let stateName = stateJS.properties.NAME;
+                        if(entry.state == stateName) {
+                            if(setOfStates.has(entry.state)){
+                                return
+                            }
+                            setOfStates.add(entry.state)
+                            console.log(stateJS.geometry.coordinates)
+                            maps.current[i].addSource(entry.state.toLowerCase(), {
+                                'type': 'geojson',
+                                'data': {
+                                    'type': 'Feature',
+                                    'geometry': {
+                                        'type': stateJS.geometry.type,
+                                        // These coordinates outline Maine.
+                                        'coordinates': stateJS.geometry.coordinates,
+                                    }
+                                }
+                            });
+                            // Add a new layer to visualize the polygon.
+                            maps.current[i].addLayer({
+                                'id': entry.state.toLowerCase(),
+                                'type': 'fill',
+                                'source': entry.state.toLowerCase(), // reference the data source
+                                'layout': {},
+                                'paint': {
+                                    'fill-color': entry.status == DEMOCRAT ? '#0080ff' : '#ff2222', // blue color fill
+                                    'fill-opacity': 0.5
+                                }
+                            });
+                        }
+
+                    }
+                })
             });
+
         }
-    });
+
+    }, []);
 
     const handleSelection = async(val) => {
         console.log(val)
+        let entry = null;
+        for(const stateObj of placesPayload){
+            if(stateObj.state == val){
+                entry = stateObj
+            }
+        }
         if(placeselection.has(val)){
             await axios({
                 method: 'get',
@@ -94,30 +117,39 @@ export default function Maps(props){
                         setPaintProperty: ('region', 'fill-color', 'rgb(255, 0, 0)')
                     }
                 );
-                const poliColors = ["#ff2233", "#0055cc"];
-                for(let x = .1; x < 1; x += .1){
-                    const marker = new mapboxgl.Marker({
-                        color: poliColors[Math.floor(Math.random() * 2)],
-                        draggable: false
-                    }).setLngLat([newLat+x, newLng+x])
-                    .addTo(maps.current[0]);
-                    const marker2 = new mapboxgl.Marker({
-                        color: poliColors[Math.floor(Math.random() * 2)],
-                        draggable: false
-                    }).setLngLat([newLat-x, newLng-x])
-                    .addTo(maps.current[0]);
-                    const marker3 = new mapboxgl.Marker({
-                        color: poliColors[Math.floor(Math.random() * 2)],
-                        draggable: false
-                    }).setLngLat([newLat+x, newLng-x])
-                    .addTo(maps.current[0]);
-                    const marker4 = new mapboxgl.Marker({
-                        color: poliColors[Math.floor(Math.random() * 2)],
-                        draggable: false
-                    }).setLngLat([newLat-x, newLng+x])
-                    .addTo(maps.current[0]);
-                }
-                setplacesCopy([{"state": val}]);
+                maps.current[0].on('load', () => {
+                    console.log("Loaded")
+                    for(const stateJS of statesGeoJSON){
+                        let stateName = stateJS.properties.NAME;
+                        if(entry.state == stateName) {
+                            console.log(stateJS.geometry.coordinates)
+                            maps.current[0].addSource(entry.state.toLowerCase(), {
+                                'type': 'geojson',
+                                'data': {
+                                    'type': 'Feature',
+                                    'geometry': {
+                                        'type': stateJS.geometry.type,
+                                        // These coordinates outline Maine.
+                                        'coordinates': stateJS.geometry.coordinates,
+                                    }
+                                }
+                            });
+                            // Add a new layer to visualize the polygon.
+                            maps.current[0].addLayer({
+                                'id': entry.state.toLowerCase(),
+                                'type': 'fill',
+                                'source': entry.state.toLowerCase(), // reference the data source
+                                'layout': {},
+                                'paint': {
+                                    'fill-color': entry.status == DEMOCRAT ? '#0080ff' : '#ff2222', // blue color fill
+                                    'fill-opacity': 0.5
+                                }
+                            });
+                        }
+
+                    }
+                })
+                setplacesCopy([entry]);
             });
         }
     }
@@ -143,7 +175,7 @@ export default function Maps(props){
             </main>
             <section className={"assortmentOfMaps"}>
                 {placesCopy.map((el, i) => (
-                        <div className={"mapWrapper"}><div ref={(el) => refs.current[i] = el} className={"map-container"}></div><h2>{el.state}</h2></div>
+                        <div className={"mapWrapper"} id={`id-${el.state}`}><div ref={(el) => refs.current[i] = el} className={"map-container"}></div><h2>{el.state}</h2></div>
                     )
                 )}
             </section>
