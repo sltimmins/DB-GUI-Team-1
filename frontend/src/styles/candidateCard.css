@@ -15,6 +15,10 @@
     display: inline;
 }
 
+.info h2 {
+    font-size: 2rem;
+}
+
 .candidateImage {
     float: left;
     margin: 1rem;
@@ -25,24 +29,37 @@
 }
 
 .party {
-    display: inline;
-    margin-right: .45rem;
-    padding: .5rem 1rem;
-    border-radius: 1rem
+    font-size: 1.5rem;
 }
 
-.party[val="Republican"] {
-    background: lightcoral;
-}
+@media only screen and (max-width: 768px) {
+    #profiles {
+        display: block;
+        align-items: center;
+        justify-content: center;
+    }
 
-.party[val="Democrat"] {
-    background: lightblue;
-}
+    .candidateCard {
+        border : 1px solid lightgray;
+        margin: .5rem;
+        width: 96vw;
+    }
 
-.party[val="Green"] {
-    background: lightgreen
-}
+    .info {
+        margin: 1rem;
+        display: inline-block;
+    }
+    
+    .info h2 {
+        font-size: 2rem;
+    }
+    
+    .candidateImage {
+        align-items: center;
+        margin: 1rem;
+    }
 
-.party[val="Independent"] {
-    background: #b57edc
+    .candidateBio {
+        display: none;
+    }
 }
