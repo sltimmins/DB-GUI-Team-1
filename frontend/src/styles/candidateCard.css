@@ -1,0 +1,48 @@
+#profiles {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.candidateCard {
+    border : 1px solid lightgray;
+    margin: .5rem;
+    width: 75%;
+}
+
+.info {
+    margin: 1rem;
+    display: inline;
+}
+
+.candidateImage {
+    float: left;
+    margin: 1rem;
+}
+
+.clear {
+    clear: both;
+}
+
+.party {
+    display: inline;
+    margin-right: .45rem;
+    padding: .5rem 1rem;
+    border-radius: 1rem
+}
+
+.party[val="Republican"] {
+    background: lightcoral;
+}
+
+.party[val="Democrat"] {
+    background: lightblue;
+}
+
+.party[val="Green"] {
+    background: lightgreen
+}
+
+.party[val="Independent"] {
+    background: #b57edc
+}
