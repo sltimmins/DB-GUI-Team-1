@@ -92,6 +92,37 @@ export default function Maps(props){
 
     }, []);
 
+    const renderMap = (entry) => {
+        for(const stateJS of statesGeoJSON){
+        let stateName = stateJS.properties.NAME;
+        if(entry.state == stateName) {
+            console.log(stateJS.geometry.coordinates)
+            maps.current[0].addSource(entry.state.toLowerCase(), {
+                'type': 'geojson',
+                'data': {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': stateJS.geometry.type,
+                        // These coordinates outline Maine.
+                        'coordinates': stateJS.geometry.coordinates,
+                    }
+                }
+            });
+            // Add a new layer to visualize the polygon.
+            maps.current[0].addLayer({
+                'id': entry.state.toLowerCase(),
+                'type': 'fill',
+                'source': entry.state.toLowerCase(), // reference the data source
+                'layout': {},
+                'paint': {
+                    'fill-color': entry.status == DEMOCRAT ? '#0080ff' : '#ff2222', // blue color fill
+                    'fill-opacity': 0.5
+                }
+            });
+        }
+    }
+    }
+
     const handleSelection = async(val) => {
         console.log(val)
         let entry = null;
@@ -121,35 +152,7 @@ export default function Maps(props){
                 );
                 maps.current[0].on('load', () => {
                     console.log("Loaded")
-                    for(const stateJS of statesGeoJSON){
-                        let stateName = stateJS.properties.NAME;
-                        if(entry.state == stateName) {
-                            console.log(stateJS.geometry.coordinates)
-                            maps.current[0].addSource(entry.state.toLowerCase(), {
-                                'type': 'geojson',
-                                'data': {
-                                    'type': 'Feature',
-                                    'geometry': {
-                                        'type': stateJS.geometry.type,
-                                        // These coordinates outline Maine.
-                                        'coordinates': stateJS.geometry.coordinates,
-                                    }
-                                }
-                            });
-                            // Add a new layer to visualize the polygon.
-                            maps.current[0].addLayer({
-                                'id': entry.state.toLowerCase(),
-                                'type': 'fill',
-                                'source': entry.state.toLowerCase(), // reference the data source
-                                'layout': {},
-                                'paint': {
-                                    'fill-color': entry.status == DEMOCRAT ? '#0080ff' : '#ff2222', // blue color fill
-                                    'fill-opacity': 0.5
-                                }
-                            });
-                        }
-
-                    }
+                    renderMap(entry)
                 })
                 setPlacesCopy([entry]);
             });
@@ -178,35 +181,7 @@ export default function Maps(props){
             maps.current[0].on('load', () => {
                 console.log("Loaded")
                 for(let entry of placesPayload){
-                    for(const stateJS of statesGeoJSON){
-                    let stateName = stateJS.properties.NAME;
-                    if(entry.state == stateName) {
-                        console.log(stateJS.geometry.coordinates)
-                        maps.current[0].addSource(entry.state.toLowerCase(), {
-                            'type': 'geojson',
-                            'data': {
-                                'type': 'Feature',
-                                'geometry': {
-                                    'type': stateJS.geometry.type,
-                                    // These coordinates outline Maine.
-                                    'coordinates': stateJS.geometry.coordinates,
-                                }
-                            }
-                        });
-                        // Add a new layer to visualize the polygon.
-                        maps.current[0].addLayer({
-                            'id': entry.state.toLowerCase(),
-                            'type': 'fill',
-                            'source': entry.state.toLowerCase(), // reference the data source
-                            'layout': {},
-                            'paint': {
-                                'fill-color': entry.status == DEMOCRAT ? '#0080ff' : '#ff2222', // blue color fill
-                                'fill-opacity': 0.5
-                            }
-                        });
-                    }
-
-                }
+                    renderMap(entry)
                 }
             })
             setPlacesCopy([{"state": val}]);
