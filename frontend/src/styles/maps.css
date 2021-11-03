@@ -27,7 +27,17 @@
 }
 
 .assortmentOfMaps > * {
-    flex: 1 1 460px;
+    flex: 1 1 560px;
+}
+
+.largerMap {
+    /*height: 70vw;*/
+    /*max-width: 70vw;*/
+}
+
+canvas {
+    top: initial !important;
+    left: initial !important;
 }
 
 @media only screen and (max-width: 768px) {

@@ -18,7 +18,7 @@ export default function Maps(props){
     const [lng, setLng] = useState(-70.9);
     const [lat, setLat] = useState(42.35);
     const [zoom, setZoom] = useState(4);
-    const [placesCopy, setplacesCopy] = useState(placesPayload)
+    const [placesCopy, setPlacesCopy] = useState(placesPayload)
     const [setOfStates, setSetOfStates] = useState(new Set())
     const [numOfOccurrences, setNumOfOccurrences] = useState(0)
     const arrToMap = () => {
@@ -151,7 +151,7 @@ export default function Maps(props){
 
                     }
                 })
-                setplacesCopy([entry]);
+                setPlacesCopy([entry]);
             });
         }
     }
@@ -177,7 +177,7 @@ export default function Maps(props){
             );
             maps.current[0].on('load', () => {
                 console.log("Loaded")
-                for(let entry of placesCopy){
+                for(let entry of placesPayload){
                     for(const stateJS of statesGeoJSON){
                     let stateName = stateJS.properties.NAME;
                     if(entry.state == stateName) {
@@ -209,7 +209,7 @@ export default function Maps(props){
                 }
                 }
             })
-            setplacesCopy([{"state": val}]);
+            setPlacesCopy([{"state": val}]);
         });
     }
 
@@ -236,8 +236,9 @@ export default function Maps(props){
                 </div>
             </main>
             <section className={"assortmentOfMaps"}>
+
                 {placesCopy.map((el, i) => (
-                        <div className={"mapWrapper"} id={`id-${el.state}`}><div ref={(el) => refs.current[i] = el} className={"map-container"}></div><h2>{el.state}</h2></div>
+                        <div className={"mapWrapper "+(placesCopy.length == 1 ? "largerMap mapboxgl-map" : "")} id={`id-${el.state}`}><div ref={(el) => refs.current[i] = el} className={"map-container "+(placesCopy.length == 1 ? "largerMap mapboxgl-map" : "")}></div><h2>{el.state}</h2></div>
                     )
                 )}
             </section>
