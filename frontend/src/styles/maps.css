@@ -31,8 +31,8 @@
 }
 
 .largerMap {
-    /*height: 70vw;*/
-    /*max-width: 70vw;*/
+    height: 50vw;
+    max-width: 70vw;
 }
 
 canvas {
@@ -40,9 +40,36 @@ canvas {
     left: initial !important;
 }
 
+.exploreMapButton {
+    width: 100%;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+@media only screen and (min-width: 769px) {
+    .largerMap canvas {
+        height: 50vw !important;
+        width: 70vw !important;
+    }
+}
+
 @media only screen and (max-width: 768px) {
     .map-container {
         max-width: 70vw;
         height: 70vw;
     }
+
+    .mapWrapper {
+        max-width: 70vw;
+        height: fit-content;
+    }
+
+    canvas {
+        height: 70vw !important;
+        width: 70vw !important;
+    }
+
 }

@@ -6,7 +6,7 @@ import MetaTags from 'react-meta-tags';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import "../styles/maps.css"
 import axios from "axios";
-import {placesPayload, statesGeoJSON, DEMOCRAT, REPUBLICAN} from "../test_data/test_data_objects";
+import {placesPayload, statesGeoJSON, politicalColors, DEMOCRAT} from "../test_data/test_data_objects";
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY3BycHdob3oifQ.xuqTng_6PKWKkW59Us5aXA';
 
@@ -78,7 +78,7 @@ export default function Maps(props){
                                 'source': entry.state.toLowerCase(), // reference the data source
                                 'layout': {},
                                 'paint': {
-                                    'fill-color': entry.status == DEMOCRAT ? '#0080ff' : '#ff2222', // blue color fill
+                                    'fill-color': politicalColors[entry.status], // blue color fill
                                     'fill-opacity': 0.5
                                 }
                             });
@@ -115,7 +115,7 @@ export default function Maps(props){
                 'source': entry.state.toLowerCase(), // reference the data source
                 'layout': {},
                 'paint': {
-                    'fill-color': entry.status == DEMOCRAT ? '#0080ff' : '#ff2222', // blue color fill
+                    'fill-color': politicalColors[entry.status], // blue color fill
                     'fill-opacity': 0.5
                 }
             });
@@ -188,8 +188,6 @@ export default function Maps(props){
         });
     }
 
-    (()=>{console.log(process.env.MAPBOX_ACCESS_TOKEN)})();
-
     const transformArr = () => {
         let newArr = [];
         for(const elem of placesPayload) {
@@ -213,7 +211,15 @@ export default function Maps(props){
             <section className={"assortmentOfMaps"}>
 
                 {placesCopy.map((el, i) => (
-                        <div className={"mapWrapper "+(placesCopy.length == 1 ? "largerMap mapboxgl-map" : "")} id={`id-${el.state}`}><div ref={(el) => refs.current[i] = el} className={"map-container "+(placesCopy.length == 1 ? "largerMap mapboxgl-map" : "")}></div><h2>{el.state}</h2></div>
+                        <div className={"mapWrapper "+(placesCopy.length == 1 ? "largerMap mapboxgl-map" : "")} id={`id-${el.state}`}>
+                            <div ref={(el) => refs.current[i] = el} className={"map-container "+(placesCopy.length == 1 ? "largerMap mapboxgl-map" : "")}>
+
+                            </div>
+                            <h2>{el.state}</h2>
+                            <div className={"exploreMapButton"}>
+                                <Button mainText={"Explore Map"} baseColor={"#232323"}/>
+                            </div>
+                        </div>
                     )
                 )}
             </section>

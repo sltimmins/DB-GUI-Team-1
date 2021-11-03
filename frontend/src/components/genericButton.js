@@ -19,7 +19,7 @@ const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVerti
     const setStyles = () => {
         let initialStyles = {
             backgroundColor: baseColor,
-            color: textColor
+            color: textColor ? textColor : calcFontColor(),
         }
         if(paddingHorizontal){
             initialStyles.paddingLeft = paddingHorizontal;
@@ -42,6 +42,7 @@ const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVerti
     }
     const [fontColor, setFontColor] = useState(textColor ? textColor : calcFontColor())
     const [dynamicStyles, setDynamicStyles] = useState(setStyles())
+
 
     return (
         <button className={"genericButton"} style={dynamicStyles} type={"button"} role={"button"} onClick={onButtonClick}>{mainText}</button>
