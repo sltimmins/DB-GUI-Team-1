@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import '../styles/generic_button.css';
 
-const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVertical, fontSize, fontWeight, dropShadow, onButtonClick}) => {
+const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVertical, fontSize, fontWeight, dropShadow, onButtonClick, gradient}) => {
     const calcFontColor = () => {
         if(baseColor.length==4){
             baseColor+= baseColor.substring(1, 4);
@@ -37,6 +37,11 @@ const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVerti
         }
         if(!dropShadow){
             initialStyles.filter = "drop-shadow(0 0 0 white)"
+        } else {
+            initialStyles.filter = dropShadow
+        }
+        if(gradient) {
+            initialStyles.background = gradient;
         }
         return initialStyles;
     }

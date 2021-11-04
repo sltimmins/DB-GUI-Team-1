@@ -1,5 +1,5 @@
 .map-container {
-    height: 40vw;
+    height: 50vw;
     max-width: 40vw;
     margin-right: auto;
     margin-left: auto;
@@ -31,7 +31,6 @@
 }
 
 .largerMap {
-    height: 50vw;
     max-width: 70vw;
 }
 
