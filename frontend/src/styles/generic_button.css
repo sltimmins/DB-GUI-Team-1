@@ -8,3 +8,7 @@
     cursor: pointer;
     filter: drop-shadow(0 0px 30px white);
 }
+
+.genericButton:hover {
+    border: 1px solid black;
+}

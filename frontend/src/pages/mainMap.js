@@ -12,7 +12,11 @@ mapboxgl.accessToken = 'pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY
 
 export default function Maps(props){
     const refs = useRef(placesPayload.map(() => createRef()));
+    const mapContainers = useRef(new Array());
+    const [renderElems, setRenderElems] = useState([<div ref={(elem) => mapContainers.current.push(elem)} className={"map-container"}></div>]);
     const maps = useRef(placesPayload.map(() => createRef()));
+    const [lng, setLng] = useState(-70.9);
+    const [lat, setLat] = useState(42.35);
     const [zoom, setZoom] = useState(4);
     const [placesCopy, setPlacesCopy] = useState(placesPayload)
     const [setOfStates, setSetOfStates] = useState(new Set())

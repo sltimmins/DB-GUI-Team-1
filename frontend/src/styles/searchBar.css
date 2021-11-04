@@ -29,10 +29,6 @@
 .inactive {
     display: none;
 }
-.dataList {
-    display: block;
-    width: 100%;
-}
 
 .queryContainer {
     display: inline-flex;
@@ -40,4 +36,8 @@
     align-items: center;
     justify-content: center;
     width: 100%;
+}
+
+#USButton {
+    margin-top: 0;
 }
