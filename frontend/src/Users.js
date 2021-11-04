@@ -51,17 +51,16 @@ import axios from "axios";
         });
       }
 
-      const doRegister = async (firstName, lastName, username, password, email, user_type, party) => {
+      const doRegister = async (firstName, lastName, username, password, email, user_type, party, bio, profilePic) => {
         setBanner("");
-        let cand = false
-        if(user_type === "Candidate") {
-          cand = true
-        }
+        let cand = user_type === "Candidate"
+        console.log(bio);
+        console.log(profilePic);
 
         if(firstName === "" || lastName === "" || username === "" || password === "" || email === "") {
           setBanner("Please complete all fields")
         } else {
-          axios.post(baseURL + '/users/create_account', { firstName: firstName, lastName: lastName, username: username, password: password, email: email, candidate: cand, party: party }).then((res) => {
+          axios.post(baseURL + '/users/create_account', { firstName: firstName, lastName: lastName, username: username, password: password, email: email, candidate: cand, party: party, bio: bio}).then((res) => {
             doLogin(username, password)
           }).catch((e) => {
             if(e.response) {
