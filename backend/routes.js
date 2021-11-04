@@ -192,8 +192,6 @@ module.exports = function routes(app, logger) {
         if(err) {
           logger.error("Error querying Database\n", err)
         } else {
-          
-          
           electionId = result[0].electionId
         }
       })
@@ -201,7 +199,7 @@ module.exports = function routes(app, logger) {
       
       if(electionId != -1) {
       connection.query("SELECT * FROM electionData JOIN states on electionData.stateId = states.stateId WHERE electionId = ? ", [electionId], function(err,result,fields) {
-        
+
         if(err) {
           logger.error("Something went wrong...")
           res.send(err)
@@ -213,7 +211,7 @@ module.exports = function routes(app, logger) {
             GV = Number(result[i].greenVotes)
             LV = Number(result[i].libertarianVotes)
             OV = Number(result[i].otherVotes)
-            
+
             max = Math.max(RV,DV,GV,LV,OV)
             winner = "ERROR"
             if(max == RV) winner = "R"
@@ -228,7 +226,7 @@ module.exports = function routes(app, logger) {
               "EV":result[i].electoralVotes,
             }
             vals.push(tempRow)
-            
+
           }
           res.send(vals)
         }
