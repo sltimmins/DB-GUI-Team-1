@@ -28,6 +28,9 @@
 .candidateImage {
     float: left;
     margin: 1rem;
+    max-width: 15.625rem;
+    max-height: 15.625rem;
+    border-radius: 20rem;
 }
 
 .clear {
