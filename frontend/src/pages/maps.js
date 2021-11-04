@@ -9,8 +9,8 @@ import axios from "axios";
 import {placesPayload, statesGeoJSON, politicalColors, DEMOCRAT} from "../test_data/test_data_objects";
 import Loader from "../components/loader";
 import MainMap from "./mainMap";
+import {mapboxAPIKey} from "../constants/constants";
 
-mapboxgl.accessToken = 'pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY3BycHdob3oifQ.xuqTng_6PKWKkW59Us5aXA';
 
 export default function Maps(props){
     const refs = useRef(placesPayload.map(() => createRef()));
@@ -37,7 +37,7 @@ export default function Maps(props){
             const entry = placesCopy[i];
             await axios({
                 method: 'get',
-                url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${entry.state}.json?types=region&access_token=pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY3BycHdob3oifQ.xuqTng_6PKWKkW59Us5aXA`
+                url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${entry.state}.json?types=region&access_token=${mapboxAPIKey}`
             })
             .then(function (response) {
                 console.log(refs)
@@ -140,7 +140,7 @@ export default function Maps(props){
         if(placeselection.has(val)){
             await axios({
                 method: 'get',
-                url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${val}.json?types=region&access_token=pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY3BycHdob3oifQ.xuqTng_6PKWKkW59Us5aXA`
+                url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${val}.json?types=region&access_token=${mapboxAPIKey}`
             })
             .then(function (response) {
                 console.log(refs)
@@ -169,7 +169,7 @@ export default function Maps(props){
         const val = "United States"
         await axios({
             method: 'get',
-            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${val}.json?types=country&access_token=pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY3BycHdob3oifQ.xuqTng_6PKWKkW59Us5aXA`
+            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${val}.json?types=country&access_token=${mapboxAPIKey}`
         })
         .then(function (response) {
             console.log(refs)

@@ -7,8 +7,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import "../styles/maps.css"
 import axios from "axios";
 import {placesPayload, statesGeoJSON, politicalColors, DEMOCRAT} from "../test_data/test_data_objects";
-
-mapboxgl.accessToken = 'pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY3BycHdob3oifQ.xuqTng_6PKWKkW59Us5aXA';
+import {mapboxAPIKey} from "../constants/constants";
 
 export default function MainMap({mapToCoordinates, place, polygons, mapOfAffiliation}){
     const ref = createRef();
@@ -20,7 +19,7 @@ export default function MainMap({mapToCoordinates, place, polygons, mapOfAffilia
         console.log(entry)
         await axios({
             method: 'get',
-            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${entry.state}.json?types=${entry.state == "United States" ? "country" : "region"}&access_token=pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY3BycHdob3oifQ.xuqTng_6PKWKkW59Us5aXA`
+            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${entry.state}.json?types=${entry.state == "United States" ? "country" : "region"}&access_token=${mapboxAPIKey}`
         })
         .then(function (response) {
             console.log(response.data)
