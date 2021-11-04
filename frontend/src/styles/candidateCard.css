@@ -1,18 +1,24 @@
 #profiles {
     display: flex;
-    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: center;
+}
+
+.no-wrap {
+    overflow: hidden;
 }
 
 .candidateCard {
     border : 1px solid lightgray;
     margin: .5rem;
-    width: 75%;
+    width: 35rem;
+    flex: 1 0 30;
+    size: fixed;
 }
 
 .info {
     margin: 1rem;
-    display: inline;
 }
 
 .info h2 {
@@ -32,11 +38,33 @@
     font-size: 1.5rem;
 }
 
+.center {
+    display: flex;
+    justify-content: left;
+    flex-direction: column;
+}
+
+.banner {
+    margin-top: 7.5rem;
+    text-align: center;
+    width: 25%;
+    display: flex;
+    justify-content: center;
+}
+
+#candidateSearchBox {
+    margin-left: 4.5%;
+}
+
 @media only screen and (max-width: 768px) {
     #profiles {
         display: block;
         align-items: center;
         justify-content: center;
+    }
+
+    #bio {
+        display: none;
     }
 
     .candidateCard {
@@ -47,7 +75,9 @@
 
     .info {
         margin: 1rem;
-        display: inline-block;
+        margin-left: .75rem;
+        display: flex;
+        flex-direction: column;
     }
     
     .info h2 {
@@ -55,11 +85,17 @@
     }
     
     .candidateImage {
-        align-items: center;
-        margin: 1rem;
+        margin: .5rem;
+        height: 45%;
+        width: 45%;
+        display: block;
     }
 
     .candidateBio {
         display: none;
+    }
+
+    #candidateSearchBox {
+        margin-left: 0;
     }
 }

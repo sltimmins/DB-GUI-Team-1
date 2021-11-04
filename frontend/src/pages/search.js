@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { AppContext } from '../AppContext'
 import Scroll from '../components/scroll.js'
 import CandidateList from './candidateList';
+import '../styles/candidateSearch.css'
 import axios from 'axios';
 
 export default function Search() {
@@ -31,22 +32,30 @@ export default function Search() {
     };
 
     function searchList() {
-        return (
-            <Scroll>
-                <CandidateList filteredCandidates={filteredCandidates} />
-            </Scroll>
-        )
+        if(filteredCandidates.length > 0) {
+            return (
+                <Scroll>
+                    <CandidateList filteredCandidates={filteredCandidates} />
+                </Scroll>
+            )
+        } else {
+            return (
+                <div class="center">
+                    <div class="alert alert-primary banner" role="alert">
+                        <span>No candidates found matching the search criteria.</span>
+                    </div>
+                </div>
+            )
+        }
     }
 
 
 
     return (
         <section>
-            <div className="navy georgia ma0 grow">
-                <h2 className="f2">Search for a candidate</h2>
-            </div>
-            <div className="pa2">
-                <input className="form-control input-lg" type="search" placeholder="Search" onChange={handleChange} />
+            <div id="candidateSearchBox">
+                <h2 id="title">Search:</h2>
+                <input className="form-control input-lg" id="candidateSearchBar" type="search" placeholder="Search" onChange={handleChange} />
             </div>
             {searchList()}
         </section>

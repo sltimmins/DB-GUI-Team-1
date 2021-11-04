@@ -5,8 +5,8 @@ export default function CandidateList({ filteredCandidates }) {
     const filtered = filteredCandidates.map((candidate) => <CandidateCard key={candidate.id} candidate={candidate} />);
 
     return (
-        <div>
+        <>
             {filtered}
-        </div>
+        </>
     )
 }
