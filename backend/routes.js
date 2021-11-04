@@ -209,8 +209,6 @@ app.put('/users', async(req,res) => {
 })
 
 
-
-
   // app.get('/showMyEmail', authenticateToken, (req,res) => {
   //   pool.getConnection(function(err,connection) {
   //     connection.query("Select email FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
