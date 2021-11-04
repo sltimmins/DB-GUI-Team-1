@@ -54,8 +54,6 @@ import axios from "axios";
       const doRegister = async (firstName, lastName, username, password, email, user_type, party, bio, profilePic) => {
         setBanner("");
         let cand = user_type === "Candidate"
-        console.log(bio);
-        console.log(profilePic);
 
         if(firstName === "" || lastName === "" || username === "" || password === "" || email === "") {
           setBanner("Please complete all fields")
