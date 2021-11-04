@@ -10,7 +10,7 @@ export function Register(props) {
     user_type: "Candidate",
     party: "Republican",
     bio: "",
-    profilePic: ""
+    profilePic: {}
   });
 
   const handleInputChange = (e) => {
@@ -19,11 +19,10 @@ export function Register(props) {
   };
 
   const handleImageChange = (e) => {
-    e.preventDefault();
     let reader = new FileReader();
     let inFile = e.target.files[0];
     reader.onload = () => {
-      setValues({ ...values, profilePic: inFile });
+      values.profilePic = inFile;
     };
     reader.readAsDataURL(inFile);
   }
@@ -67,6 +66,7 @@ export function Register(props) {
           <option value="Republican">Republican</option>
           <option value="Independent">Independent</option>
           <option value="Democrat">Democrat</option>
+          <option value="Prefer Not to Say">Prefer Not to Say</option>
         </select>
       </div>
       <div className="form-group mb-3">
@@ -78,7 +78,7 @@ export function Register(props) {
         <input type="file" accept="image/*" onChange={handleImageChange} className="form-control" id="profilePic"/>
       </div>
       <div className="col-12 text-center">
-        <button type="button" onClick={() => props.doRegister(values.firstName, values.lastName, values.username, values.password, values.email, values.user_type, values.party, values.bio, values.profile_pic)} className="btn btn-primary mx-auto" >Submit</button>
+        <button type="button" onClick={() => props.doRegister(values.firstName, values.lastName, values.username, values.password, values.email, values.user_type, values.party, values.bio, values.profilePic)} className="btn btn-primary mx-auto" >Submit</button>
       </div>
       <div className="col-12 mt-3 text-center">
         <p>
