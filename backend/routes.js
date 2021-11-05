@@ -319,6 +319,7 @@ module.exports = function routes(app, logger) {
     });
   }
 
+  // Upload profile images to cloudinary and set UUID to image link
   app.post('/storage/upload', (req, res) => {
       const id = req.body.id;
       const candidateId = req.body.candidateId;
