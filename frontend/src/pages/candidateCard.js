@@ -5,12 +5,11 @@ export default function CandidateCard ({ candidate }) {
     let name = candidate.firstName + " " + candidate.lastName;
     let image = ["assets/userImages/default.jpg"]
 
-    if(candidate.image) {
+    if(candidate.uuid) {
         image = [];
-        image = [candidate.image];
+        image = ["https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + candidate.uuid];
     }
 
-    console.log(image);
     return (
         // TODO: Take user to candidate profile page on click
         <div class="candidateCard">

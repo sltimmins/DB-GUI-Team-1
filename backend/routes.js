@@ -158,6 +158,7 @@ module.exports = function routes(app, logger) {
             res.status(200).send({
               success: true,
               id: result.insertId,
+              candidateId: candidateId,
               msg: 'Please go to 0.0.0.0:8000/users/login to login!'
             })
           })
@@ -262,12 +263,12 @@ module.exports = function routes(app, logger) {
     pool.getConnection(function(err,connection) {
       const bool = req.body.bool;
       if(bool){
-        connection.query("Select username, firstName, lastName FROM users", function(err,result,fields) {
+        connection.query("Select username, firstName, lastName, uuid FROM users", function(err,result,fields) {
           res.send(result);
         })
       }
       else {
-        connection.query("Select firstName, lastName, party FROM candidates", function(err,result,fields){
+        connection.query("Select firstName, lastName, party, uuid FROM candidates", function(err,result,fields){
           res.send(result);
         })
       }
@@ -318,39 +319,30 @@ module.exports = function routes(app, logger) {
     });
   }
 
-  cloudinary.config({
-    cloud_name: "stimmins",
-    api_key: "821548329565931",
-    api_secret: "40jyKqb6nqu7ewUPSnVlrkivAKw"
-  })
-
-  const storage = new CloudinaryStorage({
-      cloudinary: cloudinary,
-      folder: "images",
-      allowedFormats: ["png", "jpg", "jpeg", "gif"],
-      transformation: [{ format: 'jpg' }]
-  });
-
-  const parser = multer({ storage: storage });
-
   app.post('/storage/upload', (req, res) => {
-      console.log(req.body)
+      const id = req.body.id;
+      const candidateId = req.body.candidateId;
+      const uuid = req.body.name;
 
-      cloudinary.uploader.upload(req.body.data, {max_width: 500, max_height: 500}, (err, results) => {
-        console.log(err, results);
-      });
+      pool.getConnection(function(err, connection) {
+          let sql = "UPDATE users SET uuid = ? where accountNumber = ?";
+          connection.query(sql, [uuid, id], (err,result) => {
+              if(err) {
+                res.status(400);
+              }
+          })
 
-      // pool.getConnection(function(err, connection) {
-      //     const sql = "UPDATE users SET uuid = ? where id = ?";
-      //     connection.query(sql, [uuid, req.body.id], function(err,result) {
-      //         if(err) {
-      //           res.status(400);
-      //         } else {
-      //           res.status(200).send({ 
-      //             success: true
-      //           })
-      //         }
-      //     })
-      // })
+          sql = "UPDATE candidates SET uuid = ? where candidateId = ?";
+          connection.query(sql, [uuid, candidateId], (err, result) => {
+            if(err) {
+              res.status(400);
+            } else {
+              res.status(200).send({
+                success: true
+              })
+            }
+          })
+          connection.release();
+      })
   })
 }

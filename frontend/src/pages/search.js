@@ -14,6 +14,7 @@ export default function Search() {
 
     if(!loadCandidates) {
         axios.get(baseURL + '/users/search_user', { bool: false }).then((res) => {
+            console.log(res.data)
             setCandidatesList(res.data);
         });
         setLoadCandidates(true);
