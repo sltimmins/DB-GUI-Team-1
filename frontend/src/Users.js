@@ -59,7 +59,9 @@ import axios from "axios";
           setBanner("Please complete all fields")
         } else {
           axios.post(baseURL + '/users/create_account', { firstName: firstName, lastName: lastName, username: username, password: password, email: email, candidate: cand, party: party, bio: bio}).then((res) => {
-            doLogin(username, password)
+            axios.post(baseURL + '/storage/upload', profilePic, { id: res.data.id }).then((res) => {
+              doLogin(username, password)
+            })
           }).catch((e) => {
             if(e.response) {
               setBanner(e.response.data.message)

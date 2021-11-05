@@ -1,6 +1,9 @@
 const pool = require('./db');
 const jwt = require('jsonwebtoken');
 const bcrypt = require("bcryptjs");
+var multer = require('multer');
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 module.exports = function routes(app, logger) {
   // GET /
@@ -152,10 +155,11 @@ module.exports = function routes(app, logger) {
             if(err) {
               logger.error("Error creating user\n",err)
             }
-          })
-          res.status(200).send({
-            success: true,
-            msg: 'Please go to 0.0.0.0:8000/users/login to login!'
+            res.status(200).send({
+              success: true,
+              id: result.insertId,
+              msg: 'Please go to 0.0.0.0:8000/users/login to login!'
+            })
           })
         } catch {
           res.status(500).send('something went wrong...', );
@@ -313,5 +317,39 @@ module.exports = function routes(app, logger) {
       setTimeout(resolve, ms);
     });
   }
+
+  cloudinary.config({
+    cloud_name: "stimmins",
+    api_key: "821548329565931",
+    api_secret: "40jyKqb6nqu7ewUPSnVlrkivAKw"
+  })
+
+  const storage = new CloudinaryStorage({
+      cloudinary: cloudinary,
+      folder: "images",
+      allowedFormats: ["png", "jpg", "jpeg", "gif"],
+      transformation: [{ format: 'jpg' }]
+  });
+
+  const parser = multer({ storage: storage });
+
+  app.post('/storage/upload', parser.single("file"), (req, res) => {
+    console.log(req.params)
+      const uuid = req.file.public_id;
+      console.log(uuid);
+
+      pool.getConnection(function(err, connection) {
+          const sql = "UPDATE users SET uuid = ? where id = ?";
+          connection.query(sql, [uuid, req.body.id], function(err,result) {
+              if(err) {
+                res.status(400);
+              } else {
+                res.status(200).send({ 
+                  success: true
+                })
+              }
+          })
+      })
+  })
 
 }
