@@ -9,7 +9,6 @@ const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVerti
         }
         let decimal = parseInt(baseColor.substring(1, baseColor.length), 16);
         let darkBoundary = parseInt("777777", 16)
-        console.log(decimal, darkBoundary, baseColor)
         if(darkBoundary < decimal){
             return "black"
         } else {

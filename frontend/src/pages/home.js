@@ -3,7 +3,7 @@ import "../styles/home.css"
 import Button from "../components/genericButton";
 import SearchBar from "../components/searchBar";
 
-export default function Home(props){
+export default function Home(){
     return (
         <>
             <main>

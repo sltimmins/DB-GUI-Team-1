@@ -14,6 +14,7 @@ import Footer from "./components/footer";
 import {MainBackgroundColor, MainTitle} from "./constants/constants";
 import { AppContext, useProvideAppContext, setupLogin } from "./AppContext.js";
 import Maps from "./pages/maps";
+import {getElectionData} from "./api/api";
 require('dotenv').config()
 
 // React functional component
@@ -29,8 +30,12 @@ export function App () {
     localStorage.setItem('jwt', "")
   }
 
+  const [allStates, setAllStates] = useState([])
+
   // tell app to fetch values from db on first load (if initialized)
-  useEffect(() => {
+  useEffect(async() => {
+     let newPayload = await getElectionData(2020);
+      setAllStates(newPayload);
     setupLogin(context);
   }, [])
 
@@ -52,7 +57,7 @@ export function App () {
                 <Users />
               </Route>
               <Route path="/maps">
-                <Maps />
+                <Maps mainPlacesPayload = {allStates}/>
               </Route>
               <Route path="/">
                 <Home />

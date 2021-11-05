@@ -10,29 +10,34 @@ import {placesPayload, statesGeoJSON, politicalColors, DEMOCRAT} from "../test_d
 import Loader from "../components/loader";
 import MainMap from "./mainMap";
 import {mapboxAPIKey} from "../constants/constants";
+import {getElectionData} from "../api/api";
+
+mapboxgl.accessToken = mapboxAPIKey;
 
 
-export default function Maps(props){
-    const refs = useRef(placesPayload.map(() => createRef()));
-    const maps = useRef(placesPayload.map(() => createRef()));
+export default function Maps({mainPlacesPayload}){
+    let refs = useRef(placesPayload.map(() => createRef()));
+    let maps = useRef(placesPayload.map(() => createRef()));
     const [zoom, setZoom] = useState(4);
     const [placesCopy, setPlacesCopy] = useState(placesPayload)
     const [setOfStates, setSetOfStates] = useState(new Set())
     const [currentlyLoading, setCurrentlyLoading] = useState(false)
     const [mapToCoordinates, setMapToCoordinates] = useState({})
-    const [showMainMap, setShowMainMap] = useState(false)
     const [mainMapPayload, setMainMapPayload] = useState(null)
-    const arrToMap = () => {
+    const [retreivedPayload, setRetreivedPayload] = useState(null)
+    const arrToMap = (arr) => {
         let mapOfNames = new Set();
-        for(const place of placesPayload) {
+        for(const place of arr) {
             mapOfNames.add(place.state);
         }
         return mapOfNames;
     }
-    const [placeselection, setplaceselection] = useState(arrToMap())
+    const [placeSelection, setPlaceSelection] = useState(arrToMap(placesPayload))
     useEffect(async() => {
-        console.log("use effect")
         setCurrentlyLoading(true)
+        let res = await getElectionData(2020);
+        setRetreivedPayload(res);
+        setPlaceSelection(arrToMap(res))
         for(let i = 0; i < placesCopy.length; i++){
             const entry = placesCopy[i];
             await axios({
@@ -40,14 +45,11 @@ export default function Maps(props){
                 url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${entry.state}.json?types=region&access_token=${mapboxAPIKey}`
             })
             .then(function (response) {
-                console.log(refs)
                 let newLat = response.data["features"][0]["center"][0]
                 let newLng = response.data["features"][0]["center"][1]
                 let copy = JSON.parse(JSON.stringify(mapToCoordinates))
-                console.log(copy)
                 copy[entry.state] = [newLat, newLng];
                 setMapToCoordinates(copy)
-                console.log(newLat, newLng, entry)
                 maps.current[i] = new mapboxgl.Map({
                         container: refs.current[i],
                         style: 'mapbox://styles/mapbox/streets-v11',
@@ -57,7 +59,6 @@ export default function Maps(props){
                     }
                 );
                 maps.current[i].on('load', () => {
-                    console.log("Loaded")
                     for(const stateJS of statesGeoJSON){
                         let stateName = stateJS.properties.NAME;
                         if(entry.state == stateName) {
@@ -65,7 +66,6 @@ export default function Maps(props){
                                 return
                             }
                             setOfStates.add(entry.state)
-                            console.log(stateJS.geometry.coordinates)
                             maps.current[i].addSource(entry.state.toLowerCase(), {
                                 'type': 'geojson',
                                 'data': {
@@ -130,34 +130,29 @@ export default function Maps(props){
     }
 
     const handleSelection = async(val) => {
-        console.log(val)
         let entry = null;
-        for(const stateObj of placesPayload){
+        for(const stateObj of (retreivedPayload ? retreivedPayload : placesPayload)){
             if(stateObj.state == val){
                 entry = stateObj
             }
         }
-        if(placeselection.has(val)){
+        if(placeSelection.has(val)){
             await axios({
                 method: 'get',
                 url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${val}.json?types=region&access_token=${mapboxAPIKey}`
             })
             .then(function (response) {
-                console.log(refs)
                 let newLat = response.data["features"][0]["center"][0]
                 let newLng = response.data["features"][0]["center"][1]
-                console.log(newLat, newLng)
-                setZoom(2);
                 maps.current[0] = new mapboxgl.Map({
                         container: refs.current[0],
                         style: 'mapbox://styles/mapbox/streets-v11',
                         center: [newLat, newLng],
-                        zoom: zoom,
+                        zoom: 4,
                         setPaintProperty: ('region', 'fill-color', 'rgb(255, 0, 0)')
                     }
                 );
                 maps.current[0].on('load', () => {
-                    console.log("Loaded")
                     renderMap(entry)
                 })
                 setPlacesCopy([entry]);
@@ -172,13 +167,11 @@ export default function Maps(props){
             url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${val}.json?types=country&access_token=${mapboxAPIKey}`
         })
         .then(function (response) {
-            console.log(refs)
             let newLat = response.data["features"][0]["center"][0]
             let newLng = response.data["features"][0]["center"][1]
             let copy = JSON.parse(JSON.stringify(mapToCoordinates))
             copy[val] = [newLat, newLng];
             setMapToCoordinates(copy)
-            console.log(mapToCoordinates)
             maps.current[0] = new mapboxgl.Map({
                     container: refs.current[0],
                     style: 'mapbox://styles/mapbox/streets-v11',
@@ -188,8 +181,7 @@ export default function Maps(props){
                 }
             );
             maps.current[0].on('load', () => {
-                console.log("Loaded")
-                for(let entry of placesPayload){
+                for(let entry of (retreivedPayload ? retreivedPayload : placesPayload)){
                     renderMap(entry)
                 }
             })
@@ -197,9 +189,9 @@ export default function Maps(props){
         });
     }
 
-    const transformArr = () => {
+    const transformArr = (arr) => {
         let newArr = [];
-        for(const elem of placesPayload) {
+        for(const elem of arr) {
             newArr.push({name: elem.state, href: '/'})
         }
         return newArr;
@@ -214,11 +206,11 @@ export default function Maps(props){
                         <main className={"mapMain"}>
                             <div className={"divForButton"}>
                                 <div>
-                                    <SearchBar routes={transformArr()} placeHolder={"Search for Locations"} baseColor={"white"} textColor={"black"} dropShadow={true} onChangeFunc={val => handleSelection(val.target.value)}/>
+                                    <SearchBar routes={retreivedPayload ? transformArr(retreivedPayload) : transformArr(placesCopy)} placeHolder={"Search for Locations"} baseColor={"white"} textColor={"black"} dropShadow={true} onChangeFunc={val => handleSelection(val.target.value)}/>
                                 </div>
                             </div>
                             <div className={"divForButton"} id={"USButton"}>
-                                <Button mainText={"United States"} baseColor={"black"} textColor={"white"} fontWeight={700} onButtonClick={() => {handleAllSelection()}} gradient={"linear-gradient(to right, rgba(255, 0, 0, 0), rgba(255, 0, 0, 1) , rgba(0, 0, 255, 1) , rgba(0, 0, 255, 0))"}/>
+                                <Button mainText={"United States"} baseColor={"black"} textColor={"white"} fontWeight={700} onButtonClick={() => {handleAllSelection()}}/>
                             </div>
                         </main>
                         <section className={"assortmentOfMaps"}>
@@ -244,16 +236,9 @@ export default function Maps(props){
                                                         for(const stateJS of statesGeoJSON) {
                                                             if(setOfStateNames.has(stateJS.properties.NAME.toLowerCase())) {
                                                                 polygons.push(stateJS)
-                                                                console.log(mapOfAffiliation)
                                                             }
                                                         }
                                                         setMainMapPayload({
-                                                            mapToCoordinates : mapToCoordinates,
-                                                            place: el,
-                                                            polygons: polygons,
-                                                            mapOfAffiliation: mapOfAffiliation
-                                                        })
-                                                        console.log({
                                                             mapToCoordinates : mapToCoordinates,
                                                             place: el,
                                                             polygons: polygons,

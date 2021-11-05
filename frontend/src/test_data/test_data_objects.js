@@ -1,5 +1,5 @@
-export const REPUBLICAN = 0;
-export const DEMOCRAT = 1;
+export const REPUBLICAN = 'R';
+export const DEMOCRAT = 'D';
 export const placesPayload = [{"state": "Texas", "status": REPUBLICAN},
     {"state": "California", "status": DEMOCRAT},
     {"state": "New York", "status": DEMOCRAT},

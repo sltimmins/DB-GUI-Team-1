@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import mapboxgl from "mapbox-gl";
 
 export function Register(props) {
   const [values, setValues] = useState({

@@ -9,7 +9,6 @@ const SearchBar = ({baseColor, placeHolder, textColor, width, height, fontSize, 
         }
         let decimal = parseInt(baseColor.substring(1, baseColor.length), 16);
         let darkBoundary = parseInt("777777", 16)
-        console.log(decimal, darkBoundary, baseColor)
         if(darkBoundary < decimal){
             return "black"
         } else {
@@ -40,7 +39,6 @@ const SearchBar = ({baseColor, placeHolder, textColor, width, height, fontSize, 
     }
     const getRoutes = () => {
         if (!Array.isArray(routes)) {
-            console.log("Is not array")
             return [];
         }
         let elems = [];
@@ -62,7 +60,7 @@ const SearchBar = ({baseColor, placeHolder, textColor, width, height, fontSize, 
             <div className={"queryContainer"}>
                 <input list={"data-list"} className={"searchBar"} style={dynamicStyles} type={"text"} placeholder={placeHolder} onChange={onChangeFunc}></input>
                 <datalist id={"data-list"} className={"dataList"}>
-                    {routes ? routes.map(route => (<option key={"datalist-"+ route.name}  value={route.name} onClick={() => {window.location.href = route.href; console.log(route.href)}}></option>)) : []}
+                    {routes && Array.isArray(routes) ? routes.map(route => (<option key={"datalist-"+ route.name}  value={route.name} onClick={() => {window.location.href = route.href}}></option>)) : []}
 
                 </datalist>
             </div>
