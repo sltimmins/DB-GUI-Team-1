@@ -333,10 +333,8 @@ module.exports = function routes(app, logger) {
 
   const parser = multer({ storage: storage });
 
-  app.post('/storage/upload', parser.single("file"), (req, res) => {
-    console.log(req.params)
-      const uuid = req.file.public_id;
-      console.log(uuid);
+  app.post('/storage/upload', (req, res) => {
+      const uuid = req.body.uuid;
 
       pool.getConnection(function(err, connection) {
           const sql = "UPDATE users SET uuid = ? where id = ?";
@@ -351,5 +349,4 @@ module.exports = function routes(app, logger) {
           })
       })
   })
-
 }

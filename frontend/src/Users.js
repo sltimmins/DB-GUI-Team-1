@@ -54,14 +54,33 @@ import axios from "axios";
       const doRegister = async (firstName, lastName, username, password, email, user_type, party, bio, profilePic) => {
         setBanner("");
         let cand = user_type === "Candidate"
+        const formData = new FormData();
+        let uuid = "";
+        console.log(profilePic);
+        formData.append('file', profilePic);
+        formData.append('upload_preset', 'e0s8om4e');
+        const options = {
+          method: 'POST',
+          body: formData
+        };
+  
+        fetch('https://api.Cloudinary.com/v1_1/stimmins/upload', options).then(result => {
+          uuid = result.public_id;
+          console.log(uuid);
+          console.log(result);
+        })
 
         if(firstName === "" || lastName === "" || username === "" || password === "" || email === "") {
           setBanner("Please complete all fields")
         } else {
           axios.post(baseURL + '/users/create_account', { firstName: firstName, lastName: lastName, username: username, password: password, email: email, candidate: cand, party: party, bio: bio}).then((res) => {
-            axios.post(baseURL + '/storage/upload', profilePic, { id: res.data.id }).then((res) => {
+            if(profilePic) {
+              axios.post(baseURL + '/storage/upload', {uuid: uuid, id: res.data.id }).then((res) => {
+                doLogin(username, password)
+              })
+            } else {
               doLogin(username, password)
-            })
+            }        
           }).catch((e) => {
             if(e.response) {
               setBanner(e.response.data.message)
