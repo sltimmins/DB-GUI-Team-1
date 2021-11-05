@@ -334,19 +334,23 @@ module.exports = function routes(app, logger) {
   const parser = multer({ storage: storage });
 
   app.post('/storage/upload', (req, res) => {
-      const uuid = req.body.uuid;
+      console.log(req.body)
 
-      pool.getConnection(function(err, connection) {
-          const sql = "UPDATE users SET uuid = ? where id = ?";
-          connection.query(sql, [uuid, req.body.id], function(err,result) {
-              if(err) {
-                res.status(400);
-              } else {
-                res.status(200).send({ 
-                  success: true
-                })
-              }
-          })
-      })
+      cloudinary.uploader.upload(req.body.data, {max_width: 500, max_height: 500}, (err, results) => {
+        console.log(err, results);
+      });
+
+      // pool.getConnection(function(err, connection) {
+      //     const sql = "UPDATE users SET uuid = ? where id = ?";
+      //     connection.query(sql, [uuid, req.body.id], function(err,result) {
+      //         if(err) {
+      //           res.status(400);
+      //         } else {
+      //           res.status(200).send({ 
+      //             success: true
+      //           })
+      //         }
+      //     })
+      // })
   })
 }

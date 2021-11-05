@@ -64,18 +64,18 @@ import axios from "axios";
           body: formData
         };
   
-        fetch('https://api.Cloudinary.com/v1_1/stimmins/upload', options).then(result => {
-          uuid = result.public_id;
-          console.log(uuid);
-          console.log(result);
-        })
+        // fetch('https://api.Cloudinary.com/v1_1/stimmins/upload', options).then(result => {
+        //   uuid = result.public_id;
+        //   console.log(uuid);
+        //   console.log(result);
+        // })
 
         if(firstName === "" || lastName === "" || username === "" || password === "" || email === "") {
           setBanner("Please complete all fields")
         } else {
           axios.post(baseURL + '/users/create_account', { firstName: firstName, lastName: lastName, username: username, password: password, email: email, candidate: cand, party: party, bio: bio}).then((res) => {
             if(profilePic) {
-              axios.post(baseURL + '/storage/upload', {uuid: uuid, id: res.data.id }).then((res) => {
+              axios.post(baseURL + '/storage/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' }}).then((res) => {
                 doLogin(username, password)
               })
             } else {
