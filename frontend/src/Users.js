@@ -51,18 +51,36 @@ import axios from "axios";
         });
       }
 
-      const doRegister = async (firstName, lastName, username, password, email, user_type, party) => {
+      const doRegister = async (firstName, lastName, username, password, email, user_type, party, bio, profilePic) => {
         setBanner("");
-        let cand = false
-        if(user_type === "Candidate") {
-          cand = true
-        }
+        let cand = user_type === "Candidate"
+        const formData = new FormData();
+        let uuid = "";
+        console.log(profilePic);
+        formData.append('file', profilePic);
+        formData.append('upload_preset', 'e0s8om4e');
+        const options = {
+          method: 'POST',
+          body: formData
+        };
+  
+        fetch('https://api.Cloudinary.com/v1_1/stimmins/image/upload', options).then(res => {
+          uuid = res.public_id;
+          console.log(uuid);
+          console.log(res);
+        })
 
         if(firstName === "" || lastName === "" || username === "" || password === "" || email === "") {
           setBanner("Please complete all fields")
         } else {
-          axios.post(baseURL + '/users/create_account', { firstName: firstName, lastName: lastName, username: username, password: password, email: email, candidate: cand, party: party }).then((res) => {
-            doLogin(username, password)
+          axios.post(baseURL + '/users/create_account', { firstName: firstName, lastName: lastName, username: username, password: password, email: email, candidate: cand, party: party, bio: bio}).then((res) => {
+            if(profilePic) {
+              axios.post(baseURL + '/storage/upload', { id: res.data.id, candidateId: res.data.candidateId, name: profilePic.name }).then((res) => {
+                doLogin(username, password)
+              })
+            } else {
+              doLogin(username, password)
+            }        
           }).catch((e) => {
             if(e.response) {
               setBanner(e.response.data.message)
