@@ -1,9 +1,6 @@
 const pool = require('./db');
 const jwt = require('jsonwebtoken');
 const bcrypt = require("bcryptjs");
-var multer = require('multer');
-const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 module.exports = function routes(app, logger) {
   // GET /

@@ -3,8 +3,6 @@ import React, { useState, useRef, useContext } from "react";
 import { AppContext } from '../AppContext.js'
 
 export function Register(props) {
-  const imageRef = useRef(null)
-  const { baseURL } = useContext(AppContext)
   const [values, setValues] = useState({
     firstName: "",
     lastName: "",
@@ -30,31 +28,6 @@ export function Register(props) {
     };
     reader.readAsDataURL(inFile);
   }
-
-  // const submit = (e) => {
-  //   // let formData = new FormData();
-  //   // formData.append('file', imageRef.current.files[0]);
-
-  //   // axios.post(baseURL + '/storage/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-  //   console.log(imageRef.current.files[0])
-  //   let file = imageRef.current.files[0];
-  //   const uploadPath = "../assets/userImages/" + file.name;
-  //   console.log(file)
-
-  //   var fs = require('fs');
-  //   fs.rename(imageRef.current.files[0].name, uploadPath);
-
-    
-  //   // file.Move(uploadPath, function(err) {
-  //   //   if(err) {
-  //   //     console.log("Error uploading profile image")
-  //   //   } else {
-  //   //     console.log("Image uploaded")
-  //   //   }
-  //   // });
-
-  //   props.doRegister(values.firstName, values.lastName, values.username, values.password, values.email, values.user_type, values.party, values.bio)
-  // }
 
   return (
     <>
@@ -104,7 +77,7 @@ export function Register(props) {
       </div>
       <div className="form-group mb-3">
         <label htmlFor="profilePic">Profile Picture</label>
-        <input type="file" accept="image/*" onChange={handleImageChange} ref={imageRef} className="form-control" id="profilePic"/>
+        <input type="file" accept="image/*" onChange={handleImageChange} className="form-control" id="profilePic"/>
       </div>
       <div className="col-12 text-center">
         <button type="button" onClick={() => props.doRegister(values.firstName, values.lastName, values.username, values.password, values.email, values.user_type, values.party, values.bio, values.profilePic)} className="btn btn-primary mx-auto" >Submit</button>
