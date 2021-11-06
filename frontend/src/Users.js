@@ -71,7 +71,7 @@ import axios from "axios";
         })
 
         if(firstName === "" || lastName === "" || username === "" || password === "" || email === "") {
-          setBanner("Please complete all fields")
+          setBanner("Please complete all required fields")
         } else {
           axios.post(baseURL + '/users/create_account', { firstName: firstName, lastName: lastName, username: username, password: password, email: email, candidate: cand, party: party, bio: bio}).then((res) => {
             if(profilePic) {
