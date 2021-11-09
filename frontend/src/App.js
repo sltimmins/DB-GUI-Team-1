@@ -35,8 +35,8 @@ export function App () {
   // tell app to fetch values from db on first load (if initialized)
   useEffect(async() => {
      let newPayload = await getElectionData(2020);
-      setAllStates(newPayload);
-    setupLogin(context);
+     setAllStates(newPayload);
+     setupLogin(context);
   }, [])
 
   return (
@@ -46,9 +46,9 @@ export function App () {
             <Header baseColor={MainBackgroundColor}
                 routes={
                   [
-                    {name: "Home", href: '/', active: (window.location.pathname == "/" ? true: false)},
-                    {name: "Maps", href: '/maps', active: (window.location.pathname == "/maps" ? true: false)},
-                    {name: "About", href: '/', active: (window.location.pathname == "/about" ? true: false) }
+                    {name: "Home", href: '/', active: (window.location.pathname === "/")},
+                    {name: "Maps", href: '/maps', active: (window.location.pathname === "/maps")},
+                    {name: "About", href: '/', active: (window.location.pathname === "/about") }
                   ]
                 }
                 mainTitle={MainTitle} mainImage = {{src: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1280px-React-icon.svg.png", width: "70px", height: '50px'}}/>
@@ -57,7 +57,7 @@ export function App () {
                 <Users />
               </Route>
               <Route path="/maps">
-                <Maps mainPlacesPayload = {allStates}/>
+                <Maps />
               </Route>
               <Route path="/">
                 <Home />

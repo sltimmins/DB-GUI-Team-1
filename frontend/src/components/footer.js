@@ -4,7 +4,7 @@ import '../styles/footer.css';
 import {MainBackgroundColor} from "../constants/constants";
 const Footer = ({mainTitle}) => {
     const calcFontColor = (baseColor) => {
-        if(baseColor.length==4){
+        if(baseColor.length === 4){
             baseColor+= baseColor.substring(1, 4);
         }
         let decimal = parseInt(baseColor.substring(1, baseColor.length), 16);
@@ -15,7 +15,7 @@ const Footer = ({mainTitle}) => {
             return "white"
         }
     }
-    const [fontColor, setFontColor] = useState(calcFontColor(MainBackgroundColor))
+    const [fontColor] = useState(calcFontColor(MainBackgroundColor))
     return (
         <>
             <section className = {"wideFooter"} style={{backgroundColor: MainBackgroundColor}}>

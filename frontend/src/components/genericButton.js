@@ -4,7 +4,7 @@ import '../styles/generic_button.css';
 
 const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVertical, fontSize, fontWeight, dropShadow, onButtonClick, gradient}) => {
     const calcFontColor = () => {
-        if(baseColor.length==4){
+        if(baseColor.length === 4){
             baseColor+= baseColor.substring(1, 4);
         }
         let decimal = parseInt(baseColor.substring(1, baseColor.length), 16);
@@ -44,8 +44,7 @@ const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVerti
         }
         return initialStyles;
     }
-    const [fontColor, setFontColor] = useState(textColor ? textColor : calcFontColor())
-    const [dynamicStyles, setDynamicStyles] = useState(setStyles())
+    const [dynamicStyles] = useState(setStyles())
 
 
     return (

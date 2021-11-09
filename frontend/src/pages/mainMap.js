@@ -1,25 +1,22 @@
 import React, { useState, useEffect, useRef, createRef } from 'react';
-import Button from "../components/genericButton";
-import SearchBar from "../components/searchBar";
 import mapboxgl from 'mapbox-gl';
-import MetaTags from 'react-meta-tags';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import "../styles/maps.css"
 import axios from "axios";
-import {placesPayload, statesGeoJSON, politicalColors, DEMOCRAT} from "../test_data/test_data_objects";
+import {politicalColors} from "../test_data/test_data_objects";
 import {mapboxAPIKey} from "../constants/constants";
 
 mapboxgl.accessToken = mapboxAPIKey;
 
-export default function MainMap({mapToCoordinates, place, polygons, mapOfAffiliation}){
+export default function MainMap({place, polygons, mapOfAffiliation}){
     const ref = createRef();
     const map = useRef(null);
-    const [setOfStates, setSetOfStates] = useState(new Set())
+    const [setOfStates] = useState(new Set())
     useEffect(async() => {
         const entry = place;
         await axios({
             method: 'get',
-            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${entry.state}.json?types=${entry.state == "United States" ? "country" : "region"}&access_token=${mapboxAPIKey}`
+            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${entry.state}.json?types=${entry.state === "United States" ? "country" : "region"}&access_token=${mapboxAPIKey}`
         })
         .then(function (response) {
             let newLat = response.data["features"][0]["center"][0]
@@ -28,8 +25,7 @@ export default function MainMap({mapToCoordinates, place, polygons, mapOfAffilia
                     container: ref.current,
                     style: 'mapbox://styles/mapbox/streets-v11',
                     center: [newLat, newLng],
-                    zoom: entry.state == "United States" ? 2 : 4,
-                    setPaintProperty: ('region', 'fill-color', 'rgb(255, 0, 0)')
+                    zoom: entry.state === "United States" ? 2 : 4,
                 }
             );
             map.current.on('load', () => {

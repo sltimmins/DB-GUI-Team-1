@@ -1,5 +1,5 @@
 .map-container {
-    height: 50vw;
+    height: 40vw;
     max-width: 40vw;
     margin-right: auto;
     margin-left: auto;
@@ -50,8 +50,12 @@ canvas {
 
 @media only screen and (min-width: 769px) {
     .largerMap canvas {
-        height: 50vw !important;
+        height: 70vw !important;
         width: 70vw !important;
+    }
+
+    .largerMap .map-container {
+        height: 70vw !important;
     }
 }
 

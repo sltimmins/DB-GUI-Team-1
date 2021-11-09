@@ -2,11 +2,10 @@ import React, { useState, useEffect, useRef, createRef } from 'react';
 import Button from "../components/genericButton";
 import SearchBar from "../components/searchBar";
 import mapboxgl from 'mapbox-gl';
-import MetaTags from 'react-meta-tags';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import "../styles/maps.css"
 import axios from "axios";
-import {placesPayload, statesGeoJSON, politicalColors, DEMOCRAT} from "../test_data/test_data_objects";
+import {placesPayload, statesGeoJSON, politicalColors} from "../test_data/test_data_objects";
 import Loader from "../components/loader";
 import MainMap from "./mainMap";
 import {mapboxAPIKey} from "../constants/constants";
@@ -15,12 +14,12 @@ import {getElectionData} from "../api/api";
 mapboxgl.accessToken = mapboxAPIKey;
 
 
-export default function Maps({mainPlacesPayload}){
+export default function Maps(){
     let refs = useRef(placesPayload.map(() => createRef()));
     let maps = useRef(placesPayload.map(() => createRef()));
-    const [zoom, setZoom] = useState(4);
+    const [zoom] = useState(4);
     const [placesCopy, setPlacesCopy] = useState(placesPayload)
-    const [setOfStates, setSetOfStates] = useState(new Set())
+    const [setOfStates] = useState(new Set())
     const [currentlyLoading, setCurrentlyLoading] = useState(false)
     const [mapToCoordinates, setMapToCoordinates] = useState({})
     const [mainMapPayload, setMainMapPayload] = useState(null)
@@ -55,13 +54,12 @@ export default function Maps({mainPlacesPayload}){
                         style: 'mapbox://styles/mapbox/streets-v11',
                         center: [newLat, newLng],
                         zoom: zoom,
-                        setPaintProperty: ('region', 'fill-color', 'rgb(255, 0, 0)')
                     }
                 );
                 maps.current[i].on('load', () => {
                     for(const stateJS of statesGeoJSON){
                         let stateName = stateJS.properties.NAME;
-                        if(entry.state == stateName) {
+                        if(entry.state === stateName) {
                             if(setOfStates.has(entry.state)){
                                 return
                             }
@@ -72,7 +70,7 @@ export default function Maps({mainPlacesPayload}){
                                     'type': 'Feature',
                                     'geometry': {
                                         'type': stateJS.geometry.type,
-                                        // These coordinates outline Maine.
+                                        // These coordinates outline the state.
                                         'coordinates': stateJS.geometry.coordinates,
                                     }
                                 }
@@ -102,7 +100,7 @@ export default function Maps({mainPlacesPayload}){
     const renderMap = (entry) => {
         for(const stateJS of statesGeoJSON){
             let stateName = stateJS.properties.NAME;
-            if(entry.state == stateName) {
+            if(entry.state === stateName) {
                 maps.current[0].addSource(entry.state.toLowerCase(), {
                     'type': 'geojson',
                     'data': {
@@ -132,7 +130,7 @@ export default function Maps({mainPlacesPayload}){
     const handleSelection = async(val) => {
         let entry = null;
         for(const stateObj of (retreivedPayload ? retreivedPayload : placesPayload)){
-            if(stateObj.state == val){
+            if(stateObj.state === val){
                 entry = stateObj
             }
         }
@@ -149,7 +147,6 @@ export default function Maps({mainPlacesPayload}){
                         style: 'mapbox://styles/mapbox/streets-v11',
                         center: [newLat, newLng],
                         zoom: 4,
-                        setPaintProperty: ('region', 'fill-color', 'rgb(255, 0, 0)')
                     }
                 );
                 maps.current[0].on('load', () => {
@@ -177,7 +174,6 @@ export default function Maps({mainPlacesPayload}){
                     style: 'mapbox://styles/mapbox/streets-v11',
                     center: [newLat, newLng],
                     zoom: 2,
-                    setPaintProperty: ('region', 'fill-color', 'rgb(255, 0, 0)')
                 }
             );
             maps.current[0].on('load', () => {
@@ -216,8 +212,8 @@ export default function Maps({mainPlacesPayload}){
                         <section className={"assortmentOfMaps"}>
 
                             {placesCopy.map((el, i) => (
-                                    <div className={"mapWrapper "+(placesCopy.length == 1 ? "largerMap mapboxgl-map" : "")} id={`id-${el.state}`}>
-                                        <div ref={(el) => refs.current[i] = el} className={"map-container "+(placesCopy.length == 1 ? "largerMap mapboxgl-map" : "")}>
+                                    <div className={"mapWrapper "+(placesCopy.length === 1 ? "largerMap mapboxgl-map" : "")} id={`id-${el.state}`}>
+                                        <div ref={(el) => refs.current[i] = el} className={"map-container "+(placesCopy.length === 1 ? "largerMap mapboxgl-map" : "")}>
 
                                         </div>
                                         <h2>{el.state}</h2>
@@ -225,7 +221,7 @@ export default function Maps({mainPlacesPayload}){
                                             <Button mainText={"Explore Map"} baseColor={"#232323"}
                                                 onButtonClick={() => {
                                                     setCurrentlyLoading(true)
-                                                    if (el.state == "United States") {
+                                                    if (el.state === "United States") {
                                                         let polygons = [];
                                                         let mapOfAffiliation = {};
                                                         let setOfStateNames = new Set();
@@ -251,7 +247,7 @@ export default function Maps({mainPlacesPayload}){
                                                             [el.state.toLowerCase()]: el.status
                                                         };
                                                         for(const stateJS of statesGeoJSON) {
-                                                            if(stateJS.properties.NAME.toLowerCase() == el.state.toLowerCase()) {
+                                                            if(stateJS.properties.NAME.toLowerCase() === el.state.toLowerCase()) {
                                                                 polygons.push(stateJS)
                                                             }
                                                         }

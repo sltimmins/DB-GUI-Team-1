@@ -1,5 +1,5 @@
 // import closeUp from '/images/closeUp.JPG'
-import React, { useState } from 'react';
+import React  from 'react';
 import '../styles/loader.css';
 
 const Loader = ({loading}) => {
