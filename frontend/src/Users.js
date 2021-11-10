@@ -64,11 +64,7 @@ import axios from "axios";
           body: formData
         };
   
-        fetch('https://api.Cloudinary.com/v1_1/stimmins/image/upload', options).then(res => {
-          uuid = res.public_id;
-          console.log(uuid);
-          console.log(res);
-        })
+        fetch('https://api.Cloudinary.com/v1_1/stimmins/image/upload', options);
 
         if(firstName === "" || lastName === "" || username === "" || password === "" || email === "") {
           setBanner("Please complete all required fields")

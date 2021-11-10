@@ -14,7 +14,7 @@ export function Register(props) {
     profilePic: {}
   });
 
-  const handleInputChange = (e) => {
+  const handleInputChange =(e) => {
     const { name, value } = e.target;
     setValues({ ...values, [name]: value });
   };
