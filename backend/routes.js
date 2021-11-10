@@ -111,7 +111,7 @@ module.exports = function routes(app, logger) {
     pool.getConnection(async function(err,connection) {
       const userToFind = {username:req.body.username, password:req.body.password}
       console.log("user: ", userToFind)
-      connection.query("select username, password, accountNumber, candidateId, firstName, lastName FROM users WHERE username = ?",userToFind.username , async function(err,result,fields){
+      connection.query("select username, password, accountNumber, candidateId, firstName, lastName, uuid FROM users WHERE username = ?",userToFind.username , async function(err,result,fields){
         if(!result) {
           logger.error("Invalid username or Password")
           res.status(400).send("Invalid username or password")
@@ -138,7 +138,8 @@ module.exports = function routes(app, logger) {
                   lastName: usersJSON[0].lastName,
                   username: usersJSON[0].username,
                   user_id: usersJSON[0].accountNumber,
-                  candidate: usersJSON[0].candidate
+                  candidate: usersJSON[0].candidate,
+                  uuid: usersJSON[0].uuid
                 }
               })
             } else {
