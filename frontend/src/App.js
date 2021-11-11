@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import Users from "./Users.js"
 import Home from "./pages/home";
+import UserProfile from './pages/UserProfile';
 import Header from "./components/header";
 import Footer from "./components/footer";
 import {MainBackgroundColor, MainTitle} from "./constants/constants";
@@ -34,25 +35,53 @@ export function App () {
     setupLogin(context);
   }, [])
 
+  let refP = "/login";
+  let loggedIn = false;
+  if (context.JWT != undefined) {
+    loggedIn = true;
+    refP = "/UserProfile";
+  }
+
   return (
     <AppContext.Provider value={context}>
         <Router>
           <div className={"initialView"}>
-            <Header baseColor={MainBackgroundColor}
-                routes={
-                  [
-                    {name: "Home", href: '/', active: (window.location.pathname == "/" ? true: false)},
-                    {name: "Maps", href: '/maps', active: (window.location.pathname == "/maps" ? true: false)},
-                    {name: "About", href: '/', active: (window.location.pathname == "/about" ? true: false) }
-                  ]
+
+            <ul className="nav">
+              <li className="nav-item col">
+                <Header className="col" baseColor={MainBackgroundColor} 
+                  routes={
+                    [
+                      {name: "Home", href: '/', active: (window.location.pathname == "/" ? true: false)},
+                      {name: "Maps", href: '/maps', active: (window.location.pathname == "/maps" ? true: false)},
+                      {name: "About", href: '/', active: (window.location.pathname == "/about" ? true: false) }
+                    ]
+                  }
+                  mainTitle={MainTitle} mainImage = {{src: "https://via.placeholder.com/200", width: "50px", height: '50px', href: {refP}, borderRadius: '50%', onClick: () => {  
+                    return refP;  
+                  }}}
+                />
+              </li>
+              <li className="nav-item border">
+                <a className="nav-link" href=""></a>
+                {
+                  loggedIn && <a className="nav-link" onClick={context.signout} href={refP}>Sign out</a>
                 }
-                mainTitle={MainTitle} mainImage = {{src: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1280px-React-icon.svg.png", width: "70px", height: '50px'}}/>
+                {
+                  !loggedIn && <a className="nav-link" onClick={() => {console.debug("clicked!")}} href={refP}>Sign in</a>
+                }
+              </li>
+            </ul>
+
             <Switch>
               <Route path="/login">
                 <Users />
               </Route>
               <Route path="/maps">
                 <Maps />
+              </Route>
+              <Route path="/UserProfile">
+                <UserProfile />
               </Route>
               <Route path="/">
                 <Home />
