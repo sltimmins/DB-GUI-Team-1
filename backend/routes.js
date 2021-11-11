@@ -195,6 +195,31 @@ module.exports = function routes(app, logger) {
       connection.release();
     })
   })
+
+  //Returns all a users favorite candidates
+  //No input but user needs to be logged in
+  //return format:
+  // [
+  //   {
+  //       "firstName": "Donald",
+  //       "lastName": "Trump",
+  //       "party": "Republican"
+  //   }
+  // ]
+  app.get('/favorites/candidates', authenticateToken, (req,res) => {
+    pool.getConnection(function(err,connection) {
+      if(err){
+        res.status(300).send()
+      }
+      connection.query("SELECT accountNumber FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
+        connection.query("SELECT firstName, lastName, party FROM favorites INNER JOIN candidates c on favorites.candidateID = c.candidateId WHERE favorites.accountNumber = ?", result[0].accountNumber, function(err,result2,fields) {
+          res.send(result2);
+        })
+      })
+      
+      connection.release();
+    })
+  })
   // app.get('/showMyEmail', authenticateToken, (req,res) => {
   //   pool.getConnection(function(err,connection) {
   //     connection.query("Select email FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
