@@ -1,0 +1,105 @@
+#profiles {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.no-wrap {
+    overflow: hidden;
+}
+
+.candidateCard {
+    border : 1px solid lightgray;
+    margin: .5rem;
+    width: 35rem;
+    flex: 1 0 30;
+    size: fixed;
+}
+
+.info {
+    margin: 1rem;
+}
+
+.info h2 {
+    font-size: 2rem;
+}
+
+.candidateImage {
+    float: left;
+    margin: 1rem;
+    width: 15.625rem;
+    height: 15.625rem;
+    border-radius: 20rem;
+    object-fit: cover;
+}
+
+.clear {
+    clear: both;
+}
+
+.party {
+    font-size: 1.5rem;
+}
+
+.center {
+    display: flex;
+    justify-content: left;
+    flex-direction: column;
+}
+
+.banner {
+    margin-top: 7.5rem;
+    text-align: center;
+    width: 25%;
+    display: flex;
+    justify-content: center;
+}
+
+#candidateSearchBox {
+    margin-left: 4.5%;
+}
+
+@media only screen and (max-width: 768px) {
+    #profiles {
+        display: block;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #bio {
+        display: none;
+    }
+
+    .candidateCard {
+        border : 1px solid lightgray;
+        margin: .5rem;
+        width: 96vw;
+    }
+
+    .info {
+        margin: 1rem;
+        margin-left: .75rem;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .info h2 {
+        font-size: 2rem;
+    }
+    
+    .candidateImage {
+        margin: .5rem;
+        height: 45%;
+        width: 45%;
+        display: block;
+    }
+
+    .candidateBio {
+        display: none;
+    }
+
+    #candidateSearchBox {
+        margin-left: 0;
+    }
+}

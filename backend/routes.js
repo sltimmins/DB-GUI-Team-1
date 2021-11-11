@@ -64,10 +64,12 @@ module.exports = function routes(app, logger) {
             if(err) {
               logger.error("Error creating user\n",err)
             }
-          })
-          res.status(200).send({
-            success: true,
-            msg: 'Please go to 0.0.0.0:8000/users/login to login!'
+            res.status(200).send({
+              success: true,
+              id: result.insertId,
+              candidateId: candidateId,
+              msg: 'Please go to 0.0.0.0:8000/users/login to login!'
+            })
           })
         } catch {
           res.status(500).send('something went wrong...', );
@@ -109,7 +111,7 @@ module.exports = function routes(app, logger) {
     pool.getConnection(async function(err,connection) {
       const userToFind = {username:req.body.username, password:req.body.password}
       console.log("user: ", userToFind)
-      connection.query("select username, password, accountNumber, candidateId, firstName, lastName FROM users WHERE username = ?",userToFind.username , async function(err,result,fields){
+      connection.query("select username, password, accountNumber, candidateId, firstName, lastName, uuid FROM users WHERE username = ?",userToFind.username , async function(err,result,fields){
         if(!result) {
           logger.error("Invalid username or Password")
           res.status(400).send("Invalid username or password")
@@ -136,7 +138,8 @@ module.exports = function routes(app, logger) {
                   lastName: usersJSON[0].lastName,
                   username: usersJSON[0].username,
                   user_id: usersJSON[0].accountNumber,
-                  candidate: usersJSON[0].candidate
+                  candidate: usersJSON[0].candidate,
+                  uuid: usersJSON[0].uuid
                 }
               })
             } else {
@@ -168,14 +171,14 @@ module.exports = function routes(app, logger) {
   //Route to search and get information for a user
   app.get('/users/search_user', async(req,res) => {
     pool.getConnection(function(err,connection) {
-      const bool = req.body.bool
-      if(bool == null){
-        connection.query("Select username, firstName, lastName FROM users", function(err,result,fields) {
+      const bool = req.body.bool;
+      if(bool){
+        connection.query("Select username, firstName, lastName, uuid FROM users", function(err,result,fields) {
           res.send(result);
         })
       }
       else {
-        connection.query("Select username, firstName, lastName FROM users WHERE candidateID IS NOT NULL", function(err,result,fields){
+        connection.query("Select firstName, lastName, party, uuid FROM candidates", function(err,result,fields){
           res.send(result);
         })
       }
@@ -310,4 +313,31 @@ app.put('/users', async(req,res) => {
     });
   }
 
+  // Upload profile images to cloudinary and set UUID to image link
+  app.post('/storage/upload', (req, res) => {
+      const id = req.body.id;
+      const candidateId = req.body.candidateId;
+      const uuid = req.body.name;
+
+      pool.getConnection(function(err, connection) {
+          let sql = "UPDATE users SET uuid = ? where accountNumber = ?";
+          connection.query(sql, [uuid, id], (err,result) => {
+              if(err) {
+                res.status(400);
+              }
+          })
+
+          sql = "UPDATE candidates SET uuid = ? where candidateId = ?";
+          connection.query(sql, [uuid, candidateId], (err, result) => {
+            if(err) {
+              res.status(400);
+            } else {
+              res.status(200).send({
+                success: true
+              })
+            }
+          })
+          connection.release();
+      })
+  })
 }
