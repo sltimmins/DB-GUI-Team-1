@@ -205,6 +205,29 @@ module.exports = function routes(app, logger) {
   // })
 
   /*
+  Returns an array of all a users favorite election years
+  No input params but user must be logged in
+  output:
+  {
+    "year":"2020"
+  }
+  */
+  app.get('/favorites/elections', authenticateToken, (req,res) => {
+    pool.getConnection(function(err,connection) {
+      if(err){
+        res.status(300).send()
+      }
+      connection.query("SELECT accountNumber FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
+        connection.query("SELECT year FROM favorites INNER JOIN elections e on favorites.electionID = e.electionId WHERE favorites.accountNumber = ? ORDER BY year DESC;", result[0].accountNumber, function(err,result2,fields) {
+          res.send(result2);
+        })
+      })
+      
+      connection.release();
+    })
+  })
+
+  /*
   Returns an array of json objects that contain data in the following format:
   {
         "state": "Vermont",
