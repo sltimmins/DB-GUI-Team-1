@@ -12,6 +12,7 @@ import Home from "./pages/home";
 import UserProfile from './pages/UserProfile';
 import Header from "./components/header";
 import Footer from "./components/footer";
+import Search from "./pages/search";
 import {MainBackgroundColor, MainTitle} from "./constants/constants";
 import { AppContext, useProvideAppContext, setupLogin } from "./AppContext.js";
 import Maps from "./pages/maps";
@@ -35,12 +36,16 @@ export function App () {
     setupLogin(context);
   }, [])
 
+<<<<<<< HEAD
   let refP = "/login";
   let loggedIn = false;
   if (context.JWT != undefined) {
     loggedIn = true;
     refP = "/UserProfile";
   }
+=======
+  console.log(context.user);
+>>>>>>> b572452796274b0ec0044de062f592785a85f63b
 
   return (
     <AppContext.Provider value={context}>
@@ -76,6 +81,9 @@ export function App () {
             <Switch>
               <Route path="/login">
                 <Users />
+              </Route>
+              <Route path="/candidateSearch">
+                <Search />
               </Route>
               <Route path="/maps">
                 <Maps />

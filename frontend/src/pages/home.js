@@ -13,7 +13,7 @@ export default function Home(props){
                     <div>
                         <SearchBar placeHolder={"Search for Locations"} baseColor={"white"} textColor={"black"} dropShadow={true}/>
                     </div>
-                    <Button mainText={"All Maps"} baseColor={"black"} textColor={"white"} dropShadow={true}/>
+                    <Button mainText={"All Maps"} baseColor={"#000"} textColor={"white"} dropShadow={true} onButtonClick={() => {window.location.href = "/maps"}}/>
                 </div>
             </main>
         </>

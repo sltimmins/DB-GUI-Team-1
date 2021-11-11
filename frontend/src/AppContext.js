@@ -1,16 +1,11 @@
 import React, { useState } from "react";
 import { axiosJWTHeader } from './utils/index.js'
 import axios from "axios";
-
+import {ec2_url, ec2, baseURL} from './constants/constants'
 export const AppContext = React.createContext("app");
 
 export function useProvideAppContext() {
-    // ENTER YOUR EC2 PUBLIC IP/URL HERE
-    const ec2_url = "";
-    // CHANGE THIS TO TRUE IF HOSTING ON EC2, MAKE SURE TO ADD IP/URL ABOVE
-    const ec2 = false;
-    // USE localhost OR ec2_url ACCORDING TO ENVIRONMENT
-    const baseURL = ec2 ? ec2_url : "http://localhost:8000";
+
 
     const [JWT, setJWT] = useState(null);
     const [user, setUser] = useState({});
