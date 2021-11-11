@@ -59,6 +59,157 @@ canvas {
     }
 }
 
+.resultDiv {
+    display: inline-flex;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: space-evenly;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+/*.resultDiv > div {*/
+/*    flex: 1 1 560px;*/
+/*}*/
+
+.resultDiv > div h5 {
+    text-align: center;
+}
+
+.changeTable {
+    max-width: 90vw;
+    border-radius: 10px;
+}
+
+.changeTable tbody tr {
+    border-bottom: 1px solid #b2b2b2;
+}
+
+.changeTable tbody tr:last-child {
+    border-bottom: 0;
+}
+
+.changeTableRowName {
+    min-width: 30vw;
+    padding: 10px;
+    border-right: 1px solid black;
+    text-align: center;
+}
+
+.changeTableRowOriginal {
+    min-width: 20vw;
+    padding: 10px;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+    text-align: center;
+}
+
+.changeTableRowChange {
+    min-width: 20vw;
+    padding: 10px;
+    border-left: 1px solid black;
+    text-align: center;
+}
+
+.tableWrapper {
+    width: fit-content;
+    height: fit-content;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid black;
+}
+
+.tableDiv {
+    width: 100%;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.headRow {
+    background-color: #d4d4d4;
+}
+
+.originalSelect {
+    border: 2px solid black;
+}
+
+.changeAffiliationSection {
+    width: 90%;
+    display: inline-flex;
+    flex-direction: row;
+    border: 1px solid black;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding: 15px;
+    border-top: 0;
+}
+
+.changeAffiliationSection > div {
+    flex : 1;
+    display: inline-flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.changeAffiliationSection select {
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.changeAffiliationSectionContainer {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.changeAffiliationSectionContainer > div {
+    width: 90%;
+    background-color: #343434;
+    padding: 7px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border: 1px solid black;
+    border-bottom: 0;
+}
+
+.changeAffiliationSectionContainer > div > h3 {
+    font-size: 1.3rem;
+    margin-block-end: 0;
+    margin-block-start: 0;
+    color: white;
+}
+
+.votingBar {
+    width: 90%;
+    height: 15px;
+    border-radius: 15px;
+}
+
+.votingBarContainer {
+    display: inline-flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.deleteEntry {
+    background-color: #ff7676;
+    padding: 1px 7px 2px 7px;
+    border-radius: 50%;
+    font-weight: 700;
+    margin-right: 5px;
+}
+
 @media only screen and (max-width: 768px) {
     .map-container {
         max-width: 70vw;
@@ -74,5 +225,11 @@ canvas {
         height: 70vw !important;
         width: 70vw !important;
     }
+    .changeAffiliationSection {
+        flex-direction: column;
+    }
 
+    .changeAffiliationSection > div {
+        margin-bottom: 1rem;
+    }
 }

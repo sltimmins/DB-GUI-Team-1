@@ -225,7 +225,7 @@ export default function Maps(){
                                                         let polygons = [];
                                                         let mapOfAffiliation = {};
                                                         let setOfStateNames = new Set();
-                                                        for(let entry of placesPayload){
+                                                        for(let entry of retreivedPayload){
                                                             setOfStateNames.add(entry.state.toLowerCase())
                                                             mapOfAffiliation[entry.state.toLowerCase()] = entry.status;
                                                         }
@@ -267,7 +267,7 @@ export default function Maps(){
                             )}
                         </section>
                     </>
-                ) : <MainMap mapToCoordinates={mainMapPayload.mapToCoordinates} place={mainMapPayload.place} polygons={mainMapPayload.polygons} mapOfAffiliation={mainMapPayload.mapOfAffiliation}/>
+                ) : <MainMap mapToCoordinates={mainMapPayload.mapToCoordinates} place={mainMapPayload.place} polygons={mainMapPayload.polygons} affiliations={mainMapPayload.mapOfAffiliation} placesArray={retreivedPayload}/>
             }
         </>
     );

@@ -1,8 +1,8 @@
 // import closeUp from '/images/closeUp.JPG'
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import '../styles/generic_button.css';
 
-const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVertical, fontSize, fontWeight, dropShadow, onButtonClick, gradient}) => {
+const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVertical, fontSize, fontWeight, dropShadow, onButtonClick, gradient, disabled}) => {
     const calcFontColor = () => {
         if(baseColor.length === 4){
             baseColor+= baseColor.substring(1, 4);
@@ -44,11 +44,16 @@ const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVerti
         }
         return initialStyles;
     }
-    const [dynamicStyles] = useState(setStyles())
-
+    const [dynamicStyles, setDynamicStyles] = useState(setStyles())
+    //
+    // useEffect(
+    //     () => {
+    //         setDynamicStyles(setStyles())
+    //     }
+    // )
 
     return (
-        <button className={"genericButton"} style={dynamicStyles} type={"button"} role={"button"} onClick={onButtonClick}>{mainText}</button>
+        <button className={"genericButton"} style={dynamicStyles} type={"button"} role={"button"} onClick={onButtonClick} disabled={disabled}>{mainText}</button>
     );
   };
 
