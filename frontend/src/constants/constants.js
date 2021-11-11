@@ -6,3 +6,5 @@ export const ec2_url = "";
 export const ec2 = false;
 // USE localhost OR ec2_url ACCORDING TO ENVIRONMENT
 export const baseURL = ec2 ? ec2_url : "http://localhost:8000";
+
+export const mapboxAPIKey = 'pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY3BycHdob3oifQ.xuqTng_6PKWKkW59Us5aXA';

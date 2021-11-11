@@ -1,5 +1,7 @@
-export const REPUBLICAN = 0;
-export const DEMOCRAT = 1;
+export const REPUBLICAN = 'R';
+export const DEMOCRAT = 'D';
+export const LIBERTARIAN = 'L';
+export const GREEN = 'G';
 export const placesPayload = [{"state": "Texas", "status": REPUBLICAN},
     {"state": "California", "status": DEMOCRAT},
     {"state": "New York", "status": DEMOCRAT},
@@ -9,7 +11,9 @@ export const placesPayload = [{"state": "Texas", "status": REPUBLICAN},
 
 export const politicalColors = {
     [DEMOCRAT]: "#0080ff",
-    [REPUBLICAN]: "#ff2222"
+    [REPUBLICAN]: "#ff2222",
+    [LIBERTARIAN]: '#fed105',
+    [GREEN]: '#508C1B'
 }
 
 export const statesGeoJSON = [
