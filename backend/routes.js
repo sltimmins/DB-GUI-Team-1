@@ -220,6 +220,35 @@ module.exports = function routes(app, logger) {
       connection.release();
     })
   })
+  app.post('/favorites/candidates', authenticateToken, (req,res) => {
+    pool.getConnection(function(err,connection) {
+      if(err){
+        res.status(300).send()
+      }
+      connection.query("SELECT accountNumber FROM users WHERE username = ?", [req.user.username], function(err,result,fields) {
+        if(err){
+          res.status(400).send("Account not found")
+        }
+        accountNumber = result[0].accountNumber
+        console.log(accountNumber)
+        connection.query("SELECT candidateId FROM candidates WHERE firstName = ? AND lastName = ?", [req.body.firstName, req.body.lastName], function(err2,result2,fields) {
+          if(err2){
+            res.send(400).send("Candidate not found")
+          }
+          console.log(result2[0].candidateId)
+          connection.query("INSERT INTO favorites (accountNumber, candidateID) VALUES (?, ?)", [result[0].accountNumber, result2[0].candidateId], function(err3,result3,fields) {
+            if(err3){
+              res.send(400).send()
+            }
+            console.log(result3);
+            res.send("Candidate added to favorites")
+          })
+        })
+      })
+      
+      connection.release();
+    })
+  })
   // app.get('/showMyEmail', authenticateToken, (req,res) => {
   //   pool.getConnection(function(err,connection) {
   //     connection.query("Select email FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
