@@ -55,12 +55,12 @@ module.exports = function routes(app, logger) {
         try {
           const salt = await bcrypt.genSalt()
           const hashedPassword = await bcrypt.hash(req.body.password, salt)
-          const user = {username:req.body.username, password:hashedPassword, firstName:req.body.firstName, lastName:req.body.lastName, email:req.body.email, candidate:req.body.candidate};
+          const user = {username:req.body.username, password:hashedPassword, firstName:req.body.firstName, lastName:req.body.lastName, email:req.body.email, candidate:req.body.candidate, party: req.body.party};
           
           if(candidateId == -1) {
             candidateId = null;
           }
-          connection.query("insert into users (firstName, lastName, email, candidateId, username, password) VALUES (?, ?, ?, ?, ?, ?)", [user.firstName,user.lastName,user.email,candidateId,user.username,user.password], function(err,result,fields) {
+          connection.query("insert into users (firstName, lastName, email, candidateId, username, password, party) VALUES (?, ?, ?, ?, ?, ?, ?)", [user.firstName,user.lastName,user.email,candidateId,user.username,user.password, user.party], function(err,result,fields) {
             if(err) {
               logger.error("Error creating user\n",err)
             }
@@ -169,16 +169,19 @@ module.exports = function routes(app, logger) {
   })
 
   //Route to search and get information for a user
-  app.get('/users/search_user', async(req,res) => {
+  app.post('/users/search_user', async(req,res) => {
     pool.getConnection(function(err,connection) {
-      const bool = req.body.bool;
-      if(bool){
-        connection.query("Select username, firstName, lastName, uuid FROM users", function(err,result,fields) {
+      const getWho = req.body.allUsers;
+      if(getWho === 1) {
+        connection.query("Select username, firstName, lastName, uuid, party FROM users", function(err,result,fields) {
           res.send(result);
         })
-      }
-      else {
+      } else if(getWho === 2) {
         connection.query("Select firstName, lastName, party, uuid FROM candidates", function(err,result,fields){
+          res.send(result);
+        })
+      } else {
+        connection.query("Select username, firstName, lastName, uuid, party FROM users WHERE candidateId is NULL", function(err,result,fields){
           res.send(result);
         })
       }

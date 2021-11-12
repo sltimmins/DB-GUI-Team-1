@@ -35,8 +35,6 @@ export function App () {
     setupLogin(context);
   }, [])
 
-  console.log(context.user);
-
   return (
     <AppContext.Provider value={context}>
         <Router>
