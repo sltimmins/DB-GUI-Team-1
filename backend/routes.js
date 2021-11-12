@@ -223,12 +223,13 @@ app.put('/user/bio', async(req,res) => {
   */
   app.get('/electionData',(req,res) => {
     pool.getConnection(async function(err,connection) {
-      year = req.body.year;
-      electionId = -1
+      let year = req.query.year;
+      let electionId = -1
       connection.query("SELECT electionId FROM elections where year = ?",[year], function(err,result,fields) {
         if(err) {
           logger.error("Error querying Database\n", err)
         } else {
+           console.log("result", result)
           electionId = result[0].electionId
         }
       })
@@ -241,7 +242,7 @@ app.put('/user/bio', async(req,res) => {
           logger.error("Something went wrong...")
           res.send(err)
         } else {
-          vals = []
+          let vals = []
           for(let i = 0; i < 50; i ++) {
             RV = Number(result[i].republicanVotes)
             DV = Number(result[i].democraticVotes)
@@ -261,6 +262,7 @@ app.put('/user/bio', async(req,res) => {
               "shortName":result[i].shortName,
               "winner":winner,
               "EV":result[i].electoralVotes,
+              "status": winner
             }
             vals.push(tempRow)
 

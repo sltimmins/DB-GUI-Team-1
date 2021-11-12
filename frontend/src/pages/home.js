@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import "../styles/home.css"
 import Button from "../components/genericButton";
 import SearchBar from "../components/searchBar";
 
-export default function Home(props){
+export default function Home(){
     return (
         <>
             <main>
