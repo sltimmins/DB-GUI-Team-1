@@ -226,7 +226,35 @@ module.exports = function routes(app, logger) {
       connection.release();
     })
   })
+  app.post('/favorites/elections', authenticateToken, (req,res) => {
+    pool.getConnection(function(err,connection) {
+      if(err){
+        res.status(300).send()
+      }
+      connection.query("SELECT accountNumber FROM users WHERE username = ?", [req.user.username], function(err,result,fields) {
+        if(err){
+          res.status(400).send("Account not found")
+        }
+        accountNumber = result[0].accountNumber
+        console.log(accountNumber)
+        connection.query("SELECT electionId FROM elections WHERE year = ?", [req.body.year], function(err2,result2,fields) {
+          if(err2){
+            res.send(400).send("Election not found")
+          }
+          console.log(result2[0])
+          connection.query("INSERT INTO favorites (accountNumber, electionID) VALUES (?, ?)", [result[0].accountNumber, result2[0].electionId], function(err3,result3,fields) {
+            if(err3){
+              res.send(400).send()
+            }
+            console.log(result3);
+            res.send("Candidate added to favorites")
+          })
+        })
+      })
 
+      connection.release();
+    })
+  })
   /*
   Returns an array of json objects that contain data in the following format:
   {
