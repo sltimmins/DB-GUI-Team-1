@@ -73,7 +73,6 @@ const Header = ({getOpenOrClose, routes, mainTitle, mainImage, baseColor}) => {
                     <div className =  {["titleChild", "titleRight"].join(" ")} >
                         <div className = {"helper"}>
                             <div className = {"headerLogoDiv"} style={{width: mainImage.width}}>
-                            
                                 <img src={mainImage.src} className = {"headerImage"} alt="logo" style={{width: mainImage.width, height: mainImage.height}} onClick={() => {
                                     let refP = mainImage.onClick();
                                     if (window.location.pathname == "/" || "/true") {

@@ -1,57 +1,86 @@
 import React, { useContext, useState } from "react";
-import { AppContext } from "./../AppContext.js";
+import { AppContext, useProvideAppContext } from "./../AppContext.js";
+import axios from 'axios';
 
 
 export default function UserProfile() {
 
     const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
+  
     let firstName = user.firstName;
     let lastName = user.lastName;
     let Bio = user.bio;
+    let profilePic = {};
 
     function handleClick() {
+        const formData= new FormData();
+        console.log(profilePic);
+        formData.append('file', profilePic);
+        formData.append('upload_preset', 'e0s8om4e');
+        const options = {
+            method: "POST",
+            body: formData
+        };
+
+        fetch("https://api.Cloudinary.com/v1_1/stimmins/image/upload", options);
+        axios.post(baseURL + "/storage/upload", { id: user.accountNumber, candidateId: user.candidateId, name: profilePic.name });
+        axios.post()
         setUser({
             firstName: firstName,
             lastName: lastName,
-            bio: Bio
+            bio: Bio,
+            uuid: profilePic.name
         });
     }
 
-    let changeFName = e => {
-        firstName = e.target.value;
+    const handleInputChange =(e) => {
+        const { name, value } = e.target;
+        setUser({ ...user, [name]: value });
+    };
+
+    let changeProfilePic = e => {
+        profilePic = e.target.files[0];
     }
 
-    let changeLName = e => {
-        lastName = e.target.value;
+    let uuid = "";
+    if (user.uuid != null) {
+        uuid = user.uuid;
     }
+    let imagePath = "assets/userImages/default.jpg";
 
-    let changeBio = e => {
-        Bio = e.target.value;
+    if (uuid != "") {
+        imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
     }
 
     return (
         <div>
             <header className="text-center bg-secondary p-3 d-static">
-                <img src="https://via.placeholder.com/200" alt="" className="rounded-circle"/>                
-                <h1 style={headerStyle}>{user.firstName + " " + user.lastName}</h1>          
+                <img src={imagePath} alt="" className="rounded-circle" style={{width: "17rem", height: '17rem'}}/>                
+                <h1 className="text-white pt-2">{user.firstName + " " + user.lastName}</h1>          
             </header>
             <main>      
                 <div className="container my-4 bg-light rounded">
                     <form>
                         <div className="row pt-2">
+                            <div className="from-group col">
+                                <label className="custom-file-label" htmlFor="imageFile">Profile picture</label>
+                                <input className="file form-control" type="file" id="imageFile" name="img[]" accept="image/*" onChange={changeProfilePic}/>
+                            </div>
+                        </div>
+                        <div className="row pt-2">
                             <div className="form-group col">
-                                <label htmlFor="fName" className>First Name</label>  
-                                <input type="text" id="fName" className="form-control p-2" onChange={changeFName} style={mRight} defaultValue={user.firstName}></input>   
+                                <label htmlFor="fName">First Name</label>  
+                                <input type="text" id="fName" className="form-control p-2" onChange={handleInputChange} defaultValue={user.firstName}></input>   
                             </div>
                             <div className="form-group col">
                                 <label htmlFor="lName">Last Name</label>
-                                <input type="text" id="lName" className="form-control p-2" onChange={changeLName} defaultValue={user.lastName}></input>
+                                <input type="text" id="lName" className="form-control p-2" onChange={handleInputChange} defaultValue={user.lastName}></input>
                             </div>
                         </div>
                         <div className="row my-1">
                             <div className="form-group">
                                 <label htmlFor="bio">Bio</label>
-                                <textarea type="text" id="bio" className="form-control col w-100" maxLength="1000" onChange={changeBio} style={{minHeight: '10rem'}} defaultValue={user.bio}></textarea>
+                                <textarea type="text" id="bio" className="form-control col w-100" maxLength="1000" onChange={handleInputChange} style={{minHeight: '10rem', maxHeight: '30rem'}} defaultValue={user.bio}></textarea>
                             </div>
                         </div>
                         <div className="form-group py-3">
@@ -62,49 +91,6 @@ export default function UserProfile() {
             </main>
         </div>    
     );
-}
-
-const table = {
-    display: "table"
-}
-
-const row = {
-    display: "table-row"
-}
-
-const cell = {
-    marginLeft: "10rem",
-    display: "table-cell"
-}
-
-const center = {
-    marginLeft: "auto",
-    marginRight: "auto"
-}
-
-const bio  = {
-    marginRight: "10rem",
-    width: "30rem", 
-    height: "8rem"
-}
-
-const mRight = {
-    marginRight: "1rem",
-}
-
-const image = {
-    borderRadius: "50%",
-    margin: "2rem",
-}
-
-const btn = {
-    padding: ".5rem .7rem",
-    margin: "1rem"
-}
-
-const navStyle = {
-    backgroundColor: "#3498db",
-    padding: "1rem",
 }
 
 const headerStyle = {

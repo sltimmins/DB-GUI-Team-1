@@ -24,11 +24,10 @@ export function App () {
   // Global context
   let context = useProvideAppContext();
 
-  console.log(context.user);
-
   // handle signout
   const signout = () => {
-    localStorage.setItem('jwt', "")
+    localStorage.setItem('jwt', "");
+
   }
 
   // tell app to fetch values from db on first load (if initialized)
@@ -36,16 +35,22 @@ export function App () {
     setupLogin(context);
   }, [])
 
-<<<<<<< HEAD
   let refP = "/login";
   let loggedIn = false;
   if (context.JWT != undefined) {
     loggedIn = true;
     refP = "/UserProfile";
   }
-=======
-  console.log(context.user);
->>>>>>> b572452796274b0ec0044de062f592785a85f63b
+
+  let uuid = "";
+  if (context.user != undefined && context.user.uuid != null) {
+    uuid = context.user.uuid;
+  }
+  let imagePath = "assets/userImages/default.jpg";
+
+  if (uuid != "") {
+    imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
+  }
 
   return (
     <AppContext.Provider value={context}>
@@ -62,7 +67,7 @@ export function App () {
                       {name: "About", href: '/', active: (window.location.pathname == "/about" ? true: false) }
                     ]
                   }
-                  mainTitle={MainTitle} mainImage = {{src: "https://via.placeholder.com/200", width: "50px", height: '50px', href: {refP}, borderRadius: '50%', onClick: () => {  
+                  mainTitle={MainTitle} mainImage = {{src: imagePath, width: "50px", height: '50px', borderRadius: '50%', onClick: () => {  
                     return refP;  
                   }}}
                 />
@@ -70,7 +75,7 @@ export function App () {
               <li className="nav-item border">
                 <a className="nav-link" href=""></a>
                 {
-                  loggedIn && <a className="nav-link" onClick={context.signout} href={refP}>Sign out</a>
+                  loggedIn && <a className="nav-link" onClick={signout} href="/home">Sign out</a>
                 }
                 {
                   !loggedIn && <a className="nav-link" onClick={() => {console.debug("clicked!")}} href={refP}>Sign in</a>
