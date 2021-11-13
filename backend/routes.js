@@ -210,6 +210,43 @@ app.put('/user/bio', async(req,res) => {
   })
 })
 
+// USER STORY 4.2
+// As a candidate	I want to be able to update information in my current election so that I can view the possible outcomes of my elections based on custom data
+// ex: update electionData set bio = 'testing' where username = 'mh';
+app.put('/updateCustomData', async(req,res) => {
+  const republicanVotes = req.body.republicanVotes
+  const democraticVotes = req.body.democraticVotes
+  const greenVotes = req.body.greenVotes
+  const libertarianVotes = req.body.libertarianVotes
+  const otherVotes = req.body.otherVotes
+  const electionId = req.body.electionId
+  pool.getConnection(function(err,connection) {
+
+    connection.query("UPDATE users SET republicanVotes = ? where electionId = ?", [republicanVotes,electionId], function(err,result,fields) {
+      res.send(result);
+    })
+
+    connection.query("UPDATE users SET democraticVotes = ? where electionId = ?", [democraticVotes,electionId], function(err,result,fields) {
+      res.send(result);
+    })
+
+    connection.query("UPDATE users SET greenVotes = ? where electionId = ?", [greenVotes,electionId], function(err,result,fields) {
+      res.send(result);
+    })
+
+    connection.query("UPDATE users SET libertarianVotes = ? where electionId = ?", [otherVotes,electionId], function(err,result,fields) {
+      res.send(result);
+    })
+
+    connection.query("UPDATE users SET otherVotes = ? where electionId = ?", [bio,electionId], function(err,result,fields) {
+      res.send(result);
+    })
+
+    connection.release();
+
+  })
+})
+
   /*
   Returns an array of json objects that contain data in the following format:
   {
