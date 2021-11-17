@@ -1,7 +1,7 @@
 // import closeUp from '/images/closeUp.JPG'
 import React, { useState } from 'react';
 import '../styles/footer.css';
-import {MainBackgroundColor} from "../constants/constants";
+import {MAIN_BACKGROUND_COLOR} from "../constants/constants";
 const Footer = ({mainTitle}) => {
     const calcFontColor = (baseColor) => {
         if(baseColor.length === 4){
@@ -15,10 +15,10 @@ const Footer = ({mainTitle}) => {
             return "white"
         }
     }
-    const [fontColor] = useState(calcFontColor(MainBackgroundColor))
+    const [fontColor] = useState(calcFontColor(MAIN_BACKGROUND_COLOR))
     return (
         <>
-            <section className = {"wideFooter"} style={{backgroundColor: MainBackgroundColor}}>
+            <section className = {"wideFooter"} style={{backgroundColor: MAIN_BACKGROUND_COLOR}}>
                 <h3 className={"footerText"} style={{color: fontColor}}>
                     {mainTitle}
                 </h3>
