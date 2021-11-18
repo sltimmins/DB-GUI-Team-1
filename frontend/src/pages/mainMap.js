@@ -1,226 +1,284 @@
 import React, { useState, useEffect, useRef, createRef } from 'react';
-import Button from "../components/genericButton";
-import SearchBar from "../components/searchBar";
 import mapboxgl from 'mapbox-gl';
-import MetaTags from 'react-meta-tags';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import "../styles/maps.css"
 import axios from "axios";
-import {placesPayload, statesGeoJSON, politicalColors, DEMOCRAT} from "../test_data/test_data_objects";
+import {politicalColors} from "../test_data/test_data_objects";
+import {mapboxAPIKey} from "../constants/constants";
+import Button from "../components/genericButton";
 
-mapboxgl.accessToken = 'pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY3BycHdob3oifQ.xuqTng_6PKWKkW59Us5aXA';
+mapboxgl.accessToken = mapboxAPIKey;
 
-export default function Maps(props){
-    const refs = useRef(placesPayload.map(() => createRef()));
-    const mapContainers = useRef(new Array());
-    const [renderElems, setRenderElems] = useState([<div ref={(elem) => mapContainers.current.push(elem)} className={"map-container"}></div>]);
-    const maps = useRef(placesPayload.map(() => createRef()));
-    const [lng, setLng] = useState(-70.9);
-    const [lat, setLat] = useState(42.35);
-    const [zoom, setZoom] = useState(4);
-    const [placesCopy, setPlacesCopy] = useState(placesPayload)
-    const [setOfStates, setSetOfStates] = useState(new Set())
-    const arrToMap = () => {
-        let mapOfNames = new Set();
-        for(const place of placesPayload) {
-            mapOfNames.add(place.state);
-        }
-        return mapOfNames;
+const statusMap = {
+    "D" : "Democrat",
+    "R" : "Republican",
+}
+
+const ChangeRow = ({name, original, change}) => {
+    return (
+        <tr className={"changeTableRow"}>
+            <td className={"changeTableRowName"}><span className={"deleteEntry"}>-</span>{name}</td>
+            <td className={"changeTableRowOriginal"}>{original}</td>
+            <td className={"changeTableRowChange"}>{change}</td>
+        </tr>
+    )
+}
+
+export default function MainMap({place, polygons, affiliations, placesArray}){
+    const copyArr = (source) => {
+        return JSON.parse(JSON.stringify(source))
     }
-    const [placeselection, setplaceselection] = useState(arrToMap())
-    useEffect(async() => {
-        console.log("use effect")
-        for(let i = 0; i < placesCopy.length; i++){
-            const entry = placesCopy[i];
-            await axios({
-                method: 'get',
-                url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${entry.state}.json?types=region&access_token=pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY3BycHdob3oifQ.xuqTng_6PKWKkW59Us5aXA`
-            })
-            .then(function (response) {
-                console.log(refs)
-                let newLat = response.data["features"][0]["center"][0]
-                let newLng = response.data["features"][0]["center"][1]
-                console.log(newLat, newLng)
-                maps.current[i] = new mapboxgl.Map({
-                        container: refs.current[i],
-                        style: 'mapbox://styles/mapbox/streets-v11',
-                        center: [newLat, newLng],
-                        zoom: zoom,
-                        setPaintProperty: ('region', 'fill-color', 'rgb(255, 0, 0)')
-                    }
-                );
-                maps.current[i].on('load', () => {
-                    console.log("Loaded")
-                    for(const stateJS of statesGeoJSON){
-                        let stateName = stateJS.properties.NAME;
-                        if(entry.state == stateName) {
-                            if(setOfStates.has(entry.state)){
-                                return
-                            }
-                            setOfStates.add(entry.state)
-                            console.log(stateJS.geometry.coordinates)
-                            maps.current[i].addSource(entry.state.toLowerCase(), {
-                                'type': 'geojson',
-                                'data': {
-                                    'type': 'Feature',
-                                    'geometry': {
-                                        'type': stateJS.geometry.type,
-                                        // These coordinates outline Maine.
-                                        'coordinates': stateJS.geometry.coordinates,
-                                    }
-                                }
-                            });
-                            // Add a new layer to visualize the polygon.
-                            maps.current[i].addLayer({
-                                'id': entry.state.toLowerCase(),
-                                'type': 'fill',
-                                'source': entry.state.toLowerCase(), // reference the data source
-                                'layout': {},
-                                'paint': {
-                                    'fill-color': politicalColors[entry.status], // blue color fill
-                                    'fill-opacity': 0.5
-                                }
-                            });
-                        }
-
-                    }
-                })
-            });
-
-        }
-
-    }, []);
-
-    const renderMap = (entry) => {
-        for(const stateJS of statesGeoJSON){
-        let stateName = stateJS.properties.NAME;
-        if(entry.state == stateName) {
-            console.log(stateJS.geometry.coordinates)
-            maps.current[0].addSource(entry.state.toLowerCase(), {
-                'type': 'geojson',
-                'data': {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': stateJS.geometry.type,
-                        // These coordinates outline Maine.
-                        'coordinates': stateJS.geometry.coordinates,
-                    }
+    const [placesArrayCopy, setPlacesArrayCopy] = useState(copyArr(placesArray))
+    const getElectoralVotes = () => {
+        if(placesArrayCopy){
+            let map = {}
+            for(const placeObj of placesArrayCopy){
+                if(placeObj["EV"]){
+                    map[placeObj["status"]] = map[placeObj["status"]] ? map[placeObj["status"]] + placeObj["EV"] : placeObj["EV"]
                 }
-            });
-            // Add a new layer to visualize the polygon.
-            maps.current[0].addLayer({
-                'id': entry.state.toLowerCase(),
-                'type': 'fill',
-                'source': entry.state.toLowerCase(), // reference the data source
-                'layout': {},
-                'paint': {
-                    'fill-color': politicalColors[entry.status], // blue color fill
-                    'fill-opacity': 0.5
-                }
-            });
-        }
-    }
-    }
-
-    const handleSelection = async(val) => {
-        console.log(val)
-        let entry = null;
-        for(const stateObj of placesPayload){
-            if(stateObj.state == val){
-                entry = stateObj
             }
+            return map;
+        } else {
+            return null
         }
-        if(placeselection.has(val)){
-            await axios({
-                method: 'get',
-                url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${val}.json?types=region&access_token=pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY3BycHdob3oifQ.xuqTng_6PKWKkW59Us5aXA`
-            })
-            .then(function (response) {
-                console.log(refs)
-                let newLat = response.data["features"][0]["center"][0]
-                let newLng = response.data["features"][0]["center"][1]
-                console.log(newLat, newLng)
-                setZoom(2);
-                maps.current[0] = new mapboxgl.Map({
-                        container: refs.current[0],
-                        style: 'mapbox://styles/mapbox/streets-v11',
-                        center: [newLat, newLng],
-                        zoom: zoom,
-                        setPaintProperty: ('region', 'fill-color', 'rgb(255, 0, 0)')
-                    }
-                );
-                maps.current[0].on('load', () => {
-                    console.log("Loaded")
-                    renderMap(entry)
-                })
-                setPlacesCopy([entry]);
-            });
-        }
+        return null;
     }
 
-    const handleAllSelection = async() => {
-        const val = "United States"
+    const [mapOfAffiliation, setMapOfAffiliation] = useState(copyArr(affiliations))
+    const ref = useRef(createRef());
+    const map = useRef(null);
+    const [setOfStates, setSetOfStates] = useState(new Set())
+    const [electionNumbers, setElectionNumbers] = useState(getElectoralVotes())
+    const [chosenChangeLocation, setChosenChangeLocation] = useState("")
+    const [newAffiliation, setNewAffiliation] = useState("")
+    useEffect(async() => {
+        const entry = place;
         await axios({
             method: 'get',
-            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${val}.json?types=country&access_token=pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY3BycHdob3oifQ.xuqTng_6PKWKkW59Us5aXA`
+            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${entry.state}.json?types=${entry.state === "United States" ? "country" : "region"}&access_token=${mapboxAPIKey}`
         })
         .then(function (response) {
-            console.log(refs)
             let newLat = response.data["features"][0]["center"][0]
             let newLng = response.data["features"][0]["center"][1]
-            console.log(newLat, newLng)
-            maps.current[0] = new mapboxgl.Map({
-                    container: refs.current[0],
+            map.current = new mapboxgl.Map({
+                    container: ref.current,
                     style: 'mapbox://styles/mapbox/streets-v11',
                     center: [newLat, newLng],
-                    zoom: 2,
-                    setPaintProperty: ('region', 'fill-color', 'rgb(255, 0, 0)')
+                    zoom: entry.state === "United States" ? 2 : 4,
                 }
             );
-            maps.current[0].on('load', () => {
-                console.log("Loaded")
-                for(let entry of placesPayload){
-                    renderMap(entry)
+            map.current.on('load', () => {
+                for(const stateJS of polygons){
+                    if(setOfStates.has(stateJS.properties.NAME)){
+                        return
+                    }
+                    setOfStates.add(stateJS.properties.NAME)
+                    map.current.addSource(stateJS.properties.NAME.toLowerCase(), {
+                        'type': 'geojson',
+                        'data': {
+                            'type': 'Feature',
+                            'geometry': {
+                                'type': stateJS.geometry.type,
+                                // These coordinates outline Maine.
+                                'coordinates': stateJS.geometry.coordinates,
+                            }
+                        }
+                    });
+                    // Add a new layer to visualize the polygon.
+                    map.current.addLayer({
+                        'id': stateJS.properties.NAME.toLowerCase(),
+                        'type': 'fill',
+                        'source': stateJS.properties.NAME.toLowerCase(), // reference the data source
+                        'layout': {},
+                        'paint': {
+                            'fill-color': politicalColors[mapOfAffiliation ? mapOfAffiliation[stateJS.properties.NAME.toLowerCase()] : "white"], // blue color fill
+                            'fill-opacity': 0.5
+                        }
+                    });
                 }
+                setOfStates.clear()
             })
-            setPlacesCopy([{"state": val}]);
         });
+    });
+
+    const checkObjectEquality = (obj1, obj2) => {
+        for(const key in obj1) {
+            if(obj1[key] != obj2[key])
+                return false
+        }
+        return true
     }
 
-    const transformArr = () => {
-        let newArr = [];
-        for(const elem of placesPayload) {
-            newArr.push({name: elem.state, href: '/'})
+    const votingGradient = () => {
+        let gradient = "linear-gradient(to right, "
+        for(const key in electionNumbers) {
+            gradient += politicalColors[key] + ", "
         }
-        return newArr;
+        gradient = gradient.substring(0, gradient.length - 2) + ")";
+        console.log(gradient)
+        return gradient;
+    }
+
+    const getWinner = () => {
+        let max = [-Infinity, ""];
+        for(const prop in electionNumbers){
+            if(electionNumbers[prop] > max[0]) {
+                max = [electionNumbers[prop], prop]
+            }
+        }
+        return max;
     }
 
     return (
         <>
-            <main className={"mapMain"}>
-                <div className={"divForButton"}>
-                    <div>
-                        <SearchBar routes={transformArr()} placeHolder={"Search for Locations"} baseColor={"white"} textColor={"black"} dropShadow={true} onChangeFunc={val => handleSelection(val.target.value)}/>
-                    </div>
-                </div>
-                <div className={"divForButton"} id={"USButton"}>
-                    <Button mainText={"United States"} baseColor={"black"} textColor={"white"} onButtonClick={() => {handleAllSelection()}}/>
-                </div>
-            </main>
             <section className={"assortmentOfMaps"}>
-
-                {placesCopy.map((el, i) => (
-                        <div className={"mapWrapper "+(placesCopy.length == 1 ? "largerMap mapboxgl-map" : "")} id={`id-${el.state}`}>
-                            <div ref={(el) => refs.current[i] = el} className={"map-container "+(placesCopy.length == 1 ? "largerMap mapboxgl-map" : "")}>
+                {place ?
+                    [(<div className={"mapWrapper largerMap mapboxgl-map"} id={`id-${place.state}`}>
+                            <div ref={(el) => ref.current = el} className={"map-container largerMap mapboxgl-map"}>
 
                             </div>
-                            <h2>{el.state}</h2>
-                            <div className={"exploreMapButton"}>
-                                <Button mainText={"Explore Map"} baseColor={"#232323"}/>
+                            <h2>{place.state}</h2>
+                        </div>)] :
+                    []}
+            </section>
+            <section>
+                <section className={"votingBarContainer"}>
+                    <h3>
+                        Winner: {statusMap[getWinner()[1]]}
+                    </h3>
+                    <div className={"votingBar"} style={{background: votingGradient()}}>
+
+                    </div>
+                </section>
+                <div className={"resultDiv"}>
+                    {
+                    electionNumbers ?
+                        Object.keys(electionNumbers).map((key, index) =>
+                            <div>
+                                <h5>
+                                    {statusMap[key]} - {electionNumbers[key]}
+                                </h5>
                             </div>
-                        </div>
-                    )
-                )}
+                        ) : []
+                    }
+                </div>
+            </section>
+            <section className={"changeAffiliationSectionContainer"}>
+                <div>
+                    <h3>
+                        Make changes to your map!
+                    </h3>
+                </div>
+                <section className={"changeAffiliationSection"}>
+                    <div>
+                        <label htmlFor={"locationAffiliation"}>
+                            Location
+                        </label>
+                        <select id={"locationAffiliation"} onChange={(el) => {setChosenChangeLocation(el.target.value)}}>
+                            <option value={""}></option>
+                        {
+                            mapOfAffiliation ?
+                                Object.keys(mapOfAffiliation).map((key, index) =>
+                                <option value={key} key={"option_"+key}>
+                                    {key}
+                                </option>
+                            ) : []
+                        }
+                        </select>
+                    </div>
+                    <div>
+                        <label htmlFor={"originalAffiliation"}>
+                            Original Affiliation
+                        </label>
+                        <select id={"originalAffiliation"} className={"originalSelect"} style={{borderColor: chosenChangeLocation ? politicalColors[affiliations[chosenChangeLocation]] : 'black'}} value={affiliations[chosenChangeLocation]}>
+                            <option value={""}></option>
+                            <option value={"D"}>
+                                Democrat
+                            </option>
+                            <option value={"R"}>
+                                Republican
+                            </option>
+                            <option value={"G"}>
+                                Green Party
+                            </option>
+                            <option value={"L"}>
+                                Libertarian Party
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label htmlFor={"newAffiliation"}>
+                            New Affiliation
+                        </label>
+                        <select id={"newAffiliation"} onChange={el => {setNewAffiliation(el.target.value)}} style={{borderColor: newAffiliation ? politicalColors[newAffiliation] : 'black', borderWidth: '2px'}}>
+                            <option value={""}></option>
+                            <option value={"D"}>
+                                Democrat
+                            </option>
+                            <option value={"R"}>
+                                Republican
+                            </option>
+                            <option value={"G"}>
+                                Green Party
+                            </option>
+                            <option value={"L"}>
+                                Libertarian Party
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style={{color: 'transparent'}}>j </label>
+                        <Button mainText={"Submit"} baseColor={chosenChangeLocation ? politicalColors[mapOfAffiliation[chosenChangeLocation]] : 'black'} textColor={"white"} paddingHorizontal={"9px"} paddingVertical={"6px"} fontSize={'10pt'} disabled={(!chosenChangeLocation || !newAffiliation)}
+                            onButtonClick={() => {
+                                let copy = JSON.parse(JSON.stringify(electionNumbers))
+                                for(const placeObj of placesArrayCopy){
+                                    if(placeObj["state"].toLowerCase() == chosenChangeLocation.toLowerCase()){
+                                        console.log(mapOfAffiliation[chosenChangeLocation], placeObj["EV"], copy)
+                                        copy[mapOfAffiliation[chosenChangeLocation]] -= placeObj["EV"]
+                                        copy[newAffiliation] += placeObj["EV"]
+                                    }
+                                }
+                                setElectionNumbers(copy)
+                                copy = JSON.parse(JSON.stringify(mapOfAffiliation))
+                                copy[chosenChangeLocation] = newAffiliation;
+                                setMapOfAffiliation(copy);
+                            }}
+                        />
+                    </div>
+                </section>
+            </section>
+            <section className={"tableDiv"}>
+                <div className={"tableWrapper"}>
+                    <table className={"changeTable"}>
+                        <thead>
+                            <tr className={"changeTableRow headRow"}>
+                                <th className={"changeTableRowName"}>
+                                    Location
+                                </th>
+                                <th className={"changeTableRowOriginal"}>
+                                    Original Affiliation
+                                </th>
+                                <th className={"changeTableRowChange"}>
+                                    Change Affiliation
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                mapOfAffiliation ?
+                                    Object.keys(mapOfAffiliation).map((key, index) =>
+                                        {
+                                            return (mapOfAffiliation[key] == affiliations[key]) ? [] :
+                                                <ChangeRow name={key} original={affiliations[key]} change={mapOfAffiliation[key]} key = {"changeRow_"+key}/>
+                                        }
+                                    ) : []
+                            }
+                            {
+                                checkObjectEquality(mapOfAffiliation, affiliations) ? <tr><td>No changes have been made</td></tr> : []
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </section>
         </>
     );

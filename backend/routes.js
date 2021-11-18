@@ -189,7 +189,7 @@ module.exports = function routes(app, logger) {
     })
   })
 
-  app.get('/users/get_user', async(req,res) => {
+  app.get('/users/get_user', async(req,res) => {  
     pool.getConnection(function(err,connection) {
       const userName = req.body.userName
     
@@ -199,14 +199,19 @@ module.exports = function routes(app, logger) {
       connection.release();
     })
   })
-  // app.get('/showMyEmail', authenticateToken, (req,res) => {
-  //   pool.getConnection(function(err,connection) {
-  //     connection.query("Select email FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
-  //       res.send(result);
-  //     })
-  //     connection.release()
-  //   })
-  // })
+
+// users/{username}: update bio
+// ex: update users set bio = 'testing' where username = 'mh';
+app.put('/user/bio', async(req,res) => {
+  const bio = req.body.bio
+  const username = req.body.username
+  pool.getConnection(function(err,connection) {
+    connection.query("update users set bio = ? where username = ?", [bio,username], function(err,result,fields) {
+      res.send(result);
+    })
+    connection.release();
+  })
+})
 
   /*
   Returns an array of json objects that contain data in the following format:
@@ -221,12 +226,13 @@ module.exports = function routes(app, logger) {
   */
   app.get('/electionData',(req,res) => {
     pool.getConnection(async function(err,connection) {
-      year = req.body.year;
-      electionId = -1
+      let year = req.query.year;
+      let electionId = -1
       connection.query("SELECT electionId FROM elections where year = ?",[year], function(err,result,fields) {
         if(err) {
           logger.error("Error querying Database\n", err)
         } else {
+           console.log("result", result)
           electionId = result[0].electionId
         }
       })
@@ -239,7 +245,7 @@ module.exports = function routes(app, logger) {
           logger.error("Something went wrong...")
           res.send(err)
         } else {
-          vals = []
+          let vals = []
           for(let i = 0; i < 50; i ++) {
             RV = Number(result[i].republicanVotes)
             DV = Number(result[i].democraticVotes)
@@ -259,6 +265,7 @@ module.exports = function routes(app, logger) {
               "shortName":result[i].shortName,
               "winner":winner,
               "EV":result[i].electoralVotes,
+              "status": winner
             }
             vals.push(tempRow)
 

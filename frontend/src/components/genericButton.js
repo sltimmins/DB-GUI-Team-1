@@ -1,15 +1,14 @@
 // import closeUp from '/images/closeUp.JPG'
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import '../styles/generic_button.css';
 
-const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVertical, fontSize, fontWeight, dropShadow, onButtonClick}) => {
+const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVertical, fontSize, fontWeight, dropShadow, onButtonClick, gradient, disabled}) => {
     const calcFontColor = () => {
-        if(baseColor.length==4){
+        if(baseColor.length === 4){
             baseColor+= baseColor.substring(1, 4);
         }
         let decimal = parseInt(baseColor.substring(1, baseColor.length), 16);
         let darkBoundary = parseInt("777777", 16)
-        console.log(decimal, darkBoundary, baseColor)
         if(darkBoundary < decimal){
             return "black"
         } else {
@@ -37,15 +36,24 @@ const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVerti
         }
         if(!dropShadow){
             initialStyles.filter = "drop-shadow(0 0 0 white)"
+        } else {
+            initialStyles.filter = dropShadow
+        }
+        if(gradient) {
+            initialStyles.background = gradient;
         }
         return initialStyles;
     }
-    const [fontColor, setFontColor] = useState(textColor ? textColor : calcFontColor())
     const [dynamicStyles, setDynamicStyles] = useState(setStyles())
-
+    //
+    // useEffect(
+    //     () => {
+    //         setDynamicStyles(setStyles())
+    //     }
+    // )
 
     return (
-        <button className={"genericButton"} style={dynamicStyles} type={"button"} role={"button"} onClick={onButtonClick}>{mainText}</button>
+        <button className={"genericButton"} style={dynamicStyles} type={"button"} role={"button"} onClick={onButtonClick} disabled={disabled}>{mainText}</button>
     );
   };
 
