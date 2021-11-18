@@ -40,8 +40,6 @@ export function App () {
      setupLogin(context);
   }, [])
 
-  console.log(context.user);
-
   return (
     <AppContext.Provider value={context}>
         <Router>
@@ -51,7 +49,8 @@ export function App () {
                   [
                     {name: "Home", href: '/', active: (window.location.pathname === "/")},
                     {name: "Maps", href: '/maps', active: (window.location.pathname === "/maps")},
-                    {name: "About", href: '/', active: (window.location.pathname === "/about") }
+                    {name: "About", href: '/', active: (window.location.pathname === "/about") },
+                    {name: "Search", href: '/search', active: (window.location.pathname == "/search") }
                   ]
                 }
                 mainTitle={MainTitle} mainImage = {{src: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1280px-React-icon.svg.png", width: "70px", height: '50px'}}/>
@@ -59,7 +58,7 @@ export function App () {
               <Route path="/login">
                 <Users />
               </Route>
-              <Route path="/candidateSearch">
+              <Route path="/search">
                 <Search />
               </Route>
               <Route path="/maps">
