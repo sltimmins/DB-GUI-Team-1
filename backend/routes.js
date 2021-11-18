@@ -212,33 +212,35 @@ app.put('/user/bio', async(req,res) => {
 
 // USER STORY 4.2
 // As a candidate	I want to be able to update information in my current election so that I can view the possible outcomes of my elections based on custom data
-// ex: update electionData set bio = 'testing' where username = 'mh';
+// ex: UPDATE electionData SET greenVotes = 0 where stateID = 1;
 app.put('/updateCustomData', async(req,res) => {
+
   const republicanVotes = req.body.republicanVotes
   const democraticVotes = req.body.democraticVotes
   const greenVotes = req.body.greenVotes
   const libertarianVotes = req.body.libertarianVotes
   const otherVotes = req.body.otherVotes
-  const electionId = req.body.electionId
+  const stateID = req.body.stateID
+
   pool.getConnection(function(err,connection) {
 
-    connection.query("UPDATE users SET republicanVotes = ? where electionId = ?", [republicanVotes,electionId], function(err,result,fields) {
+    connection.query("UPDATE electionData SET republicanVotes = ? where stateID = ?", [republicanVotes,stateID], function(err,result,fields) {
       res.send(result);
     })
 
-    connection.query("UPDATE users SET democraticVotes = ? where electionId = ?", [democraticVotes,electionId], function(err,result,fields) {
+    connection.query("UPDATE electionData SET democraticVotes = ? where stateID = ?", [democraticVotes,stateID], function(err,result,fields) {
       res.send(result);
     })
 
-    connection.query("UPDATE users SET greenVotes = ? where electionId = ?", [greenVotes,electionId], function(err,result,fields) {
+    connection.query("UPDATE electionData SET greenVotes = ? where stateID = ?", [greenVotes,stateID], function(err,result,fields) {
       res.send(result);
     })
 
-    connection.query("UPDATE users SET libertarianVotes = ? where electionId = ?", [otherVotes,electionId], function(err,result,fields) {
+    connection.query("UPDATE electionData SET libertarianVotes = ? where stateID = ?", [libertarianVotes,stateID], function(err,result,fields) {
       res.send(result);
     })
 
-    connection.query("UPDATE users SET otherVotes = ? where electionId = ?", [bio,electionId], function(err,result,fields) {
+    connection.query("UPDATE electionData SET otherVotes = ? where stateID = ?", [otherVotes,stateID], function(err,result,fields) {
       res.send(result);
     })
 
