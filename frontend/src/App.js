@@ -87,7 +87,7 @@ export function App () {
                   !loggedIn && <a className="nav-link" onClick={() => {console.debug("clicked!")}} href={refP}>Sign in</a>
                 }
               </li>
-            </ ul>
+            </ul>
             <Switch>
               <Route path="/login">
                 <Users />
