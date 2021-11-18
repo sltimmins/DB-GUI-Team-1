@@ -199,7 +199,67 @@ module.exports = function routes(app, logger) {
       connection.release();
     })
   })
-
+  //Returns all a users favorite candidates
+  //No input but user needs to be logged in
+  //return format:
+  // [
+  //   {
+  //       "firstName": "Donald",
+  //       "lastName": "Trump",
+  //       "party": "Republican"
+  //   }
+  // ]
+  app.get('/favorites/candidates', authenticateToken, (req,res) => {
+    pool.getConnection(function(err,connection) {
+      if(err){
+        res.status(300).send()
+      }
+      connection.query("SELECT accountNumber FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
+        connection.query("SELECT firstName, lastName, party FROM favorites INNER JOIN candidates c on favorites.candidateID = c.candidateId WHERE favorites.accountNumber = ?", result[0].accountNumber, function(err,result2,fields) {
+          res.send(result2);
+        })
+      })
+      
+      connection.release();
+    })
+  })
+  app.post('/favorites/candidates', authenticateToken, (req,res) => {
+    pool.getConnection(function(err,connection) {
+      if(err){
+        res.status(300).send()
+      }
+      connection.query("SELECT accountNumber FROM users WHERE username = ?", [req.user.username], function(err,result,fields) {
+        if(err){
+          res.status(400).send("Account not found")
+        }
+        accountNumber = result[0].accountNumber
+        console.log(accountNumber)
+        connection.query("SELECT candidateId FROM candidates WHERE firstName = ? AND lastName = ?", [req.body.firstName, req.body.lastName], function(err2,result2,fields) {
+          if(err2){
+            res.send(400).send("Candidate not found")
+          }
+          console.log(result2[0].candidateId)
+          connection.query("INSERT INTO favorites (accountNumber, candidateID) VALUES (?, ?)", [result[0].accountNumber, result2[0].candidateId], function(err3,result3,fields) {
+            if(err3){
+              res.send(400).send()
+            }
+            console.log(result3);
+            res.send("Candidate added to favorites")
+          })
+        })
+      })
+      
+      connection.release();
+    })
+  })
+  // app.get('/showMyEmail', authenticateToken, (req,res) => {
+  //   pool.getConnection(function(err,connection) {
+  //     connection.query("Select email FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
+  //       res.send(result);
+  //     })
+  //     connection.release()
+  //   })
+  // })
 // users/{username}: update bio
 // ex: update users set bio = 'testing' where username = 'mh';
 app.put('/user/bio', async(req,res) => {
