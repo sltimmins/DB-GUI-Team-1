@@ -55,12 +55,12 @@ module.exports = function routes(app, logger) {
         try {
           const salt = await bcrypt.genSalt()
           const hashedPassword = await bcrypt.hash(req.body.password, salt)
-          const user = {username:req.body.username, password:hashedPassword, firstName:req.body.firstName, lastName:req.body.lastName, email:req.body.email, candidate:req.body.candidate, party: req.body.party};
+          const user = {username:req.body.username, password:hashedPassword, firstName:req.body.firstName, lastName:req.body.lastName, email:req.body.email, candidate:req.body.candidate};
           
           if(candidateId == -1) {
             candidateId = null;
           }
-          connection.query("insert into users (firstName, lastName, email, candidateId, username, password, party) VALUES (?, ?, ?, ?, ?, ?, ?)", [user.firstName,user.lastName,user.email,candidateId,user.username,user.password, user.party], function(err,result,fields) {
+          connection.query("insert into users (firstName, lastName, email, candidateId, username, password) VALUES (?, ?, ?, ?, ?, ?)", [user.firstName,user.lastName,user.email,candidateId,user.username,user.password], function(err,result,fields) {
             if(err) {
               logger.error("Error creating user\n",err)
             }
@@ -169,19 +169,16 @@ module.exports = function routes(app, logger) {
   })
 
   //Route to search and get information for a user
-  app.post('/users/search_user', async(req,res) => {
+  app.get('/users/search_user', async(req,res) => {
     pool.getConnection(function(err,connection) {
-      const getWho = req.body.allUsers;
-      if(getWho === 1) {
-        connection.query("Select username, firstName, lastName, uuid, party FROM users", function(err,result,fields) {
+      const bool = req.body.bool;
+      if(bool){
+        connection.query("Select username, firstName, lastName, uuid FROM users", function(err,result,fields) {
           res.send(result);
         })
-      } else if(getWho === 2) {
+      }
+      else {
         connection.query("Select firstName, lastName, party, uuid FROM candidates", function(err,result,fields){
-          res.send(result);
-        })
-      } else {
-        connection.query("Select username, firstName, lastName, uuid, party FROM users WHERE candidateId is NULL", function(err,result,fields){
           res.send(result);
         })
       }
@@ -199,67 +196,7 @@ module.exports = function routes(app, logger) {
       connection.release();
     })
   })
-  //Returns all a users favorite candidates
-  //No input but user needs to be logged in
-  //return format:
-  // [
-  //   {
-  //       "firstName": "Donald",
-  //       "lastName": "Trump",
-  //       "party": "Republican"
-  //   }
-  // ]
-  app.get('/favorites/candidates', authenticateToken, (req,res) => {
-    pool.getConnection(function(err,connection) {
-      if(err){
-        res.status(300).send()
-      }
-      connection.query("SELECT accountNumber FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
-        connection.query("SELECT firstName, lastName, party FROM favorites INNER JOIN candidates c on favorites.candidateID = c.candidateId WHERE favorites.accountNumber = ?", result[0].accountNumber, function(err,result2,fields) {
-          res.send(result2);
-        })
-      })
-      
-      connection.release();
-    })
-  })
-  app.post('/favorites/candidates', authenticateToken, (req,res) => {
-    pool.getConnection(function(err,connection) {
-      if(err){
-        res.status(300).send()
-      }
-      connection.query("SELECT accountNumber FROM users WHERE username = ?", [req.user.username], function(err,result,fields) {
-        if(err){
-          res.status(400).send("Account not found")
-        }
-        accountNumber = result[0].accountNumber
-        console.log(accountNumber)
-        connection.query("SELECT candidateId FROM candidates WHERE firstName = ? AND lastName = ?", [req.body.firstName, req.body.lastName], function(err2,result2,fields) {
-          if(err2){
-            res.send(400).send("Candidate not found")
-          }
-          console.log(result2[0].candidateId)
-          connection.query("INSERT INTO favorites (accountNumber, candidateID) VALUES (?, ?)", [result[0].accountNumber, result2[0].candidateId], function(err3,result3,fields) {
-            if(err3){
-              res.send(400).send()
-            }
-            console.log(result3);
-            res.send("Candidate added to favorites")
-          })
-        })
-      })
-      
-      connection.release();
-    })
-  })
-  // app.get('/showMyEmail', authenticateToken, (req,res) => {
-  //   pool.getConnection(function(err,connection) {
-  //     connection.query("Select email FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
-  //       res.send(result);
-  //     })
-  //     connection.release()
-  //   })
-  // })
+
 // users/{username}: update bio
 // ex: update users set bio = 'testing' where username = 'mh';
 app.put('/user/bio', async(req,res) => {
@@ -275,7 +212,7 @@ app.put('/user/bio', async(req,res) => {
 
 // USER STORY 4.2
 // As a candidate	I want to be able to update information in my current election so that I can view the possible outcomes of my elections based on custom data
-// ex: UPDATE electionData SET greenVotes = 0 where stateID = 1;
+// ex: UPDATE electionData SET greenVotes = 1 where stateID = 1;
 app.put('/updateCustomData', async(req,res) => {
 
   const republicanVotes = req.body.republicanVotes
@@ -312,57 +249,6 @@ app.put('/updateCustomData', async(req,res) => {
   })
 })
 
-  /*
-  Returns an array of all a users favorite election years
-  No input params but user must be logged in
-  output:
-  {
-    "year":"2020"
-  }
-  */
-  app.get('/favorites/elections', authenticateToken, (req,res) => {
-    pool.getConnection(function(err,connection) {
-      if(err){
-        res.status(300).send()
-      }
-      connection.query("SELECT accountNumber FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
-        connection.query("SELECT year FROM favorites INNER JOIN elections e on favorites.electionID = e.electionId WHERE favorites.accountNumber = ? ORDER BY year DESC;", result[0].accountNumber, function(err,result2,fields) {
-          res.send(result2);
-        })
-      })
-      
-      connection.release();
-    })
-  })
-  app.post('/favorites/elections', authenticateToken, (req,res) => {
-    pool.getConnection(function(err,connection) {
-      if(err){
-        res.status(300).send()
-      }
-      connection.query("SELECT accountNumber FROM users WHERE username = ?", [req.user.username], function(err,result,fields) {
-        if(err){
-          res.status(400).send("Account not found")
-        }
-        accountNumber = result[0].accountNumber
-        console.log(accountNumber)
-        connection.query("SELECT electionId FROM elections WHERE year = ?", [req.body.year], function(err2,result2,fields) {
-          if(err2){
-            res.send(400).send("Election not found")
-          }
-          console.log(result2[0])
-          connection.query("INSERT INTO favorites (accountNumber, electionID) VALUES (?, ?)", [result[0].accountNumber, result2[0].electionId], function(err3,result3,fields) {
-            if(err3){
-              res.send(400).send()
-            }
-            console.log(result3);
-            res.send("Candidate added to favorites")
-          })
-        })
-      })
-
-      connection.release();
-    })
-  })
   /*
   Returns an array of json objects that contain data in the following format:
   {
