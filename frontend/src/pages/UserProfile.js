@@ -54,42 +54,55 @@ export default function UserProfile() {
 
     return (
         <div>
-            <header className="text-center bg-secondary p-3 d-static">
-                <img src={imagePath} alt="" className="rounded-circle" style={{width: "17rem", height: '17rem'}}/>                
-                <h1 className="text-white pt-2">{user.firstName + " " + user.lastName}</h1>          
-            </header>
-            <main>      
-                <div className="container my-4 bg-light rounded">
-                    <form>
-                        <div className="row pt-2">
-                            <div className="from-group col">
-                                <label className="custom-file-label" htmlFor="imageFile">Profile picture</label>
-                                <input className="file form-control" type="file" id="imageFile" name="img[]" accept="image/*" onChange={changeProfilePic}/>
-                            </div>
+            <div></div>
+            {
+                isUser && <div>
+                    <header className="text-center bg-secondary p-3 d-static">
+                        <img src={imagePath} alt="" className="rounded-circle" style={{width: "17rem", height: '17rem'}}/>                
+                        <h1 className="text-white pt-2">{user.firstName + " " + user.lastName}</h1>          
+                    </header>
+                    <main>      
+                        <div className="container my-4 bg-light rounded">
+                            <form>
+                                <div className="row pt-2">
+                                    <div className="from-group col">
+                                        <label className="custom-file-label" htmlFor="imageFile">Profile picture</label>
+                                        <input className="file form-control" type="file" id="imageFile" name="img[]" accept="image/*" onChange={changeProfilePic}/>
+                                    </div>
+                                </div>
+                                <div className="row pt-2">
+                                    <div className="form-group col">
+                                        <label htmlFor="fName">First Name</label>  
+                                        <input type="text" id="fName" className="form-control p-2" onChange={handleInputChange} defaultValue={user.firstName}></input>   
+                                    </div>
+                                    <div className="form-group col">
+                                        <label htmlFor="lName">Last Name</label>
+                                        <input type="text" id="lName" className="form-control p-2" onChange={handleInputChange} defaultValue={user.lastName}></input>
+                                    </div>
+                                </div>
+                                <div className="row my-1">
+                                    <div className="form-group">
+                                        <label htmlFor="bio">Bio</label>
+                                        <textarea type="text" id="bio" className="form-control col w-100" maxLength="1000" onChange={handleInputChange} style={{minHeight: '10rem', maxHeight: '30rem'}} defaultValue={user.bio}></textarea>
+                                    </div>
+                                </div>
+                                <div className="form-group py-3">
+                                    <button className="btn btn-outline-success form-control col p-3" type="button" onClick={handleClick}>Save</button>   
+                                </div>
+                            </form>
                         </div>
-                        <div className="row pt-2">
-                            <div className="form-group col">
-                                <label htmlFor="fName">First Name</label>  
-                                <input type="text" id="fName" className="form-control p-2" onChange={handleInputChange} defaultValue={user.firstName}></input>   
-                            </div>
-                            <div className="form-group col">
-                                <label htmlFor="lName">Last Name</label>
-                                <input type="text" id="lName" className="form-control p-2" onChange={handleInputChange} defaultValue={user.lastName}></input>
-                            </div>
-                        </div>
-                        <div className="row my-1">
-                            <div className="form-group">
-                                <label htmlFor="bio">Bio</label>
-                                <textarea type="text" id="bio" className="form-control col w-100" maxLength="1000" onChange={handleInputChange} style={{minHeight: '10rem', maxHeight: '30rem'}} defaultValue={user.bio}></textarea>
-                            </div>
-                        </div>
-                        <div className="form-group py-3">
-                            <button className="btn btn-outline-success form-control col p-3" type="button" onClick={handleClick}>Save</button>   
-                        </div>
-                    </form>
+                    </main>
+                </div>    
+            }
+            {
+                <div>
+                    <header className="text-center bg-secondary p-3 d-static">
+                        <img src={imagePath} alt="" className="rounded-circle" style={{width: "17rem", height: '17rem'}}/>                
+                        <h1 className="text-white pt-2">{currUser.firstName + " " + currUser.lastName}</h1>          
+                    </header>
                 </div>
-            </main>
-        </div>    
+            }
+        </div>
     );
 }
 
