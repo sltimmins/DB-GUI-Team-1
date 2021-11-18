@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import Users from "./Users.js"
 import Home from "./pages/home";
+import UserProfile from './pages/UserProfile';
 import Header from "./components/header";
 import Footer from "./components/footer";
 import Search from "./pages/search";
@@ -24,11 +25,10 @@ export function App () {
   // Global context
   let context = useProvideAppContext();
 
-  console.log(context.user);
-
   // handle signout
   const signout = () => {
-    localStorage.setItem('jwt', "")
+    localStorage.setItem('jwt', "");
+
   }
 
   const [allStates, setAllStates] = useState([])
@@ -40,10 +40,50 @@ export function App () {
      setupLogin(context);
   }, [])
 
+  let refP = "/login";
+  let loggedIn = false;
+  if (context.JWT != undefined) {
+    loggedIn = true;
+    refP = "/UserProfile";
+  }
+
+  let uuid = "";
+  if (context.user != undefined && context.user.uuid != null) {
+    uuid = context.user.uuid;
+  }
+  let imagePath = "assets/userImages/default.jpg";
+
+  if (uuid != "") {
+    imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
+  }
+
+
   return (
     <AppContext.Provider value={context}>
         <Router>
           <div className={"initialView"}>
+            <ul className="nav">
+              <li className="nav-item col">
+                <Header className="col" baseColor={MainBackgroundColor} 
+                  routes={
+                    [
+                      {name: "Home", href: '/', active: (window.location.pathname == "/" ? true: false)},
+                      {name: "Maps", href: '/maps', active: (window.location.pathname == "/maps" ? true: false)},
+                      {name: "About", href: '/', active: (window.location.pathname == "/about" ? true: false) }
+                    ]
+                  }
+                  mainTitle={MainTitle} mainImage = {{src: imagePath, width: "50px", height: '50px', borderRadius: '50%', onClick: () => {  
+                    return refP;  
+                  }}}
+                />
+              </li>
+              <li className="nav-item border">
+                <a className="nav-link" href=""></a>
+                {
+                  loggedIn && <a className="nav-link" onClick={signout} href="/home">Sign out</a>
+                }
+                {
+                  !loggedIn && <a className="nav-link" onClick={() => {console.debug("clicked!")}} href={refP}>Sign in</a>
             <Header baseColor={MainBackgroundColor}
                 routes={
                   [
@@ -53,7 +93,9 @@ export function App () {
                     {name: "Search", href: '/search', active: (window.location.pathname == "/search") }
                   ]
                 }
-                mainTitle={MainTitle} mainImage = {{src: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1280px-React-icon.svg.png", width: "70px", height: '50px'}}/>
+              </li>
+            </ul>
+
             <Switch>
               <Route path="/login">
                 <Users />
@@ -63,6 +105,9 @@ export function App () {
               </Route>
               <Route path="/maps">
                 <Maps />
+              </Route>
+              <Route path="/UserProfile">
+                <UserProfile />
               </Route>
               <Route path="/">
                 <Home />
