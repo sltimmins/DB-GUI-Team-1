@@ -63,14 +63,7 @@ export function App () {
         <Router>
           <div className={"initialView"}>
             <ul className="nav">
-              <li className="nav-item border">
-                <a className="nav-link" href=""></a>
-                {
-                  loggedIn && <a className="nav-link" onClick={signout} href="/home">Sign out</a>
-                }
-                {
-                  !loggedIn && <a className="nav-link" onClick={() => {console.debug("clicked!")}} href={refP}>Sign in</a>
-                }
+              <li className="nav-item col">
                 <Header baseColor={MainBackgroundColor}
                   routes={
                     [
@@ -80,8 +73,20 @@ export function App () {
                       {name: "Search", href: '/search', active: (window.location.pathname == "/search") }
                     ]
                   }
+                  mainTitle={MainTitle} mainImage = {{src: imagePath, width: "50px", height: '50px', borderRadius: '50%', onClick: () => {  
+                    return refP;  
+                  }}}
                 />
               </ li>
+              <li className="nav-item border">
+                <a className="nav-link" href=""></a>
+                {
+                  loggedIn && <a className="nav-link" onClick={signout} href="/home">Sign out</a>
+                }
+                {
+                  !loggedIn && <a className="nav-link" onClick={() => {console.debug("clicked!")}} href={refP}>Sign in</a>
+                }
+              </li>
             </ul>
             <Switch>
               <Route path="/login">
