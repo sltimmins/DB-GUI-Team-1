@@ -13,7 +13,7 @@ export const ROUTES = [
 
     },
     {
-        path: "/candidateSearch",
+        path: "/search",
         exact: true,
         component: (routeData, getRouteData) => <Search routeData = {routeData} getRouteData={getRouteData}/>
     },

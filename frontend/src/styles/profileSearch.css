@@ -3,9 +3,13 @@
     font-size: 1rem;
 }
 
-#candidateSearchBar {
+.userSearchBar {
     margin-left: .75rem;
     width: 15rem;
+}
+
+.filterMargin {
+    margin-right: 1.5rem;
 }
 
 
@@ -18,5 +22,9 @@
     #candidateSearchBar {
         margin-left: .7rem;
         width: 127%;
+    }
+
+    .filterMargin {
+        margin-left: auto;
     }
 }

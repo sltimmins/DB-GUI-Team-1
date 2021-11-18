@@ -1,29 +1,42 @@
 import React, { useState, useContext } from 'react';
 import { AppContext } from '../AppContext'
 import Scroll from '../components/scroll.js'
-import CandidateList from './candidateList';
-import '../styles/candidateSearch.css'
+import ProfileList from './profileList.js';
+import '../styles/profileSearch.css'
 import axios from 'axios';
+import { DropdownButton, Dropdown } from 'react-bootstrap';
 
 export default function Search() {
-    const [loadCandidates, setLoadCandidates] = useState(false)
-    const [searchField, setSearchField] = useState("")
-    const [candidatesList, setCandidatesList] = useState([]);
+
+    const [load, setLoad] = useState(false);
+    const [searchField, setSearchField] = useState("");
+    const [filterParty, setFilterParty] = useState("");
+    const [list, setList] = useState([]);
 
     const { baseURL } = useContext(AppContext);
 
-    if(!loadCandidates) {
-        axios.get(baseURL + '/users/search_user', { bool: false }).then((res) => {
-            setCandidatesList(res.data);
+    const loadCandidates = loadWho => { 
+        axios.post(baseURL + '/users/search_user', { allUsers: loadWho }).then((res) => {
+            setList(res.data);
         });
-        setLoadCandidates(true);
     }
 
-    const filteredCandidates = candidatesList.filter(candidate => {
-            let name = candidate.firstName + " " + candidate.lastName;    
-            return (
-                name.toLowerCase().includes(searchField.toLowerCase())
-            );
+    if(!load) {
+        loadCandidates(1);
+        setLoad(true);
+    }
+
+    const filteredCandidates = list.filter(user => {
+            let name = user.firstName + " " + user.lastName;
+            if(filterParty !== "") {   
+                return (
+                    name.toLowerCase().includes(searchField.toLowerCase()) && user.party === filterParty
+                );
+            } else {
+                return (
+                    name.toLowerCase().includes(searchField.toLowerCase())
+                );
+            }
         }
     );
 
@@ -31,16 +44,27 @@ export default function Search() {
         setSearchField(e.target.value);
     };
 
+    const filter = e => {
+        console.log(e)
+        if(e.target.text === "All Users") {
+            loadCandidates(1);
+        } else if(e.target.text === "Candidates Only") {
+            loadCandidates(2);
+        } else if(e.target.text === "Enthusiasts Only") {
+            loadCandidates(3);
+        }
+    }
+
     function searchList() {
         if(filteredCandidates.length > 0) {
             return (
                 <Scroll>
-                    <CandidateList filteredCandidates={filteredCandidates} />
+                    <ProfileList filteredCandidates={filteredCandidates} />
                 </Scroll>
             )
         } else {
             return (
-                <div class="center">
+                <div class="d-flex justify-content-center">
                     <div class="alert alert-primary banner" role="alert">
                         <span>No candidates found matching the search criteria.</span>
                     </div>
@@ -53,9 +77,27 @@ export default function Search() {
 
     return (
         <section>
-            <div id="candidateSearchBox">
-                <h2 id="title">Search:</h2>
-                <input className="form-control input-lg" id="candidateSearchBar" type="search" placeholder="Search" onChange={handleChange} />
+            <div className="d-flex justify-content-between">
+                <div className="p-2">
+                    <label htmlFor="searchBar" id="search" class="userSearchBar">Search:</label>
+                    <input className="form-control input-lg userSearchBar" id="searchBar" type="search" placeholder="Search" onChange={handleChange} />
+                </div>
+                <div className="p-2 filterMargin mt-3">
+                    <DropdownButton id="dropdown-item-button" title="Filter:" size="lg" variant="secondary">
+                        <DropdownButton id="dropdown-item-button" title="User Type" size="lg" variant="transparent" drop="start">
+                            <Dropdown.Item onClick={ event => filter(event) }>All Users</Dropdown.Item>
+                            <Dropdown.Item onClick={ event => filter(event) }>Candidates Only</Dropdown.Item>
+                            <Dropdown.Item onClick={ event => filter(event) }>Enthusiasts Only</Dropdown.Item>
+                        </DropdownButton>
+                        <DropdownButton id="dropdown-item-button" title="Party" size="lg" variant="transparent" drop="start">
+                            <Dropdown.Item onClick={ event => setFilterParty("") }>All Parties</Dropdown.Item>
+                            <Dropdown.Item onClick={ event => setFilterParty("Republican") }>Republican</Dropdown.Item>
+                            <Dropdown.Item onClick={ event => setFilterParty("Democrat") }>Democrat</Dropdown.Item>
+                            <Dropdown.Item onClick={ event => setFilterParty("Independent") }>Independent</Dropdown.Item>
+                            <Dropdown.Item onClick={ event => setFilterParty("Green") }>Green</Dropdown.Item>
+                        </DropdownButton>
+                    </DropdownButton>
+                </div>
             </div>
             {searchList()}
         </section>

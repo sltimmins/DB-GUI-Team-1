@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import Users from "./Users.js"
 import Home from "./pages/home";
+import UserProfile from './pages/UserProfile';
 import Header from "./components/header";
 import Footer from "./components/footer";
 import Search from "./pages/search";
@@ -25,11 +26,10 @@ export function App () {
   // Global context
   let context = useProvideAppContext();
 
-  console.log(context.user);
-
   // handle signout
   const signout = () => {
-    localStorage.setItem('jwt', "")
+    localStorage.setItem('jwt', "");
+
   }
 
   const [allStates, setAllStates] = useState([])
@@ -58,22 +58,55 @@ export function App () {
      setupLogin(context);
   }, [])
 
-  console.log(context.user);
+  let refP = "/login";
+  let loggedIn = false;
+  if (context.JWT != undefined) {
+    loggedIn = true;
+    refP = "/UserProfile";
+  }
+
+  let uuid = "";
+  if (context.user != undefined && context.user.uuid != null) {
+    uuid = context.user.uuid;
+  }
+  let imagePath = "assets/userImages/default.jpg";
+
+  if (uuid != "") {
+    imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
+  }
+
 
   return (
     <AppContext.Provider value={context}>
         <Router>
           <div className={"initialView"}>
-            <Header baseColor={MAIN_BACKGROUND_COLOR}
-                    routes={
-                  [
-                    {name: "Home", href: '/', active: (window.location.pathname === "/")},
-                    {name: "Maps", href: '/maps', active: (window.location.pathname === "/maps")},
-                    {name: "About", href: '/', active: (window.location.pathname === "/about") }
-                  ]
+            <ul className="nav">
+              <li className="nav-item col">
+                <Header baseColor={MAIN_BACKGROUND_COLOR}
+                  routes={
+                    [
+                      {name: "Home", href: '/', active: (window.location.pathname === "/")},
+                      {name: "Maps", href: '/maps', active: (window.location.pathname === "/maps")},
+                      {name: "About", href: '/', active: (window.location.pathname === "/about") },
+                      {name: "Search", href: '/search', active: (window.location.pathname == "/search") }
+                    ]
+                  }
+                  mainTitle={MAIN_TITLE} mainImage = {{src: imagePath, width: "50px", height: '50px', borderRadius: '50%', onClick: () => {
+                    return refP;  
+                  }}}
+                />
+              </ li>
+              <li className="nav-item border">
+                <a className="nav-link" href=""></a>
+                {
+                  loggedIn && <a className="nav-link" onClick={signout} href="/home">Sign out</a>
                 }
-                    mainTitle={MAIN_TITLE} mainImage = {{src: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1280px-React-icon.svg.png", width: "70px", height: '50px'}}/>
-            <Switch>
+                {
+                  !loggedIn && <a className="nav-link" onClick={() => {console.debug("clicked!")}} href={refP}>Sign in</a>
+                }
+              </li>
+            </ul>
+              <Switch>
               {
                 ROUTES.map((route, index) => (
                     <Route path={route.path} exact={route.exact} key={"route"+index}>
