@@ -44,7 +44,8 @@ export function App () {
                   [
                     {name: "Home", href: '/', active: (window.location.pathname == "/" ? true: false)},
                     {name: "Maps", href: '/maps', active: (window.location.pathname == "/maps" ? true: false)},
-                    {name: "About", href: '/', active: (window.location.pathname == "/about" ? true: false) }
+                    {name: "About", href: '/', active: (window.location.pathname == "/about" ? true: false) },
+                    {name: "Search", href: '/search', active: (window.location.pathname == "/search" ? true: false) }
                   ]
                 }
                 mainTitle={MainTitle} mainImage = {{src: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1280px-React-icon.svg.png", width: "70px", height: '50px'}}/>
@@ -52,7 +53,7 @@ export function App () {
               <Route path="/login">
                 <Users />
               </Route>
-              <Route path="/candidateSearch">
+              <Route path="/search">
                 <Search />
               </Route>
               <Route path="/maps">

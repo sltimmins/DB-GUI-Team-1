@@ -4,11 +4,13 @@ import Scroll from '../components/scroll.js'
 import ProfileList from './profileList.js';
 import '../styles/profileSearch.css'
 import axios from 'axios';
+import { DropdownButton, Dropdown } from 'react-bootstrap';
 
 export default function Search() {
 
     const [load, setLoad] = useState(false);
-    const [searchField, setSearchField] = useState("")
+    const [searchField, setSearchField] = useState("");
+    const [filterParty, setFilterParty] = useState("");
     const [list, setList] = useState([]);
 
     const { baseURL } = useContext(AppContext);
@@ -24,11 +26,17 @@ export default function Search() {
         setLoad(true);
     }
 
-    const filteredCandidates = list.filter(candidate => {
-            let name = candidate.firstName + " " + candidate.lastName;    
-            return (
-                name.toLowerCase().includes(searchField.toLowerCase())
-            );
+    const filteredCandidates = list.filter(user => {
+            let name = user.firstName + " " + user.lastName;
+            if(filterParty !== "") {   
+                return (
+                    name.toLowerCase().includes(searchField.toLowerCase()) && user.party === filterParty
+                );
+            } else {
+                return (
+                    name.toLowerCase().includes(searchField.toLowerCase())
+                );
+            }
         }
     );
 
@@ -37,11 +45,12 @@ export default function Search() {
     };
 
     const filter = e => {
-        if(e.target.value === "All users") {
+        console.log(e)
+        if(e.target.text === "All Users") {
             loadCandidates(1);
-        } else if(e.target.value === "Candidates only") {
+        } else if(e.target.text === "Candidates Only") {
             loadCandidates(2);
-        } else if(e.target.value === "Enthusiasts only") {
+        } else if(e.target.text === "Enthusiasts Only") {
             loadCandidates(3);
         }
     }
@@ -73,13 +82,21 @@ export default function Search() {
                     <label htmlFor="searchBar" id="search" class="userSearchBar">Search:</label>
                     <input className="form-control input-lg userSearchBar" id="searchBar" type="search" placeholder="Search" onChange={handleChange} />
                 </div>
-                <div className="p-2 filterMargin">
-                    <label htmlFor="candidateFilter" id="filter">Filter:</label>
-                    <select id="candidateFilter" className="user" className="form-control" onChange={filter}>
-                        <option>All users</option>
-                        <option>Candidates only</option>
-                        <option>Enthusiasts only</option>
-                    </select>
+                <div className="p-2 filterMargin mt-3">
+                    <DropdownButton id="dropdown-item-button" title="Filter:" size="lg" variant="secondary">
+                        <DropdownButton id="dropdown-item-button" title="User Type" size="lg" variant="transparent" drop="start">
+                            <Dropdown.Item onClick={ event => filter(event) }>All Users</Dropdown.Item>
+                            <Dropdown.Item onClick={ event => filter(event) }>Candidates Only</Dropdown.Item>
+                            <Dropdown.Item onClick={ event => filter(event) }>Enthusiasts Only</Dropdown.Item>
+                        </DropdownButton>
+                        <DropdownButton id="dropdown-item-button" title="Party" size="lg" variant="transparent" drop="start">
+                            <Dropdown.Item onClick={ event => setFilterParty("") }>All Parties</Dropdown.Item>
+                            <Dropdown.Item onClick={ event => setFilterParty("Republican") }>Republican</Dropdown.Item>
+                            <Dropdown.Item onClick={ event => setFilterParty("Democrat") }>Democrat</Dropdown.Item>
+                            <Dropdown.Item onClick={ event => setFilterParty("Independent") }>Independent</Dropdown.Item>
+                            <Dropdown.Item onClick={ event => setFilterParty("Green") }>Green</Dropdown.Item>
+                        </DropdownButton>
+                    </DropdownButton>
                 </div>
             </div>
             {searchList()}
