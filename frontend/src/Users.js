@@ -64,14 +64,10 @@ import axios from "axios";
           body: formData
         };
   
-        fetch('https://api.Cloudinary.com/v1_1/stimmins/image/upload', options).then(res => {
-          uuid = res.public_id;
-          console.log(uuid);
-          console.log(res);
-        })
+        fetch('https://api.Cloudinary.com/v1_1/stimmins/image/upload', options);
 
         if(firstName === "" || lastName === "" || username === "" || password === "" || email === "") {
-          setBanner("Please complete all fields")
+          setBanner("Please complete all required fields")
         } else {
           axios.post(baseURL + '/users/create_account', { firstName: firstName, lastName: lastName, username: username, password: password, email: email, candidate: cand, party: party, bio: bio}).then((res) => {
             if(profilePic) {

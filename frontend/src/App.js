@@ -15,6 +15,7 @@ import Search from "./pages/search";
 import {MainBackgroundColor, MainTitle} from "./constants/constants";
 import { AppContext, useProvideAppContext, setupLogin } from "./AppContext.js";
 import Maps from "./pages/maps";
+import {getElectionData} from "./api/api";
 require('dotenv').config()
 
 // React functional component
@@ -30,12 +31,14 @@ export function App () {
     localStorage.setItem('jwt', "")
   }
 
-  // tell app to fetch values from db on first load (if initialized)
-  useEffect(() => {
-    setupLogin(context);
-  }, [])
+  const [allStates, setAllStates] = useState([])
 
-  console.log(context.user);
+  // tell app to fetch values from db on first load (if initialized)
+  useEffect(async() => {
+     let newPayload = await getElectionData(2020);
+     setAllStates(newPayload);
+     setupLogin(context);
+  }, [])
 
   return (
     <AppContext.Provider value={context}>
@@ -44,9 +47,10 @@ export function App () {
             <Header baseColor={MainBackgroundColor}
                 routes={
                   [
-                    {name: "Home", href: '/', active: (window.location.pathname == "/" ? true: false)},
-                    {name: "Maps", href: '/maps', active: (window.location.pathname == "/maps" ? true: false)},
-                    {name: "About", href: '/', active: (window.location.pathname == "/about" ? true: false) }
+                    {name: "Home", href: '/', active: (window.location.pathname === "/")},
+                    {name: "Maps", href: '/maps', active: (window.location.pathname === "/maps")},
+                    {name: "About", href: '/', active: (window.location.pathname === "/about") },
+                    {name: "Search", href: '/search', active: (window.location.pathname == "/search") }
                   ]
                 }
                 mainTitle={MainTitle} mainImage = {{src: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1280px-React-icon.svg.png", width: "70px", height: '50px'}}/>
@@ -54,7 +58,7 @@ export function App () {
               <Route path="/login">
                 <Users />
               </Route>
-              <Route path="/candidateSearch">
+              <Route path="/search">
                 <Search />
               </Route>
               <Route path="/maps">

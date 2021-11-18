@@ -55,12 +55,12 @@ module.exports = function routes(app, logger) {
         try {
           const salt = await bcrypt.genSalt()
           const hashedPassword = await bcrypt.hash(req.body.password, salt)
-          const user = {username:req.body.username, password:hashedPassword, firstName:req.body.firstName, lastName:req.body.lastName, email:req.body.email, candidate:req.body.candidate};
+          const user = {username:req.body.username, password:hashedPassword, firstName:req.body.firstName, lastName:req.body.lastName, email:req.body.email, candidate:req.body.candidate, party: req.body.party};
           
           if(candidateId == -1) {
             candidateId = null;
           }
-          connection.query("insert into users (firstName, lastName, email, candidateId, username, password) VALUES (?, ?, ?, ?, ?, ?)", [user.firstName,user.lastName,user.email,candidateId,user.username,user.password], function(err,result,fields) {
+          connection.query("insert into users (firstName, lastName, email, candidateId, username, password, party) VALUES (?, ?, ?, ?, ?, ?, ?)", [user.firstName,user.lastName,user.email,candidateId,user.username,user.password, user.party], function(err,result,fields) {
             if(err) {
               logger.error("Error creating user\n",err)
             }
@@ -111,7 +111,7 @@ module.exports = function routes(app, logger) {
     pool.getConnection(async function(err,connection) {
       const userToFind = {username:req.body.username, password:req.body.password}
       console.log("user: ", userToFind)
-      connection.query("select username, password, accountNumber, candidateId, firstName, lastName FROM users WHERE username = ?",userToFind.username , async function(err,result,fields){
+      connection.query("select username, password, accountNumber, candidateId, firstName, lastName, uuid FROM users WHERE username = ?",userToFind.username , async function(err,result,fields){
         if(!result) {
           logger.error("Invalid username or Password")
           res.status(400).send("Invalid username or password")
@@ -138,7 +138,8 @@ module.exports = function routes(app, logger) {
                   lastName: usersJSON[0].lastName,
                   username: usersJSON[0].username,
                   user_id: usersJSON[0].accountNumber,
-                  candidate: usersJSON[0].candidate
+                  candidate: usersJSON[0].candidate,
+                  uuid: usersJSON[0].uuid
                 }
               })
             } else {
@@ -168,16 +169,19 @@ module.exports = function routes(app, logger) {
   })
 
   //Route to search and get information for a user
-  app.get('/users/search_user', async(req,res) => {
+  app.post('/users/search_user', async(req,res) => {
     pool.getConnection(function(err,connection) {
-      const bool = req.body.bool;
-      if(bool){
-        connection.query("Select username, firstName, lastName, uuid FROM users", function(err,result,fields) {
+      const getWho = req.body.allUsers;
+      if(getWho === 1) {
+        connection.query("Select username, firstName, lastName, uuid, party FROM users", function(err,result,fields) {
           res.send(result);
         })
-      }
-      else {
+      } else if(getWho === 2) {
         connection.query("Select firstName, lastName, party, uuid FROM candidates", function(err,result,fields){
+          res.send(result);
+        })
+      } else {
+        connection.query("Select username, firstName, lastName, uuid, party FROM users WHERE candidateId is NULL", function(err,result,fields){
           res.send(result);
         })
       }
@@ -185,7 +189,7 @@ module.exports = function routes(app, logger) {
     })
   })
 
-  app.get('/users/get_user', async(req,res) => {
+  app.get('/users/get_user', async(req,res) => {  
     pool.getConnection(function(err,connection) {
       const userName = req.body.userName
     
@@ -195,7 +199,6 @@ module.exports = function routes(app, logger) {
       connection.release();
     })
   })
-
   //Returns all a users favorite candidates
   //No input but user needs to be logged in
   //return format:
@@ -257,6 +260,18 @@ module.exports = function routes(app, logger) {
   //     connection.release()
   //   })
   // })
+// users/{username}: update bio
+// ex: update users set bio = 'testing' where username = 'mh';
+app.put('/user/bio', async(req,res) => {
+  const bio = req.body.bio
+  const username = req.body.username
+  pool.getConnection(function(err,connection) {
+    connection.query("update users set bio = ? where username = ?", [bio,username], function(err,result,fields) {
+      res.send(result);
+    })
+    connection.release();
+  })
+})
 
   /*
   Returns an array of json objects that contain data in the following format:
@@ -271,12 +286,13 @@ module.exports = function routes(app, logger) {
   */
   app.get('/electionData',(req,res) => {
     pool.getConnection(async function(err,connection) {
-      year = req.body.year;
-      electionId = -1
+      let year = req.query.year;
+      let electionId = -1
       connection.query("SELECT electionId FROM elections where year = ?",[year], function(err,result,fields) {
         if(err) {
           logger.error("Error querying Database\n", err)
         } else {
+           console.log("result", result)
           electionId = result[0].electionId
         }
       })
@@ -289,7 +305,7 @@ module.exports = function routes(app, logger) {
           logger.error("Something went wrong...")
           res.send(err)
         } else {
-          vals = []
+          let vals = []
           for(let i = 0; i < 50; i ++) {
             RV = Number(result[i].republicanVotes)
             DV = Number(result[i].democraticVotes)
@@ -309,6 +325,7 @@ module.exports = function routes(app, logger) {
               "shortName":result[i].shortName,
               "winner":winner,
               "EV":result[i].electoralVotes,
+              "status": winner
             }
             vals.push(tempRow)
 

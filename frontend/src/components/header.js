@@ -1,26 +1,23 @@
 // import closeUp from '/images/closeUp.JPG'
 import React, { useState } from 'react';
 import '../styles/header.css';
-const logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1280px-React-icon.svg.png";
 const hamburger = ["/assets/images/1024px-Hamburger_icon_white.svg.png", "/assets/images/Hamburger_icon.svg.png"]
-const Header = ({getOpenOrClose, routes, mainTitle, mainImage, baseColor}) => {
+const Header = ({routes, mainTitle, mainImage, baseColor}) => {
     const calcFontColor = () => {
-        if(baseColor.length==4){
+        if(baseColor.length === 4){
             baseColor+= baseColor.substring(1, 4);
         }
         let decimal = parseInt(baseColor.substring(1, baseColor.length), 16);
         let darkBoundary = parseInt("777777", 16)
-        console.log(decimal, darkBoundary, baseColor)
         if(darkBoundary < decimal){
             return "black"
         } else {
             return "white"
         }
     }
-    const [fontColor, setFontColor] = useState(calcFontColor())
+    const [fontColor] = useState(calcFontColor())
     let getRoutes = () => {
         if(!Array.isArray(routes)){
-            console.log("Is not array")
             return [];
         }
         let elems = [];
@@ -37,10 +34,9 @@ const Header = ({getOpenOrClose, routes, mainTitle, mainImage, baseColor}) => {
     }
 
     const [open, openClose] = useState(true);
-    const [routeElems, getRouteElems] = useState(getRoutes());
+    const [routeElems] = useState(getRoutes());
 
     let slideDownDiv = () => {
-        const element = document.getElementById("wrapper");
         if(open){
             const slideDown = element => element.style.height = `${element.scrollHeight}px`;
             slideDown(document.getElementById("wrapper"));
@@ -66,7 +62,7 @@ const Header = ({getOpenOrClose, routes, mainTitle, mainImage, baseColor}) => {
                         onClick = {() => { openClose(!open) ; slideDownDiv();}}
                         style = {{backgroundColor : 'transparent', border : '0'}}
                     >
-                        <img src={fontColor == "white" ? hamburger[0] : hamburger[1]} className={"toggleImage"}/>
+                        <img alt={"hamburger menu"} src={fontColor === "white" ? hamburger[0] : hamburger[1]} className={"toggleImage"}/>
                     </button>
                 </div>
                 <div className = {"titleContainer"}>
