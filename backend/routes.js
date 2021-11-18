@@ -121,17 +121,17 @@ module.exports = function routes(app, logger) {
       connection.release()
     })
   })
-  app.get('/saveCSV',(req,res) => {
+  app.get('/saveCSV',authenticateToken, async(req,res) => {
     const ws = fs.createWriteStream("Temp.csv");
     pool.getConnection( function(err,connection) {
-      connection.query('select * from users', function(err,result) {
+      connection.query('select * from electionData where electionId = (select electionId from elections where createdBy = (select accountNumber from users where username = ?) AND name = ?)', [req.user.username, req.param('electionName')],function(err,result,fields) {
 
         const jsonData = JSON.parse(JSON.stringify(result))
         console.log(jsonData)
         fastcsv
         .write(jsonData, { headers: true })
         .on("finish", function() {
-        console.log("Write to bezkoder_mysql_fastcsv.csv successfully!");
+        console.log("Write to Temp.csv successfully!");
         }).pipe(ws)
         res.sendFile(path.join(__dirname, '/Temp.csv'))
           // try {
