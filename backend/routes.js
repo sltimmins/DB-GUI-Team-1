@@ -124,7 +124,7 @@ module.exports = function routes(app, logger) {
   app.get('/saveCSV',authenticateToken, async(req,res) => {
     const ws = fs.createWriteStream("Temp.csv");
     pool.getConnection( function(err,connection) {
-      connection.query('select * from electionData where electionId = (select electionId from elections where createdBy = (select accountNumber from users where username = ?) AND name = ?)', [req.user.username, req.param('electionName')],function(err,result,fields) {
+      connection.query('select s.name, ed.republicanVotes, ed.democraticVotes, ed.greenVotes, ed.libertarianVotes, ed.otherVotes from electionData ed join elections e on e.electionId = ed.electionId join states s on s.stateId = ed.stateId join users u on u.accountNumber = e.createdBy where u.username = ? and e.name = ?; ', [req.user.username, req.param('electionName')],function(err,result,fields) {
 
         const jsonData = JSON.parse(JSON.stringify(result))
         console.log(jsonData)
