@@ -63,20 +63,6 @@ export function App () {
         <Router>
           <div className={"initialView"}>
             <ul className="nav">
-              <li className="nav-item col">
-                <Header className="col" baseColor={MainBackgroundColor} 
-                  routes={
-                    [
-                      {name: "Home", href: '/', active: (window.location.pathname == "/" ? true: false)},
-                      {name: "Maps", href: '/maps', active: (window.location.pathname == "/maps" ? true: false)},
-                      {name: "About", href: '/', active: (window.location.pathname == "/about" ? true: false) }
-                    ]
-                  }
-                  mainTitle={MainTitle} mainImage = {{src: imagePath, width: "50px", height: '50px', borderRadius: '50%', onClick: () => {  
-                    return refP;  
-                  }}}
-                />
-              </li>
               <li className="nav-item border">
                 <a className="nav-link" href=""></a>
                 {
@@ -84,18 +70,19 @@ export function App () {
                 }
                 {
                   !loggedIn && <a className="nav-link" onClick={() => {console.debug("clicked!")}} href={refP}>Sign in</a>
-            <Header baseColor={MainBackgroundColor}
-                routes={
-                  [
-                    {name: "Home", href: '/', active: (window.location.pathname === "/")},
-                    {name: "Maps", href: '/maps', active: (window.location.pathname === "/maps")},
-                    {name: "About", href: '/', active: (window.location.pathname === "/about") },
-                    {name: "Search", href: '/search', active: (window.location.pathname == "/search") }
-                  ]
                 }
-              </li>
+                <Header baseColor={MainBackgroundColor}
+                  routes={
+                    [
+                      {name: "Home", href: '/', active: (window.location.pathname === "/")},
+                      {name: "Maps", href: '/maps', active: (window.location.pathname === "/maps")},
+                      {name: "About", href: '/', active: (window.location.pathname === "/about") },
+                      {name: "Search", href: '/search', active: (window.location.pathname == "/search") }
+                    ]
+                  }
+                />
+              </ li>
             </ul>
-
             <Switch>
               <Route path="/login">
                 <Users />
