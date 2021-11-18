@@ -88,7 +88,6 @@ export function App () {
                 }
               </li>
             </ ul>
-
             <Switch>
               <Route path="/login">
                 <Users />
