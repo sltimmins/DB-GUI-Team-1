@@ -3,13 +3,23 @@ import { AppContext, useProvideAppContext } from "./../AppContext.js";
 import axios from 'axios';
 
 
-export default function UserProfile() {
+export default function UserProfile(props) {
 
     const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
-  
-    let firstName = user.firstName;
-    let lastName = user.lastName;
-    let Bio = user.bio;
+    var currUser;
+    var isUser = false;
+    var currPicName;
+    var uuid;
+
+    if (props.user == undefined) {
+        isUser = true;
+        uuid = user.uuid;
+    }else {
+        currUser = axios.get(baseURL + '/users/get_user', user);
+        uuid = currUser.uuid;
+    }
+
+    var picChange = false;
     let profilePic = {};
 
     function handleClick() {
@@ -21,16 +31,15 @@ export default function UserProfile() {
             method: "POST",
             body: formData
         };
-
         fetch("https://api.Cloudinary.com/v1_1/stimmins/image/upload", options);
-        axios.post(baseURL + "/storage/upload", { id: user.accountNumber, candidateId: user.candidateId, name: profilePic.name });
-        axios.post()
-        setUser({
-            firstName: firstName,
-            lastName: lastName,
-            bio: Bio,
-            uuid: profilePic.name
-        });
+        if (!picChange) {
+            axios.post(baseURL + "/storage/upload", { id: user.accountNumber, candidateId: user.candidateId, name: uuid});
+        }else {
+            axios.post(baseURL + "/storage/upload", { id: user.accountNumber, candidateId: user.candidateId, name: profilePic.name});
+        }
+        picChange = false;
+
+        setUser({firstName: user.firstName, lastName: user.lastName, bio: user.bio});
     }
 
     const handleInputChange =(e) => {
@@ -39,16 +48,14 @@ export default function UserProfile() {
     };
 
     let changeProfilePic = e => {
+        picChange = true;
         profilePic = e.target.files[0];
+        currPicName = profilePic.name;
     }
 
-    let uuid = "";
-    if (user.uuid != null) {
-        uuid = user.uuid;
-    }
     let imagePath = "assets/userImages/default.jpg";
 
-    if (uuid != "") {
+    if (uuid != undefined) {
         imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
     }
 
