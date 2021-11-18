@@ -18,9 +18,15 @@ export const getElectionData = async(year) => {
         params: {year}
     })
     .then((response) => {
-            states = response.data;
-            transformData(states)
+            if(response.status == 200){
+                states = response.data;
+                transformData(states)
+            } else {
+                return null;
+            }
         }
-    )
+    ) .catch(e => {
+        states = [];
+    })
     return states
 }

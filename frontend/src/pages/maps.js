@@ -18,6 +18,7 @@ mapboxgl.accessToken = MAPBOX_API_KEY;
 export default function Maps(){
     let refs = useRef(placesPayload.map(() => createRef()));
     let maps = useRef(placesPayload.map(() => createRef()));
+    const {mapID, queryYear} = useParams();
     const [zoom] = useState(4);
     const [placesCopy, setPlacesCopy] = useState(placesPayload)
     const [setOfStates] = useState(new Set())
@@ -25,9 +26,8 @@ export default function Maps(){
     const [mapToCoordinates, setMapToCoordinates] = useState({})
     const [mainMapPayload, setMainMapPayload] = useState(null)
     const [retrievedPayload, setRetrievedPayload] = useState(null)
-    const [chosenYear, setChosenYear] = useState(2020)
+    const [chosenYear, setChosenYear] = useState(queryYear ? queryYear : 2020)
     const [yearOptions, setYearOptions] = useState([])
-    const {mapID} = useParams();
     const arrToMap = (arr) => {
         let mapOfNames = new Set();
         for(const place of arr) {

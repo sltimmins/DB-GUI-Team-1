@@ -297,53 +297,53 @@ module.exports = function routes(app, logger) {
           logger.error("Error querying Database\n", err)
         } else {
            console.log("result", result)
-          electionId = result[0].electionId
+          electionId = result.length > 0 ? result[0].electionId : -1
         }
       })
       await sleep(250)
       
       if(electionId != -1) {
-      connection.query("SELECT * FROM electionData JOIN states on electionData.stateId = states.stateId WHERE electionId = ? ", [electionId], function(err,result,fields) {
+        connection.query("SELECT * FROM electionData JOIN states on electionData.stateId = states.stateId WHERE electionId = ? ", [electionId], function(err,result,fields) {
 
-        if(err) {
-          logger.error("Something went wrong...")
-          res.send(err)
-        } else {
-          let vals = []
-          for(let i = 0; i < 50; i ++) {
-            RV = Number(result[i].republicanVotes)
-            DV = Number(result[i].democraticVotes)
-            GV = Number(result[i].greenVotes)
-            LV = Number(result[i].libertarianVotes)
-            OV = Number(result[i].otherVotes)
+          if(err) {
+            logger.error("Something went wrong...")
+            res.send(err)
+          } else {
+            let vals = []
+            for(let i = 0; i < 50; i ++) {
+              RV = Number(result[i].republicanVotes)
+              DV = Number(result[i].democraticVotes)
+              GV = Number(result[i].greenVotes)
+              LV = Number(result[i].libertarianVotes)
+              OV = Number(result[i].otherVotes)
 
-            max = Math.max(RV,DV,GV,LV,OV)
-            winner = "ERROR"
-            if(max == RV) winner = "R"
-            else if(max == DV) winner = "D"
-            else if (max == GV) winner = "G"
-            else if (max == LV) winner = "L"
-            else if (max == OV) winner = "O"
-            tempRow = {
-              "state": result[i].name,
-              "shortName":result[i].shortName,
-              "winner":winner,
-              "EV":result[i].electoralVotes,
-              "status": winner
+              max = Math.max(RV,DV,GV,LV,OV)
+              winner = "ERROR"
+              if(max == RV) winner = "R"
+              else if(max == DV) winner = "D"
+              else if (max == GV) winner = "G"
+              else if (max == LV) winner = "L"
+              else if (max == OV) winner = "O"
+              tempRow = {
+                "state": result[i].name,
+                "shortName":result[i].shortName,
+                "winner":winner,
+                "EV":result[i].electoralVotes,
+                "status": winner
+              }
+              vals.push(tempRow)
+
             }
-            vals.push(tempRow)
-
+            res.send(vals)
           }
-          res.send(vals)
-        }
-      })
-    } else {
-      logger.error("No elections found with that year...")
-      res.status(400).send({
-        "success":false,
-        "reason":"No such year found"
-      })
-    }
+        })
+      } else {
+        logger.error("No elections found with that year...")
+        res.status(400).send({
+          "success":false,
+          "reason":"No such year found"
+        })
+      }
       connection.release()
     })
   })

@@ -31,5 +31,10 @@ export const ROUTES = [
         path: "/maps/:mapID",
         exact: true,
         component: (routeData, getRouteData) => <Maps routeData = {routeData} getRouteData={getRouteData}/>
+    },
+    {
+        path: "/maps/:mapID/:queryYear",
+        exact: true,
+        component: (routeData, getRouteData) => <Maps routeData = {routeData} getRouteData={getRouteData}/>
     }
 ]
