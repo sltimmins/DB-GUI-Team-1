@@ -32,6 +32,8 @@ const Header = ({routes, mainTitle, mainImage, baseColor}) => {
         }
         return elems;
     }
+    var initialState = {displayImage: true};
+    const [state, setstate] = useState(initialState);
 
     const [open, openClose] = useState(true);
     const [routeElems] = useState(getRoutes());
@@ -69,8 +71,12 @@ const Header = ({routes, mainTitle, mainImage, baseColor}) => {
                     <div className =  {["titleChild", "titleRight"].join(" ")} >
                         <div className = {"helper"}>
                             <div className = {"headerLogoDiv"} style={{width: mainImage.width}}>
-                                <img src={mainImage.src} className = {"headerImage"} alt="logo" style={{width: mainImage.width, height: mainImage.height}} onClick={() => {
+                                <img src={mainImage.src} className = {"headerImage"} alt="logo" style={{width: mainImage.width, height: mainImage.height, display: {this:state.displayImage ? 'static' : 'none'}}} onClick={() => {
                                     let refP = mainImage.onClick();
+                                    console.debug(mainImage.src);
+                                    if (mainImage.src == '') {
+                                        setstate({displayImage: false});
+                                    }
                                     if (window.location.pathname == "/" || "/true") {
                                         window.location.pathname = refP;
                                     }

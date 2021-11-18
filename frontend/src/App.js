@@ -51,7 +51,7 @@ export function App () {
   if (context.user != undefined && context.user.uuid != null) {
     uuid = context.user.uuid;
   }
-  let imagePath = "assets/userImages/default.jpg";
+  let imagePath = "";
 
   if (uuid != "") {
     imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
