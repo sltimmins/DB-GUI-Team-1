@@ -10,7 +10,8 @@ import Loader from "../components/loader";
 import MainMap from "./mainMap";
 import {MAPBOX_API_KEY} from "../constants/constants";
 import {getElectionData} from "../api/api";
-
+import { useParams } from "react-router-dom";
+import {transformArr} from "../utils";
 mapboxgl.accessToken = MAPBOX_API_KEY;
 
 
@@ -26,6 +27,7 @@ export default function Maps(){
     const [retrievedPayload, setRetrievedPayload] = useState(null)
     const [chosenYear, setChosenYear] = useState(2020)
     const [yearOptions, setYearOptions] = useState([])
+    const {mapID} = useParams();
     const arrToMap = (arr) => {
         let mapOfNames = new Set();
         for(const place of arr) {
@@ -35,15 +37,18 @@ export default function Maps(){
     }
     const [placeSelection, setPlaceSelection] = useState(arrToMap(placesPayload))
     useEffect(async() => {
-        // if(retrievedPayload){
-        //     return
-        // }
+        console.log(mapID)
         setCurrentlyLoading(true)
         let res = await getElectionData(chosenYear);
         setRetrievedPayload(res);
         setPlaceSelection(arrToMap(res))
         for(let i = 0; i < placesCopy.length; i++){
             const entry = placesCopy[i];
+            if(mapID && entry.state != mapID) {
+                continue;
+            } else if (mapID) {
+                i = 0
+            }
             await axios({
                 method: 'get',
                 url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${entry.state}.json?types=region&access_token=${MAPBOX_API_KEY}`
@@ -96,7 +101,13 @@ export default function Maps(){
                     }
                 })
             });
-
+            if (mapID) {
+                break;
+            }
+        }
+        if(mapID == "United States"){
+            console.log("United States")
+            await handleAllSelection()
         }
         setCurrentlyLoading(false)
 
@@ -183,19 +194,13 @@ export default function Maps(){
             );
             maps.current[0].on('load', () => {
                 for(let entry of (retrievedPayload ? retrievedPayload : placesPayload)){
+                    console.log("load")
                     renderMap(entry)
                 }
             })
             setPlacesCopy([{"state": val}]);
         });
-    }
-
-    const transformArr = (arr) => {
-        let newArr = [];
-        for(const elem of arr) {
-            newArr.push({name: elem.state, href: '/'})
-        }
-        return newArr;
+        setChosenYear(chosenYear)
     }
 
     const handleYearSelection = (newYear) => {
@@ -230,7 +235,7 @@ export default function Maps(){
                         </main>
                         <section className={"assortmentOfMaps"}>
 
-                            {placesCopy.map((el, i) => (
+                            {placesCopy.map((el, i) => (mapID && i < 1) || (!mapID) ? (
                                     <div className={"mapWrapper "+(placesCopy.length === 1 ? "largerMap mapboxgl-map" : "")} id={`id-${el.state}`} key={"mainDiv "+el.state}>
                                         <div ref={(el) => refs.current[i] = el} className={"map-container "+(placesCopy.length === 1 ? "largerMap mapboxgl-map" : "")}>
 
@@ -282,7 +287,7 @@ export default function Maps(){
                                             />
                                         </div>
                                     </div>
-                                )
+                                ) : []
                             )}
                         </section>
                     </>
