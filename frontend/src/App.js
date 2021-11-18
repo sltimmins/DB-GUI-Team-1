@@ -16,6 +16,7 @@ import Search from "./pages/search";
 import {MainBackgroundColor, MainTitle} from "./constants/constants";
 import { AppContext, useProvideAppContext, setupLogin } from "./AppContext.js";
 import Maps from "./pages/maps";
+import {getElectionData} from "./api/api";
 require('dotenv').config()
 
 // React functional component
@@ -30,9 +31,13 @@ export function App () {
 
   }
 
+  const [allStates, setAllStates] = useState([])
+
   // tell app to fetch values from db on first load (if initialized)
-  useEffect(() => {
-    setupLogin(context);
+  useEffect(async() => {
+     let newPayload = await getElectionData(2020);
+     setAllStates(newPayload);
+     setupLogin(context);
   }, [])
 
   let refP = "/login";
@@ -52,11 +57,11 @@ export function App () {
     imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
   }
 
+
   return (
     <AppContext.Provider value={context}>
         <Router>
           <div className={"initialView"}>
-
             <ul className="nav">
               <li className="nav-item col">
                 <Header className="col" baseColor={MainBackgroundColor} 
@@ -79,6 +84,14 @@ export function App () {
                 }
                 {
                   !loggedIn && <a className="nav-link" onClick={() => {console.debug("clicked!")}} href={refP}>Sign in</a>
+            <Header baseColor={MainBackgroundColor}
+                routes={
+                  [
+                    {name: "Home", href: '/', active: (window.location.pathname === "/")},
+                    {name: "Maps", href: '/maps', active: (window.location.pathname === "/maps")},
+                    {name: "About", href: '/', active: (window.location.pathname === "/about") },
+                    {name: "Search", href: '/search', active: (window.location.pathname == "/search") }
+                  ]
                 }
               </li>
             </ul>
@@ -87,7 +100,7 @@ export function App () {
               <Route path="/login">
                 <Users />
               </Route>
-              <Route path="/candidateSearch">
+              <Route path="/search">
                 <Search />
               </Route>
               <Route path="/maps">

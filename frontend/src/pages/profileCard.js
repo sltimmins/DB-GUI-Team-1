@@ -1,7 +1,7 @@
 import React from 'react'
-import '../styles/candidateCard.css'
+import '../styles/profileCard.css'
 
-export default function CandidateCard ({ candidate }) {
+export default function ProfileCard ({ candidate }) {
     let name = candidate.firstName + " " + candidate.lastName;
     let image = ["assets/userImages/default.jpg"]
 
@@ -12,7 +12,7 @@ export default function CandidateCard ({ candidate }) {
 
     return (
         // TODO: Take user to candidate profile page on click
-        <div class="candidateCard">
+        <div key={ candidate.id } class="candidateCard">
             <img class="candidateImage" alt={name} src={image}/>
             <div class="info">
                 <h2 class="no-wrap">{name}</h2>
