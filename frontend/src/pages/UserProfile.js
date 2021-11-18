@@ -24,7 +24,6 @@ export default function UserProfile() {
 
         fetch("https://api.Cloudinary.com/v1_1/stimmins/image/upload", options);
         axios.post(baseURL + "/storage/upload", { id: user.accountNumber, candidateId: user.candidateId, name: profilePic.name });
-        axios.post()
         setUser({
             firstName: firstName,
             lastName: lastName,
