@@ -197,7 +197,7 @@ module.exports = function routes(app, logger) {
     })
   })
 
-// users/{username}: update bio
+// user can update their bio 
 // ex: update users set bio = 'testing' where username = 'mh';
 app.put('/user/bio', async(req,res) => {
   const bio = req.body.bio
@@ -209,6 +209,47 @@ app.put('/user/bio', async(req,res) => {
     connection.release();
   })
 })
+
+// user can update their firstName 
+// ex: update users set firstName = 'hii' where username = 'mh';
+app.put('/user/firstname', async(req,res) => {
+  const firstName = req.body.firstName
+  const username = req.body.username
+  pool.getConnection(function(err,connection) {
+    connection.query("update users set firstName = ? where username = ?", [firstName,username], function(err,result,fields) {
+      res.send(result);
+    })
+    connection.release();
+  })
+})
+
+// user can update their lastName 
+// ex: update users set lastName = 'bye' where username = 'mh';
+app.put('/user/firstname', async(req,res) => {
+  const lastName = req.body.lastName
+  const username = req.body.username
+  pool.getConnection(function(err,connection) {
+    connection.query("update users set firstName = ? where username = ?", [lastName,username], function(err,result,fields) {
+      res.send(result);
+    })
+    connection.release();
+  })
+})
+
+// user can update their email 
+// ex: update users set email = 'hi@bye.come' where username = 'mh';
+app.put('/user/firstname', async(req,res) => {
+  const email = req.body.email
+  const username = req.body.username
+  pool.getConnection(function(err,connection) {
+    connection.query("update users set email = ? where username = ?", [email,username], function(err,result,fields) {
+      res.send(result);
+    })
+    connection.release();
+  })
+})
+
+
 
 // USER STORY 4.2
 // As a candidate	I want to be able to update information in my current election so that I can view the possible outcomes of my elections based on custom data
@@ -342,6 +383,9 @@ app.put('/updateCustomData', async(req,res) => {
       setTimeout(resolve, ms);
     });
   }
+
+  //add bio to candidate -> standby
+  // save: first name, last name of user
 
   // Upload profile images to cloudinary and set UUID to image link
   app.post('/storage/upload', (req, res) => {
