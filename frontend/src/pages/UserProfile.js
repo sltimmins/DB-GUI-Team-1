@@ -32,6 +32,7 @@ export default function UserProfile(props) {
             body: formData
         };
         fetch("https://api.Cloudinary.com/v1_1/stimmins/image/upload", options);
+
         if (!picChange) {
             axios.post(baseURL + "/storage/upload", { id: user.accountNumber, candidateId: user.candidateId, name: uuid});
         }else {
