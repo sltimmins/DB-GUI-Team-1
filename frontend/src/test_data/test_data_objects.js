@@ -9,6 +9,9 @@ export const placesPayload = [{"state": "Texas", "status": REPUBLICAN},
     {"state": "Louisiana", "status": DEMOCRAT},
 ];
 
+export const months = ["January, February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+
+
 export const politicalColors = {
     [DEMOCRAT]: "#0080ff",
     [REPUBLICAN]: "#ff2222",

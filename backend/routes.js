@@ -1,6 +1,10 @@
 const pool = require('./db');
 const jwt = require('jsonwebtoken');
 const bcrypt = require("bcryptjs");
+const fastcsv = require("fast-csv");
+const path = require("path");
+const fs = require("fs");
+const { waitForDebugger } = require('inspector');
 
 module.exports = function routes(app, logger) {
   // GET /
@@ -8,7 +12,7 @@ module.exports = function routes(app, logger) {
     res.status(200).send('Go to 0.0.0.0:3000.');
   });
 
-  
+
   /*
   route to create a new user account and add it to the database
   Uses bcrypt to encrypt the user's password
@@ -18,7 +22,7 @@ module.exports = function routes(app, logger) {
   //TODO figure out how to actually await and not just sleep for 250 ms
   //TODO reroute the user to a login page after a successful account creation
   app.post('/users/create_account', async(req, res) => {
-    candidateId = -1;
+    let candidateId = -1;
     
       pool.getConnection(async function(err, connection) {
         if(err) {
@@ -48,7 +52,7 @@ module.exports = function routes(app, logger) {
             })
           
         } else {
-        console.log("User is not a candidate, handling accordingly");
+          console.log("User is not a candidate, handling accordingly");
         }
         await sleep(250);
         console.log("Now generatying the user with that candidate Id: ", candidateId)
@@ -71,14 +75,82 @@ module.exports = function routes(app, logger) {
               msg: 'Please go to 0.0.0.0:8000/users/login to login!'
             })
           })
-        } catch {
+        } catch(e) {
           res.status(500).send('something went wrong...', );
         }
         connection.release();
     })
   });
+  
+  app.get('/customElections', authenticateToken, async (req,res) => {
+    pool.getConnection(function(err,connection) {
+      try {
+      connection.query("Select accountNumber FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
+        accountNums = JSON.parse(JSON.stringify(result))
+          connection.query('select name,year from elections where createdBy = ?', accountNums[0]['accountNumber'], function(err,result,fields) {
+            res.send(JSON.parse(JSON.stringify(result)))
+          })
+        
+      })
+    } catch(e) {
+      logger.error("Error getting custom election for username: " + req.user.username)
+    }
+      connection.release()
+    })
+  })
+  app.get('/validElectionYears', (req,res) => {
+    pool.getConnection(function(err,connection) {
+      connection.query("select accountNumber from users where username = ?", req.param('username'), function(err,result,fields) {
+        try {
+        connection.query("select year from elections where createdBy = ?",JSON.parse(JSON.stringify(result))[0]['accountNumber'],function(err,result,fields) {
+          try {
+          if(err) {
+            logger.error(err)
+            res.status(400).send('Oopsies')
+          } else {
+            res.send(JSON.parse(JSON.stringify(result)))
+          }
+        } catch(e) {
+          logger.error('No years associated with that account')
+        }
+        })
+      } catch(e) {
+        logger.error('No elections associated with that username')
+        res.send("No elections associated with the username: " + req.param('username'))
+      }
+      })
+      connection.release()
+    })
+  })
+  app.get('/saveCSV',authenticateToken, async(req,res) => {
+    const ws = fs.createWriteStream("Temp.csv");
+    pool.getConnection( function(err,connection) {
+      connection.query('select s.name, ed.republicanVotes, ed.democraticVotes, ed.greenVotes, ed.libertarianVotes, ed.otherVotes from electionData ed join elections e on e.electionId = ed.electionId join states s on s.stateId = ed.stateId join users u on u.accountNumber = e.createdBy where u.username = ? and e.name = ?; ', [req.user.username, req.param('electionName')],function(err,result,fields) {
 
+        const jsonData = JSON.parse(JSON.stringify(result))
+        console.log(jsonData)
+        fastcsv
+        .write(jsonData, { headers: true })
+        .on("finish", function() {
+        console.log("Write to Temp.csv successfully!");
+        }).pipe(ws)
+        res.sendFile(path.join(__dirname, '/Temp.csv'))
+          // try {
+          //   fs.unlinkSync(path.join(__dirname,'/Temp.csv'))
+          //   console.log('file Deleted')
+          //   //file removed
+          // } catch(err) {
+          //   console.log('ERROR DELETING FILE')
+          //   console.log(err)
+          // }
+        
+        
+        
+      })
+      connection.release()
+    })
 
+  })
 
   /*
     Route that tests the JWT functionality, For future just use middleware authenticateToken
@@ -145,7 +217,7 @@ module.exports = function routes(app, logger) {
             } else {
               res.status(400).send("You really thought I would let u in without the right password buddy?")
             }
-          } catch {
+          } catch(e) {
             res.status(500).send('Something went wrong...');
           }
         }
@@ -344,53 +416,53 @@ app.put('/user/bio', async(req,res) => {
           logger.error("Error querying Database\n", err)
         } else {
            console.log("result", result)
-          electionId = result[0].electionId
+          electionId = result.length > 0 ? result[0].electionId : -1
         }
       })
       await sleep(250)
       
       if(electionId != -1) {
-      connection.query("SELECT * FROM electionData JOIN states on electionData.stateId = states.stateId WHERE electionId = ? ", [electionId], function(err,result,fields) {
+        connection.query("SELECT * FROM electionData JOIN states on electionData.stateId = states.stateId WHERE electionId = ? ", [electionId], function(err,result,fields) {
 
-        if(err) {
-          logger.error("Something went wrong...")
-          res.send(err)
-        } else {
-          let vals = []
-          for(let i = 0; i < 50; i ++) {
-            RV = Number(result[i].republicanVotes)
-            DV = Number(result[i].democraticVotes)
-            GV = Number(result[i].greenVotes)
-            LV = Number(result[i].libertarianVotes)
-            OV = Number(result[i].otherVotes)
+          if(err) {
+            logger.error("Something went wrong...")
+            res.send(err)
+          } else {
+            let vals = []
+            for(let i = 0; i < 50; i ++) {
+              RV = Number(result[i].republicanVotes)
+              DV = Number(result[i].democraticVotes)
+              GV = Number(result[i].greenVotes)
+              LV = Number(result[i].libertarianVotes)
+              OV = Number(result[i].otherVotes)
 
-            max = Math.max(RV,DV,GV,LV,OV)
-            winner = "ERROR"
-            if(max == RV) winner = "R"
-            else if(max == DV) winner = "D"
-            else if (max == GV) winner = "G"
-            else if (max == LV) winner = "L"
-            else if (max == OV) winner = "O"
-            tempRow = {
-              "state": result[i].name,
-              "shortName":result[i].shortName,
-              "winner":winner,
-              "EV":result[i].electoralVotes,
-              "status": winner
+              max = Math.max(RV,DV,GV,LV,OV)
+              winner = "ERROR"
+              if(max == RV) winner = "R"
+              else if(max == DV) winner = "D"
+              else if (max == GV) winner = "G"
+              else if (max == LV) winner = "L"
+              else if (max == OV) winner = "O"
+              tempRow = {
+                "state": result[i].name,
+                "shortName":result[i].shortName,
+                "winner":winner,
+                "EV":result[i].electoralVotes,
+                "status": winner
+              }
+              vals.push(tempRow)
+
             }
-            vals.push(tempRow)
-
+            res.send(vals)
           }
-          res.send(vals)
-        }
-      })
-    } else {
-      logger.error("No elections found with that year...")
-      res.status(400).send({
-        "success":false,
-        "reason":"No such year found"
-      })
-    }
+        })
+      } else {
+        logger.error("No elections found with that year...")
+        res.status(400).send({
+          "success":false,
+          "reason":"No such year found"
+        })
+      }
       connection.release()
     })
   })

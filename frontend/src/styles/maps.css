@@ -210,6 +210,25 @@ canvas {
     margin-right: 5px;
 }
 
+.yearDiv {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.yearDiv select {
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.yearDiv label {
+    font-size: 1.1rem;
+    padding-right: .6rem
+}
+
+
 @media only screen and (max-width: 768px) {
     .map-container {
         max-width: 70vw;
