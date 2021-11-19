@@ -1,5 +1,5 @@
 import axios from "axios";
-import {mapboxAPIKey} from "../constants/constants";
+import {MAPBOX_API_KEY} from "../constants/constants";
 
 const transformData = (arr) => {
     for(let state of arr) {
@@ -18,9 +18,15 @@ export const getElectionData = async(year) => {
         params: {year}
     })
     .then((response) => {
-            states = response.data;
-            transformData(states)
+            if(response.status == 200){
+                states = response.data;
+                transformData(states)
+            } else {
+                return null;
+            }
         }
-    )
+    ) .catch(e => {
+        states = [];
+    })
     return states
 }

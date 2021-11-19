@@ -2,7 +2,7 @@
 import React, {useEffect, useState} from 'react';
 import '../styles/generic_button.css';
 
-const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVertical, fontSize, fontWeight, dropShadow, onButtonClick, gradient, disabled}) => {
+const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVertical, fontSize, fontWeight, dropShadow, onButtonClick, gradient, disabled, marginTop, marginBottom, marginLeft, marginRight}) => {
     const calcFontColor = () => {
         if(baseColor.length === 4){
             baseColor+= baseColor.substring(1, 4);
@@ -29,7 +29,7 @@ const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVerti
             initialStyles.paddingBottom = paddingVertical;
         }
         if(fontSize){
-            initialStyles.fontSize = fontSize;
+            initialStyles.fontSize = `calc(${fontSize} + .2vh)`;
         }
         if(fontWeight){
             initialStyles.fontWeight = fontWeight;
@@ -41,6 +41,18 @@ const Button = ({baseColor, mainText, textColor, paddingHorizontal, paddingVerti
         }
         if(gradient) {
             initialStyles.background = gradient;
+        }
+        if(marginTop) {
+            initialStyles.marginTop = marginTop;
+        }
+        if(marginBottom) {
+            initialStyles.marginBottom = marginBottom;
+        }
+        if(marginLeft) {
+            initialStyles.marginLeft = marginLeft;
+        }
+        if(marginRight) {
+            initialStyles.marginRight = marginRight;
         }
         return initialStyles;
     }

@@ -1,0 +1,77 @@
+.specialModal {
+    width: 90vw;
+    border-radius: 10px;
+    filter: drop-shadow(0 0px 30px black);
+    position: fixed;
+    top: 30vh;
+    left: 5vw;
+    background-color: #e2e2e2;
+    z-index: 100;
+    padding: 15px;
+}
+
+.buttonsDiv {
+    width: 100%;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+
+.closer:after {
+    content: "\2715";
+    font-size: 18pt;
+    padding-right: 1rem;
+    cursor: pointer;
+}
+
+.closerDiv {
+    width: 100%;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.saveButtonDiv {
+    width: 100%;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding-right: 1rem;
+}
+
+.saveInput {
+    padding: 5px 10px;
+    border-radius: 10px;
+    border: 0;
+    margin-right: 1rem;
+    width: 33vw;
+}
+
+.inputAndButtonWrapper {
+    display: inline-flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.inputDiv {
+    display: inline-flex;
+    flex-direction: column;
+}
+
+@media only screen and (max-width: 768px) {
+    .inputAndButtonWrapper {
+        flex-direction: column;
+    }
+    .saveInput {
+        width: 65vw;
+        margin-right: initial;
+    }
+
+    .inputDiv label {
+        padding-bottom: 0.5rem;
+    }
+}

@@ -3,21 +3,22 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import "../styles/maps.css"
 import axios from "axios";
-import {politicalColors} from "../test_data/test_data_objects";
-import {mapboxAPIKey} from "../constants/constants";
+import {DEMOCRAT, months, politicalColors, REPUBLICAN} from "../test_data/test_data_objects";
+import {MAPBOX_API_KEY} from "../constants/constants";
 import Button from "../components/genericButton";
+import {Modal,SaveModal} from '../components/modal'
 
-mapboxgl.accessToken = mapboxAPIKey;
+mapboxgl.accessToken = MAPBOX_API_KEY;
 
 const statusMap = {
     "D" : "Democrat",
     "R" : "Republican",
 }
 
-const ChangeRow = ({name, original, change}) => {
+const ChangeRow = ({name, original, change, deleteAction}) => {
     return (
         <tr className={"changeTableRow"}>
-            <td className={"changeTableRowName"}><span className={"deleteEntry"}>-</span>{name}</td>
+            <td className={"changeTableRowName"} onClick={deleteAction}>{name}</td>
             <td className={"changeTableRowOriginal"}>{original}</td>
             <td className={"changeTableRowChange"}>{change}</td>
         </tr>
@@ -51,11 +52,16 @@ export default function MainMap({place, polygons, affiliations, placesArray}){
     const [electionNumbers, setElectionNumbers] = useState(getElectoralVotes())
     const [chosenChangeLocation, setChosenChangeLocation] = useState("")
     const [newAffiliation, setNewAffiliation] = useState("")
+    const [deleteEntryModal, setDeleteEntryModal] = useState(false)
+    const [locationToRemove, setLocationRemove] = useState("")
+    const [saveOpenModal, setSaveOpenModal] = useState(false)
+    const [saveName, setSaveName] = useState("")
+    const [savedModal, setSavedModal] = useState(false)
     useEffect(async() => {
         const entry = place;
         await axios({
             method: 'get',
-            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${entry.state}.json?types=${entry.state === "United States" ? "country" : "region"}&access_token=${mapboxAPIKey}`
+            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${entry.state}.json?types=${entry.state === "United States" ? "country" : "region"}&access_token=${MAPBOX_API_KEY}`
         })
         .then(function (response) {
             let newLat = response.data["features"][0]["center"][0]
@@ -115,7 +121,6 @@ export default function MainMap({place, polygons, affiliations, placesArray}){
             gradient += politicalColors[key] + ", "
         }
         gradient = gradient.substring(0, gradient.length - 2) + ")";
-        console.log(gradient)
         return gradient;
     }
 
@@ -129,8 +134,30 @@ export default function MainMap({place, polygons, affiliations, placesArray}){
         return max;
     }
 
+    const getInitialPlaceholder = () => {
+        let currDate = new Date();
+        let val = months[currDate.getMonth()-1] + " " + currDate.getDate() + ", " + currDate.getFullYear() + " " + currDate.getHours() + ":" + currDate.getMinutes() + ":" + currDate.getSeconds();
+        return val;
+    }
+
     return (
         <>
+            <Modal open={deleteEntryModal} mainTitle={`Deleting ${locationToRemove} Change`} description={""} cancelButtonText={"Cancel"} confirmButtonText={"Confirm"}
+                   confirmAction={() => {
+                       console.log("CONFIRM")
+                            let copy = JSON.parse(JSON.stringify(mapOfAffiliation))
+                            copy[locationToRemove] = affiliations[locationToRemove];
+                            setMapOfAffiliation(copy)
+                            setDeleteEntryModal(false)
+                    }}
+                   cancelAction={() => {
+                       setDeleteEntryModal(false)
+                   }}
+            />
+            <SaveModal placeholder={getInitialPlaceholder()} inputLabelText={"Saved Map ID"} open={saveOpenModal} cancelAction={() => setSaveOpenModal(false)} saveAction={(val) => {setSaveName(val); setSaveOpenModal(false); setSavedModal(true)}}/>
+            <Modal open={savedModal} mainTitle={"Saved!"} description={"Your changes have been saved and your custom map can be viewed in you profile"} confirmButtonText={"Yay"}
+                confirmAction={() => setSavedModal(false)}
+            />
             <section className={"assortmentOfMaps"}>
                 {place ?
                     [(<div className={"mapWrapper largerMap mapboxgl-map"} id={`id-${place.state}`}>
@@ -228,7 +255,7 @@ export default function MainMap({place, polygons, affiliations, placesArray}){
                     </div>
                     <div>
                         <label style={{color: 'transparent'}}>j </label>
-                        <Button mainText={"Submit"} baseColor={chosenChangeLocation ? politicalColors[mapOfAffiliation[chosenChangeLocation]] : 'black'} textColor={"white"} paddingHorizontal={"9px"} paddingVertical={"6px"} fontSize={'10pt'} disabled={(!chosenChangeLocation || !newAffiliation)}
+                        <Button mainText={"Submit"} baseColor={chosenChangeLocation ? politicalColors[mapOfAffiliation[chosenChangeLocation]] : 'black'} textColor={"white"} paddingHorizontal={"9px"} paddingVertical={"6px"} fontSize={'.8rem'} disabled={(!chosenChangeLocation || !newAffiliation)}
                             onButtonClick={() => {
                                 let copy = JSON.parse(JSON.stringify(electionNumbers))
                                 for(const placeObj of placesArrayCopy){
@@ -269,16 +296,33 @@ export default function MainMap({place, polygons, affiliations, placesArray}){
                                     Object.keys(mapOfAffiliation).map((key, index) =>
                                         {
                                             return (mapOfAffiliation[key] == affiliations[key]) ? [] :
-                                                <ChangeRow name={key} original={affiliations[key]} change={mapOfAffiliation[key]} key = {"changeRow_"+key}/>
+                                                <ChangeRow name={key} original={affiliations[key]} change={mapOfAffiliation[key]} key = {"changeRow_"+key} deleteAction={() => {setLocationRemove(key); setDeleteEntryModal(true);}}/>
                                         }
                                     ) : []
                             }
                             {
-                                checkObjectEquality(mapOfAffiliation, affiliations) ? <tr><td>No changes have been made</td></tr> : []
+                                checkObjectEquality(mapOfAffiliation, affiliations) ? <tr><td style={{textAlign: 'center'}}>No changes have been made</td></tr>
+                                    :
+                                <tr><td></td><td></td><td style={{textAlign: 'right', paddingRight: '1rem', paddingTop: '5px', paddingBottom: '5px'}}>
+                                    <Button mainText={"Reset"} baseColor={politicalColors[REPUBLICAN]} textColor={"white"} paddingHorizontal={"9px"} paddingVertical={"6px"} fontSize={'.8rem'} disabled={(!chosenChangeLocation || !newAffiliation)}
+                                        onButtonClick={() => {
+                                            setMapOfAffiliation(affiliations);
+                                        }}
+                                    />
+                                </td></tr>
                             }
                         </tbody>
                     </table>
                 </div>
+                <p>*Click on the location name to delete entry</p>
+            </section>
+            <section className={"saveButtonDiv"}>
+                <Button mainText={"Save Map"} baseColor={politicalColors[DEMOCRAT]} textColor={"white"} paddingHorizontal={"15px"} paddingVertical={"12px"} fontSize={'.8rem'} disabled={(!chosenChangeLocation || !newAffiliation)}
+                    onButtonClick={() => {
+                        setSaveOpenModal(true)
+                        setMapOfAffiliation(affiliations);
+                    }}
+                />
             </section>
         </>
     );
