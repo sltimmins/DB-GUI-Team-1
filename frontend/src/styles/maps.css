@@ -228,6 +228,20 @@ canvas {
     padding-right: .6rem
 }
 
+.pill {
+    padding: .3rem .5rem;
+    border: 2px solid green;
+    border-radius: 20px;
+    margin-right: 1rem;
+    margin-left: 1rem;
+    color: green;
+    cursor: pointer;
+}
+
+.pill:after {
+    content: " \2715";
+}
+
 
 @media only screen and (max-width: 768px) {
     .map-container {

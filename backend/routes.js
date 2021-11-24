@@ -409,6 +409,9 @@ app.put('/user/bio', async(req,res) => {
   */
   app.get('/electionData',(req,res) => {
     pool.getConnection(async function(err,connection) {
+      if(err){
+        res.status(300).send()
+      }
       let year = req.query.year;
       let electionId = -1
       connection.query("SELECT electionId FROM elections where year = ?",[year], function(err,result,fields) {
@@ -417,6 +420,7 @@ app.put('/user/bio', async(req,res) => {
         } else {
            console.log("result", result)
           electionId = result.length > 0 ? result[0].electionId : -1
+          console.log(result)
         }
       })
       await sleep(250)

@@ -8,3 +8,18 @@ export const EC2 = false;
 export const BASE_URL = EC2 ? EC2_URL : "http://localhost:8000";
 
 export const MAPBOX_API_KEY = 'pk.eyJ1Ijoic2Vuc2Vpc3ViIiwiYSI6ImNrdjE1OHAxbzNxcnMydnBnY3BycHdob3oifQ.xuqTng_6PKWKkW59Us5aXA';
+
+export const REPUBLICAN = 'R';
+
+export const DEMOCRAT = 'D';
+
+export const LIBERTARIAN = 'L';
+
+export const GREEN = 'G';
+
+export const statusMap = {
+    "D": "Democrat",
+    "R": "Republican",
+    "G": "Green",
+    "L": "Libertarian"
+}

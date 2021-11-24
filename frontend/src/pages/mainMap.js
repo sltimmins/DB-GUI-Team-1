@@ -3,17 +3,14 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import "../styles/maps.css"
 import axios from "axios";
-import {DEMOCRAT, months, politicalColors, REPUBLICAN} from "../test_data/test_data_objects";
-import {MAPBOX_API_KEY} from "../constants/constants";
+import {months, politicalColors} from "../test_data/test_data_objects";
+import {DEMOCRAT, MAPBOX_API_KEY, REPUBLICAN, statusMap} from "../constants/constants";
 import Button from "../components/genericButton";
 import {Modal,SaveModal} from '../components/modal'
+import {checkObjectEquality} from "../utils";
 
 mapboxgl.accessToken = MAPBOX_API_KEY;
 
-const statusMap = {
-    "D" : "Democrat",
-    "R" : "Republican",
-}
 
 const ChangeRow = ({name, original, change, deleteAction}) => {
     return (
@@ -106,14 +103,6 @@ export default function MainMap({place, polygons, affiliations, placesArray}){
             })
         });
     });
-
-    const checkObjectEquality = (obj1, obj2) => {
-        for(const key in obj1) {
-            if(obj1[key] != obj2[key])
-                return false
-        }
-        return true
-    }
 
     const votingGradient = () => {
         let gradient = "linear-gradient(to right, "

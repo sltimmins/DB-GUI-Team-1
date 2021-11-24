@@ -286,7 +286,14 @@ export default function Maps(){
                                                 }}
                                             />
                                         </div>
+                                        {
+                                            placesCopy.length == 1 ? (
+                                                <></>
+                                            ) : []
+
+                                        }
                                     </div>
+
                                 ) : []
                             )}
                         </section>

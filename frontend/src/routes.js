@@ -4,6 +4,7 @@ import Search from "./pages/search";
 import Maps from "./pages/maps";
 import Home from "./pages/home";
 import MainMap from "./pages/mainMap";
+import HistoricalMap from "./pages/compareMaps";
 
 export const ROUTES = [
     {
@@ -28,6 +29,11 @@ export const ROUTES = [
         component: (routeData, getRouteData) => <Home routeData = {routeData} getRouteData={getRouteData}/>
     },
     {
+        path: "/maps/compare",
+        exact: true,
+        component: (routeData, getRouteData) => <HistoricalMap routeData = {routeData} getRouteData={getRouteData}/>
+    },
+    {
         path: "/maps/:mapID",
         exact: true,
         component: (routeData, getRouteData) => <Maps routeData = {routeData} getRouteData={getRouteData}/>
@@ -36,5 +42,5 @@ export const ROUTES = [
         path: "/maps/:mapID/:queryYear",
         exact: true,
         component: (routeData, getRouteData) => <Maps routeData = {routeData} getRouteData={getRouteData}/>
-    }
+    },
 ]
