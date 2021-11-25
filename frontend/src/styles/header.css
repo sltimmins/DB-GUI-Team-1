@@ -29,6 +29,7 @@
     text-decoration: none;
     color: #f2f2f2;
     font-family: 'Raleway', sans-serif;
+    font-size: calc(1.1rem + .15vw);
 }
 
 .headerLinks li .active{
@@ -98,7 +99,7 @@
     background: #1a1a1a;
     color:white;
     width:100%;
-    height:200px;
+    height: fit-content;
     padding:20px;
 }
 
@@ -128,7 +129,7 @@
     .headerLinks li {
         list-style-type: none;
         display:list-item;
-        padding-bottom: 1em;
+        padding-bottom: calc(.8rem + .2vh);
     }
     .wideHeader:first-child .headerLinks  {
         width: 100%;
