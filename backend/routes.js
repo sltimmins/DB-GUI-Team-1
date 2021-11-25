@@ -164,6 +164,19 @@ module.exports = function routes(app, logger) {
       connection.release()
     })
   })
+  app.get("/elections/candidates", (req,res) =>{
+    pool.getConnection(function(err,connection) {
+      connection.query("select firstName,lastName,party from candidates c join elections e on (e.democraticCandidate = c.candidateId or e.republicanCandidate = c.candidateId or e.greenCandidate = c.candidateId or e.libertarianCandidate = c.candidateId) where year = ? and name = \'official\'", req.param('year'),function(err,result,fields) {
+       if(err) {
+         logger.error("Invalid year (Probably)",err);
+         res.status(400).send("Invalid Year");
+       } else {
+         res.send(JSON.parse(JSON.stringify(result)))
+       }
+       connection.release();
+      })
+    })
+  })
   /*Route to login, accepts formatting:
      {"username":"ashockley66","password":"alex66"} passed in Body
 
@@ -178,11 +191,13 @@ module.exports = function routes(app, logger) {
     //TODO figure out how to pass the JWT to frontend without displaying it to the user
     //TODO handle the case where the user enters the incorrect password better
     //TODO if the username is correct, move them back to homepage using the JWT
+
   app.post('/users/login', async(req,res) => {
     
     pool.getConnection(async function(err,connection) {
       const userToFind = {username:req.body.username, password:req.body.password}
       console.log("user: ", userToFind)
+      
       connection.query("select username, password, accountNumber, candidateId, firstName, lastName, uuid FROM users WHERE username = ?",userToFind.username , async function(err,result,fields){
         if(!result) {
           logger.error("Invalid username or Password")
