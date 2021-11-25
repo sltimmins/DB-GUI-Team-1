@@ -122,7 +122,7 @@ module.exports = function routes(app, logger) {
     })
   })
   app.get('/saveCSV',authenticateToken, async(req,res) => {
-    const ws = fs.createWriteStream("Temp.csv");
+    const ws = fs.createWriteStream("Election.csv");
     pool.getConnection( function(err,connection) {
       connection.query('select s.name, ed.republicanVotes, ed.democraticVotes, ed.greenVotes, ed.libertarianVotes, ed.otherVotes from electionData ed join elections e on e.electionId = ed.electionId join states s on s.stateId = ed.stateId join users u on u.accountNumber = e.createdBy where u.username = ? and e.name = ?; ', [req.user.username, req.param('electionName')],function(err,result,fields) {
 
@@ -133,7 +133,7 @@ module.exports = function routes(app, logger) {
         .on("finish", function() {
         console.log("Write to Temp.csv successfully!");
         }).pipe(ws)
-        res.sendFile(path.join(__dirname, '/Temp.csv'))
+        res.sendFile(path.join(__dirname, '/Election.csv'))
           // try {
           //   fs.unlinkSync(path.join(__dirname,'/Temp.csv'))
           //   console.log('file Deleted')
