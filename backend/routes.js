@@ -225,11 +225,11 @@ app.put('/user/firstname', async(req,res) => {
 
 // user can update their lastName 
 // ex: update users set lastName = 'bye' where username = 'mh';
-app.put('/user/firstname', async(req,res) => {
+app.put('/user/lastname', async(req,res) => {
   const lastName = req.body.lastName
   const username = req.body.username
   pool.getConnection(function(err,connection) {
-    connection.query("update users set firstName = ? where username = ?", [lastName,username], function(err,result,fields) {
+    connection.query("update users set lastName = ? where username = ?", [lastName,username], function(err,result,fields) {
       res.send(result);
     })
     connection.release();
@@ -250,45 +250,44 @@ app.put('/user/email', async(req,res) => {
 })
 
 
-
 // USER STORY 4.2
 // As a candidate	I want to be able to update information in my current election so that I can view the possible outcomes of my elections based on custom data
 // ex: UPDATE electionData SET greenVotes = 1 where stateID = 1;
-app.put('/updateCustomElectionData', async(req,res) => {
+// app.put('/updateCustomElectionData', async(req,res) => {
 
-  const republicanVotes = req.body.republicanVotes
-  const democraticVotes = req.body.democraticVotes
-  const greenVotes = req.body.greenVotes
-  const libertarianVotes = req.body.libertarianVotes
-  const otherVotes = req.body.otherVotes
-  const stateID = req.body.stateID
+//   const republicanVotes = req.body.republicanVotes
+//   const democraticVotes = req.body.democraticVotes
+//   const greenVotes = req.body.greenVotes
+//   const libertarianVotes = req.body.libertarianVotes
+//   const otherVotes = req.body.otherVotes
+//   const stateID = req.body.stateID
 
-  pool.getConnection(function(err,connection) {
+//   pool.getConnection(function(err,connection) {
 
-    connection.query("UPDATE electionData SET republicanVotes = ? where stateID = ?", [republicanVotes,stateID], function(err,result,fields) {
-      res.send(result);
-    })
+//     connection.query("UPDATE electionData SET republicanVotes = ? where stateID = ?", [republicanVotes,stateID], function(err,result,fields) {
+//       res.send(result);
+//     })
 
-    connection.query("UPDATE electionData SET democraticVotes = ? where stateID = ?", [democraticVotes,stateID], function(err,result,fields) {
-      res.send(result);
-    })
+//     connection.query("UPDATE electionData SET democraticVotes = ? where stateID = ?", [democraticVotes,stateID], function(err,result,fields) {
+//       res.send(result);
+//     })
 
-    connection.query("UPDATE electionData SET greenVotes = ? where stateID = ?", [greenVotes,stateID], function(err,result,fields) {
-      res.send(result);
-    })
+//     connection.query("UPDATE electionData SET greenVotes = ? where stateID = ?", [greenVotes,stateID], function(err,result,fields) {
+//       res.send(result);
+//     })
 
-    connection.query("UPDATE electionData SET libertarianVotes = ? where stateID = ?", [libertarianVotes,stateID], function(err,result,fields) {
-      res.send(result);
-    })
+//     connection.query("UPDATE electionData SET libertarianVotes = ? where stateID = ?", [libertarianVotes,stateID], function(err,result,fields) {
+//       res.send(result);
+//     })
 
-    connection.query("UPDATE electionData SET otherVotes = ? where stateID = ?", [otherVotes,stateID], function(err,result,fields) {
-      res.send(result);
-    })
+//     connection.query("UPDATE electionData SET otherVotes = ? where stateID = ?", [otherVotes,stateID], function(err,result,fields) {
+//       res.send(result);
+//     })
 
-    connection.release();
+//     connection.release();
 
-  })
-})
+//   })
+// })
 
   /*
   Returns an array of json objects that contain data in the following format:
