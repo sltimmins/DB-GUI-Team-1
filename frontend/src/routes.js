@@ -4,6 +4,7 @@ import Search from "./pages/search";
 import Maps from "./pages/maps";
 import Home from "./pages/home";
 import MainMap from "./pages/mainMap";
+import UserProfile from './pages/UserProfile';
 
 export const ROUTES = [
     {
@@ -36,5 +37,10 @@ export const ROUTES = [
         path: "/maps/:mapID/:queryYear",
         exact: true,
         component: (routeData, getRouteData) => <Maps routeData = {routeData} getRouteData={getRouteData}/>
+    },
+    {
+        path: "/UserProfile",
+        exact: true,
+        component: (routeData, getRouteData) => <UserProfile routeData = {routeData} getRouteData={getRouteData}/>
     }
 ]

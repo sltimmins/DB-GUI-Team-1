@@ -9,7 +9,6 @@ import {
 } from "react-router-dom";
 import Users from "./Users.js"
 import Home from "./pages/home";
-import UserProfile from './pages/UserProfile';
 import Header from "./components/header";
 import Footer from "./components/footer";
 import Search from "./pages/search";
@@ -50,7 +49,6 @@ export function App () {
       console.log(copy)
       setRouteData(copy)
   }
-
   // tell app to fetch values from db on first load (if initialized)
   useEffect(async() => {
      let newPayload = await getElectionData(2020);
@@ -75,7 +73,6 @@ export function App () {
     imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
   }
 
-
   return (
     <AppContext.Provider value={context}>
         <Router>
@@ -83,6 +80,9 @@ export function App () {
             <ul className="nav">
               <li className="nav-item col">
                 <Header baseColor={MAIN_BACKGROUND_COLOR}
+                  mainTitle={MAIN_TITLE} mainImage = {{src: imagePath, width: "50px", height: '50px', borderRadius: '50%', onClick: () => {
+                    return refP;  
+                  }}}
                   routes={
                     [
                       {name: "Home", href: '/', active: (window.location.pathname === "/")},
@@ -91,15 +91,12 @@ export function App () {
                       {name: "Search", href: '/search', active: (window.location.pathname == "/search") }
                     ]
                   }
-                  mainTitle={MAIN_TITLE} mainImage = {{src: imagePath, width: "50px", height: '50px', borderRadius: '50%', onClick: () => {
-                    return refP;  
-                  }}}
                 />
               </ li>
               <li className="nav-item border">
                 <a className="nav-link" href=""></a>
                 {
-                  loggedIn && <a className="nav-link" onClick={signout} href="/home">Sign out</a>
+                  loggedIn && <a className="nav-link" href="/" onClick={() => {context.signout();}}>Sign out</a>
                 }
                 {
                   !loggedIn && <a className="nav-link" onClick={() => {console.debug("clicked!")}} href={refP}>Sign in</a>

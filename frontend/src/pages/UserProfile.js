@@ -1,21 +1,24 @@
 import React, { useContext, useState } from "react";
 import { AppContext, useProvideAppContext } from "./../AppContext.js";
 import axios from 'axios';
+import NonUserProfile from "./NonUserProfile.js";
 
 
 export default function UserProfile(props) {
 
     const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
     var currUser = {};
-    var isUser = false;
-    var uuid;
-    var currPicName;
+    var isUser = true;
+    var uuid = user.uuid;
 
-    if (props.user == undefined) {
-        isUser = true;
-        uuid = user.uuid;
-    }else {
+    //temp
+    currUser = user;
+    isUser = false;
+    //end temp
+
+    if (props.user != undefined) {
         currUser = props.user;
+        isUser = false;
         uuid = currUser.uuid;
     }
 
@@ -24,7 +27,6 @@ export default function UserProfile(props) {
 
     function handleClick() {
         const formData= new FormData();
-        console.log(profilePic);
         formData.append('file', profilePic);
         formData.append('upload_preset', 'e0s8om4e');
         const options = {
@@ -32,10 +34,10 @@ export default function UserProfile(props) {
             body: formData
         };
         fetch("https://api.Cloudinary.com/v1_1/stimmins/image/upload", options);
-        if (!picChange) {
-            axios.post(baseURL + "/storage/upload", { id: user.accountNumber, candidateId: user.candidateId, name: uuid});
-        }else {
+        if (picChange) {
             axios.post(baseURL + "/storage/upload", { id: user.accountNumber, candidateId: user.candidateId, name: profilePic.name});
+        }else {
+            axios.post(baseURL + "/storage/upload", { id: user.accountNumber, candidateId: user.candidateId, name: uuid});
         }
         //axios.put(baseURL + "/user/bio", {...{}, bio: user.bio});
         picChange = false;
@@ -43,7 +45,7 @@ export default function UserProfile(props) {
         setUser({firstName: user.firstName, lastName: user.lastName, bio: user.bio});
     }
 
-    const handleInputChange =(e) => {
+    const handleInputChange = (e) => {
         const { name, value } = e.target;
         setUser({ ...user, [name]: value });
     };
@@ -51,7 +53,7 @@ export default function UserProfile(props) {
     let changeProfilePic = e => {
         picChange = true;
         profilePic = e.target.files[0];
-        currPicName = profilePic.name;
+        uuid = profilePic.name;
     }
 
     let imagePath = "assets/userImages/default.jpg";
@@ -104,18 +106,7 @@ export default function UserProfile(props) {
             }
             {
                 !isUser && <div>
-                    <header className="text-center bg-secondary p-3 d-static">
-                        <img src={imagePath} alt="" className="rounded-circle" style={{width: "17rem", height: '17rem'}}/>                
-                        <h1 className="text-white pt-2">{currUser.firstName + " " + currUser.lastName}</h1>          
-                    </header>
-                    <main>
-                        <div className="container my-4 bg-light rounded">
-                            <div className="col">
-                                <label htmlFor="currUserBio">Bio</label>
-                                <p id="currUserBio">{currUser.bio}</p>
-                            </div>
-                        </div>
-                    </main>
+                    <NonUserProfile user={currUser} />
                 </div>
             }
         </div>

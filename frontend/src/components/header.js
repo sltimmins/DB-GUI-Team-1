@@ -1,4 +1,3 @@
-// import closeUp from '/images/closeUp.JPG'
 import React, { useState } from 'react';
 import '../styles/header.css';
 const hamburger = ["/assets/images/1024px-Hamburger_icon_white.svg.png", "/assets/images/Hamburger_icon.svg.png"]
