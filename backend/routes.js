@@ -238,7 +238,7 @@ app.put('/user/firstname', async(req,res) => {
 
 // user can update their email 
 // ex: update users set email = 'hi@bye.come' where username = 'mh';
-app.put('/user/firstname', async(req,res) => {
+app.put('/user/email', async(req,res) => {
   const email = req.body.email
   const username = req.body.username
   pool.getConnection(function(err,connection) {
@@ -254,7 +254,7 @@ app.put('/user/firstname', async(req,res) => {
 // USER STORY 4.2
 // As a candidate	I want to be able to update information in my current election so that I can view the possible outcomes of my elections based on custom data
 // ex: UPDATE electionData SET greenVotes = 1 where stateID = 1;
-app.put('/updateCustomData', async(req,res) => {
+app.put('/updateCustomElectionData', async(req,res) => {
 
   const republicanVotes = req.body.republicanVotes
   const democraticVotes = req.body.democraticVotes
