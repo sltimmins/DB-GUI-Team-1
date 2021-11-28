@@ -12,8 +12,8 @@ export default function UserProfile(props) {
     var uuid = user.uuid;
 
     //temp
-    currUser = user;
-    isUser = false;
+    // currUser = user;
+    // isUser = false;
     //end temp
 
     if (props.user != undefined) {

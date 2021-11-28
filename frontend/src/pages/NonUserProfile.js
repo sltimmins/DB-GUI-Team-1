@@ -46,74 +46,79 @@ export default function NonUserProfile(props) {
             <main>
                 <div className="container my-4 bg-light rounded">
                     <div className="row p-3">
-                        <div className="col-6">
+                        <div>
                             <label htmlFor="currUserBio">Bio</label>
                             <p id="currUserBio" className="border ">This is my current bio!</p> 
                         
                         </div>
-                        <div className="col">
-                            <div className="btn-group d-flex" role="group" aria-label="Basic radio toggle button group">
-                                <input type="radio" className="btn-check btn-lg w-100" type="text" name="btnradio" id="btnradio1" autoComplete="off" onClick={() => {
-                                    setToggle(toggle => !toggle);
-                                }}/>
-                                <label className="btn btn-outline-primary " htmlFor="btnradio1">Favorite Candidates</label>
+                        <div></div>
+                        {
+                            props.user.candidateId && <div></div>
+                        }
+                        {
+                            !props.user.candidateId && <div>
+                                <div className="btn-group d-flex" role="group" aria-label="Basic radio toggle button group">
+                                    <input type="radio" className="btn-check btn-lg w-100" type="text" name="btnradio" id="btnradio1" autoComplete="off" onClick={() => {
+                                        setToggle(toggle => !toggle);
+                                    }}/>
+                                    <label className="btn btn-outline-primary " htmlFor="btnradio1">Favorite Candidates</label>
 
-                                <input type="radio" className="btn-check btn-lg w-100" type="text" name="btnradio" id="btnradio2" autoComplete="off" onClick={() => {
-                                   setToggleTwo(toggleTwo => !toggleTwo);
-                                }} />
-                                <label className="btn btn-outline-primary" htmlFor="btnradio2">Favorite Elections</label>
+                                    <input type="radio" className="btn-check btn-lg w-100" type="text" name="btnradio" id="btnradio2" autoComplete="off" onClick={() => {
+                                    setToggleTwo(toggleTwo => !toggleTwo);
+                                    }} />
+                                    <label className="btn btn-outline-primary" htmlFor="btnradio2">Favorite Elections</label>
 
-                                <input type="radio" className="btn-check btn-lg w-100" type="text" name="btnradio" id="btnradio3" autoComplete="off" onClick={() => {
-                                    setToggleThree(toggleThree => !toggleThree);
-                                }} />
-                                <label className="btn btn-outline-primary" htmlFor="btnradio3">Custom Election</label>
-                            </div>
+                                    <input type="radio" className="btn-check btn-lg w-100" type="text" name="btnradio" id="btnradio3" autoComplete="off" onClick={() => {
+                                        setToggleThree(toggleThree => !toggleThree);
+                                    }} />
+                                    <label className="btn btn-outline-primary" htmlFor="btnradio3">Custom Election</label>
+                                </div>
 
 
-                            <div className="collapse" id="favCands">
-                                <div className="card card-body mt-3">
-                                    <label htmlFor="list" className="font-weight-bold">Favorite Candidates</label>
-                                    <ul className="list-group" style={{listStyleType: "none"}} id="list"></ul>
-                                    {
-                                        favCands && favCands.map(cand => {
-                                            <li className="list-group-item">{cand.firstName} {cand.listName}</li>
-                                        })
-                                    }
-                                    {
-                                        <li>No Favorite Candidates</li>
-                                    }
+                                <div className="collapse" id="favCands">
+                                    <div className="card card-body mt-3">
+                                        <label htmlFor="list" className="font-weight-bold">Favorite Candidates</label>
+                                        <ul className="list-group" style={{listStyleType: "none"}} id="list"></ul>
+                                        {
+                                            favCands && favCands.map(cand => {
+                                                <li className="list-group-item">{cand.firstName} {cand.listName}</li>
+                                            })
+                                        }
+                                        {
+                                            <li>No Favorite Candidates</li>
+                                        }
+                                    </div>
+                                </div>
+                                <div className="collapse" id="favElects">
+                                    <div className="card card-body mt-3">
+                                        <label htmlFor="list" className="font-weight-bold">Favorite Elections</label>
+                                        <ul className="list-group" style={{listStyleType: "none"}} id="list"></ul>
+                                        {
+                                            favElects && favElects.map(elect => {
+                                                <li className="list-group-item">{elect.electionID}</li>
+                                            })
+                                        }
+                                        {
+                                            <li>No Favorite Elections</li>
+                                        }
+                                    </div>
+                                </div>
+                                <div className="collapse" id="custElects">
+                                    <div className="card card-body mt-3">
+                                        <label htmlFor="list" className="font-weight-bold">Custom Elections</label>
+                                        <ul className="list-group" style={{listStyleType: "none"}} id="list"></ul>
+                                        {
+                                            custElects && custElects.map(elect => {
+                                                <li className="list-group-item">{elect}</li>
+                                            })
+                                        }
+                                        {
+                                            <li>No Custom Elections</li>
+                                        }
+                                    </div>
                                 </div>
                             </div>
-                            <div className="collapse" id="favElects">
-                                <div className="card card-body mt-3">
-                                    <label htmlFor="list" className="font-weight-bold">Favorite Elections</label>
-                                    <ul className="list-group" style={{listStyleType: "none"}} id="list"></ul>
-                                    {
-                                        favElects && favElects.map(elect => {
-                                            <li className="list-group-item">{elect.electionID}</li>
-                                        })
-                                    }
-                                    {
-                                        <li>No Favorite Elections</li>
-                                    }
-                                </div>
-                            </div>
-                            <div className="collapse" id="custElects">
-                                <div className="card card-body mt-3">
-                                    <label htmlFor="list" className="font-weight-bold">Custom Elections</label>
-                                    <ul className="list-group" style={{listStyleType: "none"}} id="list"></ul>
-                                    {
-                                        custElects && custElects.map(elect => {
-                                            <li className="list-group-item">{elect}</li>
-                                        })
-                                    }
-                                    {
-                                        <li>No Custom Elections</li>
-                                    }
-                                </div>
-                            </div>
-
-                        </div>
+                        }
                     </div>
                 </div>
             </main>
