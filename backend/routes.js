@@ -168,8 +168,8 @@ module.exports = function routes(app, logger) {
     pool.getConnection(function(err,connection) {
       connection.query("select firstName,lastName,party from candidates c join elections e on (e.democraticCandidate = c.candidateId or e.republicanCandidate = c.candidateId or e.greenCandidate = c.candidateId or e.libertarianCandidate = c.candidateId) where year = ? and name = \'official\'", req.param('year'),function(err,result,fields) {
        if(err) {
-         logger.error("Invalid year (Probably)",err);
-         res.status(400).send("Invalid Year");
+         logger.error("Something went wrong!",err);
+         res.status(400).send("Something went wrong!");
        } else {
          res.send(JSON.parse(JSON.stringify(result)))
        }
@@ -445,11 +445,11 @@ app.put('/user/bio', async(req,res) => {
 
               max = Math.max(RV,DV,GV,LV,OV)
               winner = "ERROR"
-              if(max == RV) winner = "R"
-              else if(max == DV) winner = "D"
-              else if (max == GV) winner = "G"
-              else if (max == LV) winner = "L"
-              else if (max == OV) winner = "O"
+              if(max == RV) winner = "Republican"
+              else if(max == DV) winner = "Democrat"
+              else if (max == GV) winner = "Green"
+              else if (max == LV) winner = "Libertarian"
+              else if (max == OV) winner = "Other"
               tempRow = {
                 "state": result[i].name,
                 "shortName":result[i].shortName,

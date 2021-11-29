@@ -30,3 +30,24 @@ export const getElectionData = async(year) => {
     })
     return states
 }
+
+export const getElectionCandidates = async (year) => {
+    let candidates = null;
+    let url = 'http://localhost:8000/elections/candidates'
+    await axios({
+        method: 'get',
+        url: url,
+        params: {year}
+    })
+    .then((response) => {
+            if(response.status == 200){
+                candidates = response.data;
+            } else {
+                return null;
+            }
+        }
+    ) .catch(e => {
+        candidates = [];
+    })
+    return candidates;
+}

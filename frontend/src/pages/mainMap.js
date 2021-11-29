@@ -8,6 +8,7 @@ import {DEMOCRAT, MAPBOX_API_KEY, REPUBLICAN, statusMap} from "../constants/cons
 import Button from "../components/genericButton";
 import {Modal,SaveModal} from '../components/modal'
 import {checkObjectEquality} from "../utils";
+import {getElectionCandidates} from "../api/api";
 
 mapboxgl.accessToken = MAPBOX_API_KEY;
 
@@ -22,7 +23,7 @@ const ChangeRow = ({name, original, change, deleteAction}) => {
     )
 }
 
-export default function MainMap({place, polygons, affiliations, placesArray}){
+export default function MainMap({place, polygons, affiliations, placesArray, year}){
     const copyArr = (source) => {
         return JSON.parse(JSON.stringify(source))
     }
@@ -54,6 +55,7 @@ export default function MainMap({place, polygons, affiliations, placesArray}){
     const [saveOpenModal, setSaveOpenModal] = useState(false)
     const [saveName, setSaveName] = useState("")
     const [savedModal, setSavedModal] = useState(false)
+    const [candidates, setCandidates] = useState(null)
     useEffect(async() => {
         const entry = place;
         await axios({
@@ -103,6 +105,18 @@ export default function MainMap({place, polygons, affiliations, placesArray}){
             })
         });
     });
+
+    useEffect(async() => {
+        let payload = await getElectionCandidates(year ? year : 2020);
+        let transformedPayload = {};
+        if (payload) {
+            for(let obj of payload) {
+                transformedPayload[obj.party] = obj;
+            }
+        }
+        setCandidates(payload);
+
+    }, []);
 
     const votingGradient = () => {
         let gradient = "linear-gradient(to right, "
