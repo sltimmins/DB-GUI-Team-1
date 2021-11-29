@@ -100,9 +100,9 @@ module.exports = function routes(app, logger) {
   })
   app.get('/validElectionYears', (req,res) => {
     pool.getConnection(function(err,connection) {
-      connection.query("select accountNumber from users where username = ?", req.param('username'), function(err,result,fields) {
+      
         try {
-        connection.query("select year from elections where createdBy = ?",JSON.parse(JSON.stringify(result))[0]['accountNumber'],function(err,result,fields) {
+        connection.query("select electionId,year from elections where name = \"official\"",function(err,result,fields) {
           try {
           if(err) {
             logger.error(err)
@@ -111,14 +111,14 @@ module.exports = function routes(app, logger) {
             res.send(JSON.parse(JSON.stringify(result)))
           }
         } catch(e) {
-          logger.error('No years associated with that account')
+          logger.error('Error getting valid years')
         }
         })
       } catch(e) {
         logger.error('No elections associated with that username')
         res.send("No elections associated with the username: " + req.param('username'))
       }
-      })
+      
       connection.release()
     })
   })
