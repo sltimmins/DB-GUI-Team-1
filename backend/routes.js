@@ -284,7 +284,7 @@ module.exports = function routes(app, logger) {
       if(err){
         res.status(300).send()
       }
-      connection.query("SELECT f.candidateID FROM favorites  f INNER JOIN candidates c on f.candidateID = c.candidateId WHERE accountNumber = ?", [req.param('accountNumber')], 
+      connection.query("SELECT candidateID FROM favorites WHERE accountNumber = 119 AND candidateID IS NOT NULL;", [req.param('accountNumber')], 
       function(err,result,fields) {
         res.send(result);
       })
@@ -308,6 +308,25 @@ module.exports = function routes(app, logger) {
         }
         res.send(result)
       })     
+      connection.release();
+    })
+  })
+  /*
+  Removes a users favorite candidate
+  Input is accountNumber and candidateID passed as params
+  Ex. {"candidateID":"12", "accountNumber":"125"}
+  */
+  app.delete('/favorites/candidates', (req,res) => {
+    pool.getConnection(function(err,connection) {
+      if(err){
+        res.status(300).send()
+      }
+      console.log(req.body.candidateID+ '     ' + req.body.accountNumber)
+      connection.query("DELETE FROM favorites WHERE candidateID = ? AND accountNumber = ?", [req.body.candidateID, req.body.accountNumber], 
+      function(err,result,fields) {
+        res.send(result);
+      })
+            
       connection.release();
     })
   })
