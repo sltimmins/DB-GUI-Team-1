@@ -13,10 +13,11 @@ import UserProfile from './pages/UserProfile';
 import Header from "./components/header";
 import Footer from "./components/footer";
 import Search from "./pages/search";
-import {MainBackgroundColor, MainTitle} from "./constants/constants";
+import {MAIN_BACKGROUND_COLOR, MAIN_TITLE} from "./constants/constants";
 import { AppContext, useProvideAppContext, setupLogin } from "./AppContext.js";
 import Maps from "./pages/maps";
 import {getElectionData} from "./api/api";
+import {ROUTES} from "./routes";
 require('dotenv').config()
 
 // React functional component
@@ -32,6 +33,23 @@ export function App () {
   }
 
   const [allStates, setAllStates] = useState([])
+  const [routeData, setRouteData] = useState(null)
+
+  const handleMainMapData = (mapData) => {
+      let copy = routeData ? JSON.parse(JSON.stringify(routeData)) : {};
+      if(copy["/maps"]){
+          copy["/maps"]["from"] = mapData
+      } else {
+          copy["/maps"] = {from: mapData};
+      }
+      if(copy["/maps/:mapId"]){
+          copy["/maps/:mapId"]["to"] = mapData
+      } else {
+          copy["/maps/:mapId"] = {to: mapData};
+      }
+      console.log(copy)
+      setRouteData(copy)
+  }
 
   // tell app to fetch values from db on first load (if initialized)
   useEffect(async() => {
@@ -64,7 +82,7 @@ export function App () {
           <div className={"initialView"}>
             <ul className="nav">
               <li className="nav-item col">
-                <Header baseColor={MainBackgroundColor}
+                <Header baseColor={MAIN_BACKGROUND_COLOR}
                   routes={
                     [
                       {name: "Home", href: '/', active: (window.location.pathname === "/")},
@@ -73,7 +91,7 @@ export function App () {
                       {name: "Search", href: '/search', active: (window.location.pathname == "/search") }
                     ]
                   }
-                  mainTitle={MainTitle} mainImage = {{src: imagePath, width: "50px", height: '50px', borderRadius: '50%', onClick: () => {  
+                  mainTitle={MAIN_TITLE} mainImage = {{src: imagePath, width: "50px", height: '50px', borderRadius: '50%', onClick: () => {
                     return refP;  
                   }}}
                 />
@@ -88,24 +106,16 @@ export function App () {
                 }
               </li>
             </ul>
-            <Switch>
-              <Route path="/login">
-                <Users />
-              </Route>
-              <Route path="/search">
-                <Search />
-              </Route>
-              <Route path="/maps">
-                <Maps />
-              </Route>
-              <Route path="/UserProfile">
-                <UserProfile />
-              </Route>
-              <Route path="/">
-                <Home />
-              </Route>
+              <Switch>
+              {
+                ROUTES.map((route, index) => (
+                    <Route path={route.path} exact={route.exact} key={"route"+index}>
+                        {route.component()}
+                    </Route>
+                ))
+              }
             </Switch>
-            <Footer mainTitle={MainTitle}/>
+            <Footer mainTitle={MAIN_TITLE}/>
           </div>
         </Router>
     </AppContext.Provider>

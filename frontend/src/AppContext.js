@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { axiosJWTHeader } from './utils/index.js'
 import axios from "axios";
-import {ec2_url, ec2, baseURL} from './constants/constants'
+import {EC2_URL, EC2, BASE_URL} from './constants/constants'
 export const AppContext = React.createContext("app");
 
 export function useProvideAppContext() {
@@ -24,7 +24,7 @@ export function useProvideAppContext() {
         JWT,
         setJWT,
 
-        baseURL,
+        baseURL: BASE_URL,
 
         setup,
         setSetup,

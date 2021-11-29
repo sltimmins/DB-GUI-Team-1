@@ -38,7 +38,7 @@ const Header = ({routes, mainTitle, mainImage, baseColor}) => {
 
     let slideDownDiv = () => {
         if(open){
-            const slideDown = element => element.style.height = `${element.scrollHeight}px`;
+            const slideDown = element => element.style.height = `fit-content`;
             slideDown(document.getElementById("wrapper"));
         } else {
             const slideDown = element => element.style.height = `0px`;
