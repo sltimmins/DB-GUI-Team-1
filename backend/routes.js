@@ -164,6 +164,19 @@ module.exports = function routes(app, logger) {
       connection.release()
     })
   })
+  app.get("/elections/candidates", (req,res) =>{
+    pool.getConnection(function(err,connection) {
+      connection.query("select firstName,lastName,party from candidates c join elections e on (e.democraticCandidate = c.candidateId or e.republicanCandidate = c.candidateId or e.greenCandidate = c.candidateId or e.libertarianCandidate = c.candidateId) where year = ? and name = \'official\'", req.param('year'),function(err,result,fields) {
+       if(err) {
+         logger.error("Invalid year (Probably)",err);
+         res.status(400).send("Invalid Year");
+       } else {
+         res.send(JSON.parse(JSON.stringify(result)))
+       }
+       connection.release();
+      })
+    })
+  })
   /*Route to login, accepts formatting:
      {"username":"ashockley66","password":"alex66"} passed in Body
 
@@ -178,11 +191,13 @@ module.exports = function routes(app, logger) {
     //TODO figure out how to pass the JWT to frontend without displaying it to the user
     //TODO handle the case where the user enters the incorrect password better
     //TODO if the username is correct, move them back to homepage using the JWT
+
   app.post('/users/login', async(req,res) => {
     
     pool.getConnection(async function(err,connection) {
       const userToFind = {username:req.body.username, password:req.body.password}
       console.log("user: ", userToFind)
+      
       connection.query("select username, password, accountNumber, candidateId, firstName, lastName, uuid FROM users WHERE username = ?",userToFind.username , async function(err,result,fields){
         if(!result) {
           logger.error("Invalid username or Password")
@@ -271,56 +286,44 @@ module.exports = function routes(app, logger) {
       connection.release();
     })
   })
-  //Returns all a users favorite candidates
-  //No input but user needs to be logged in
+  //Returns all a users favorite cadidateID's
+  //Input is accountNumber as a param
   //return format:
   // [
   //   {
-  //       "firstName": "Donald",
-  //       "lastName": "Trump",
-  //       "party": "Republican"
+  //       "candidateId": "1"
   //   }
   // ]
-  app.get('/favorites/candidates', authenticateToken, (req,res) => {
+  app.get('/favorites/candidates', (req,res) => {
     pool.getConnection(function(err,connection) {
       if(err){
         res.status(300).send()
       }
-      connection.query("SELECT accountNumber FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
-        connection.query("SELECT firstName, lastName, party FROM favorites INNER JOIN candidates c on favorites.candidateID = c.candidateId WHERE favorites.accountNumber = ?", result[0].accountNumber, function(err,result2,fields) {
-          res.send(result2);
-        })
+      connection.query("SELECT f.candidateID FROM favorites  f INNER JOIN candidates c on f.candidateID = c.candidateId WHERE accountNumber = ?", [req.param('accountNumber')], 
+      function(err,result,fields) {
+        res.send(result);
       })
-      
+            
       connection.release();
     })
   })
-  app.post('/favorites/candidates', authenticateToken, (req,res) => {
+  //Inserts a users favorite candidateId
+  //Input is accountNumber and candidateId
+  app.post('/favorites/candidates', async(req,res) => {
     pool.getConnection(function(err,connection) {
       if(err){
         res.status(300).send()
       }
-      connection.query("SELECT accountNumber FROM users WHERE username = ?", [req.user.username], function(err,result,fields) {
+      console.log(connection)
+      const accountNumber = req.param('accountNumber')
+      const candidateId = req.param('candidateId')
+      console.log(accountNumber + '    ' + candidateId)
+      connection.query("INSERT INTO favorites (accountNumber, candidateID) VALUES (?, ?)", [accountNumber, candidateId], function(err,result,fields) {
         if(err){
-          res.status(400).send("Account not found")
+          res.status(400).send("Can't insert into favorites!")
         }
-        accountNumber = result[0].accountNumber
-        console.log(accountNumber)
-        connection.query("SELECT candidateId FROM candidates WHERE firstName = ? AND lastName = ?", [req.body.firstName, req.body.lastName], function(err2,result2,fields) {
-          if(err2){
-            res.send(400).send("Candidate not found")
-          }
-          console.log(result2[0].candidateId)
-          connection.query("INSERT INTO favorites (accountNumber, candidateID) VALUES (?, ?)", [result[0].accountNumber, result2[0].candidateId], function(err3,result3,fields) {
-            if(err3){
-              res.send(400).send()
-            }
-            console.log(result3);
-            res.send("Candidate added to favorites")
-          })
-        })
-      })
-      
+        res.send(result)
+      })     
       connection.release();
     })
   })
