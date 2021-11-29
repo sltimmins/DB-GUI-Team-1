@@ -299,9 +299,8 @@ module.exports = function routes(app, logger) {
       if(err){
         res.status(300).send()
       }
-      console.log(connection)
-      const accountNumber = req.param('accountNumber')
-      const candidateId = req.param('candidateId')
+      const accountNumber = req.body.accountNumber;
+      const candidateId = req.body.candidateId;
       console.log(accountNumber + '    ' + candidateId)
       connection.query("INSERT INTO favorites (accountNumber, candidateID) VALUES (?, ?)", [accountNumber, candidateId], function(err,result,fields) {
         if(err){

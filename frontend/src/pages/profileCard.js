@@ -6,7 +6,7 @@ export default function ProfileCard ({ candidate, favorite }) {
     let name = candidate.firstName + " " + candidate.lastName;
     let image = ["assets/userImages/default.jpg"]
 
-    //console.log(favorite);
+    console.log(favorite, candidate);
 
     if(candidate.uuid) {
         image = [];
@@ -15,7 +15,7 @@ export default function ProfileCard ({ candidate, favorite }) {
 
     return (
         // TODO: Take user to candidate profile page on click
-        <div key={ candidate.id } class="candidateCard favoriteButton" onClick={event => console.log(candidate) }>
+        <div key={ candidate.candidateId } class="candidateCard favoriteButton" >
             <img class="candidateImage" alt={name} src={image}/>
             <div class="info">
                 <h2 class="no-wrap">{name}</h2>
