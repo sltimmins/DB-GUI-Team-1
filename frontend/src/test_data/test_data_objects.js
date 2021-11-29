@@ -1,6 +1,12 @@
 import {DEMOCRAT, GREEN, LIBERTARIAN, REPUBLICAN} from "../constants/constants";
 
-export const placesPayload = [{"state": "Texas", "status": REPUBLICAN},
+export const placesPayload = [
+    {
+        state: "United States"
+    }
+]
+
+export const forFutureUser = [{"state": "Texas", "status": REPUBLICAN},
     {"state": "California", "status": DEMOCRAT},
     {"state": "New York", "status": DEMOCRAT},
     {"state": "Florida", "status": REPUBLICAN},

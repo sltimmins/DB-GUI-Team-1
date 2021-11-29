@@ -23,7 +23,7 @@ const ChangeRow = ({name, original, change, deleteAction}) => {
     )
 }
 
-export default function MainMap({place, polygons, affiliations, placesArray, year}){
+export default function MainMap({place, polygons, affiliations, placesArray, year, candidatesPayload}){
     const copyArr = (source) => {
         return JSON.parse(JSON.stringify(source))
     }
@@ -55,7 +55,8 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
     const [saveOpenModal, setSaveOpenModal] = useState(false)
     const [saveName, setSaveName] = useState("")
     const [savedModal, setSavedModal] = useState(false)
-    const [candidates, setCandidates] = useState(null)
+    const [candidates, setCandidates] = useState(candidatesPayload)
+    const [multiplier, setMultiplier] = useState(1)
     useEffect(async() => {
         const entry = place;
         await axios({
@@ -73,7 +74,9 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                 }
             );
             map.current.on('load', () => {
+                let baseNum = 1;
                 for(const stateJS of polygons){
+                    const calcNumID = baseNum * multiplier;
                     if(setOfStates.has(stateJS.properties.NAME)){
                         return
                     }
@@ -100,23 +103,14 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                             'fill-opacity': 0.5
                         }
                     });
+                    baseNum++;
                 }
-                setOfStates.clear()
+                setOfStates.clear();
+
             })
         });
-    });
+    }, [deleteEntryModal, chosenChangeLocation, newAffiliation, locationToRemove, saveOpenModal, savedModal]);
 
-    useEffect(async() => {
-        let payload = await getElectionCandidates(year ? year : 2020);
-        let transformedPayload = {};
-        if (payload) {
-            for(let obj of payload) {
-                transformedPayload[obj.party] = obj;
-            }
-        }
-        setCandidates(payload);
-
-    }, []);
 
     const votingGradient = () => {
         let gradient = "linear-gradient(to right, "
@@ -167,7 +161,7 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                             <div ref={(el) => ref.current = el} className={"map-container largerMap mapboxgl-map"}>
 
                             </div>
-                            <h2>{place.state}</h2>
+                            <h2>{place.state} {year}</h2>
                         </div>)] :
                     []}
             </section>
@@ -186,7 +180,20 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                         Object.keys(electionNumbers).map((key, index) =>
                             <div>
                                 <h5>
-                                    {statusMap[key]} - {electionNumbers[key]}
+                                    {statusMap[key]} - {electionNumbers[key]} {"\n"}
+                                    ({candidates[statusMap[key]].firstName} {candidates[statusMap[key]].lastName})
+                                </h5>
+                            </div>
+                        ) : []
+                    }
+                </div>
+                <div className={"resultDiv"}>
+                    {
+                    electionNumbers && candidatesPayload ?
+                        Object.keys(electionNumbers).map((key, index) =>
+                            <div>
+                                <h5>
+                                    {candidates[statusMap[key]].firstName} {candidates[statusMap[key]].lastName}
                                 </h5>
                             </div>
                         ) : []
