@@ -91,7 +91,7 @@ export function App () {
                       {name: "Search", href: '/search', active: (window.location.pathname == "/search") }
                     ]
                   }
-                  mainTitle={MAIN_TITLE} mainImage = {{src: imagePath, width: "50px", height: '50px', borderRadius: '50%', onClick: () => {
+                  mainTitle={MAIN_TITLE} mainImage = {{src: imagePath, width: "40px", height: '40px', borderRadius: '50%', onClick: () => {
                     return refP;  
                   }}}
                 />

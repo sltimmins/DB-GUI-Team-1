@@ -193,6 +193,19 @@ accepts formatting candidateID in params and returns all the years that the cand
       connection.release()
     })
   })
+  app.get("/elections/candidates", (req,res) =>{
+    pool.getConnection(function(err,connection) {
+      connection.query("select firstName,lastName,party from candidates c join elections e on (e.democraticCandidate = c.candidateId or e.republicanCandidate = c.candidateId or e.greenCandidate = c.candidateId or e.libertarianCandidate = c.candidateId) where year = ? and name = \'official\'", req.param('year'),function(err,result,fields) {
+       if(err) {
+         logger.error("Something went wrong!",err);
+         res.status(400).send("Something went wrong!");
+       } else {
+         res.send(JSON.parse(JSON.stringify(result)))
+       }
+       connection.release();
+      })
+    })
+  })
   /*Route to login, accepts formatting:
      {"username":"ashockley66","password":"alex66"} passed in Body
 
@@ -207,11 +220,13 @@ accepts formatting candidateID in params and returns all the years that the cand
     //TODO figure out how to pass the JWT to frontend without displaying it to the user
     //TODO handle the case where the user enters the incorrect password better
     //TODO if the username is correct, move them back to homepage using the JWT
+
   app.post('/users/login', async(req,res) => {
     
     pool.getConnection(async function(err,connection) {
       const userToFind = {username:req.body.username, password:req.body.password}
       console.log("user: ", userToFind)
+      
       connection.query("select username, password, accountNumber, candidateId, firstName, lastName, uuid FROM users WHERE username = ?",userToFind.username , async function(err,result,fields){
         if(!result) {
           logger.error("Invalid username or Password")
@@ -424,6 +439,9 @@ app.put('/user/bio', async(req,res) => {
       electionName = "official";
     }
     pool.getConnection(async function(err,connection) {
+      if(err){
+        res.status(300).send()
+      }
       let year = req.query.year;
       let electionId = -1
       connection.query("SELECT electionId FROM elections where year = ? and name = ?",[year,electionName], function(err,result,fields) {
@@ -432,6 +450,7 @@ app.put('/user/bio', async(req,res) => {
         } else {
            console.log("result", result)
           electionId = result.length > 0 ? result[0].electionId : -1
+          console.log(result)
         }
       })
       await sleep(250)
@@ -453,11 +472,11 @@ app.put('/user/bio', async(req,res) => {
 
               max = Math.max(RV,DV,GV,LV,OV)
               winner = "ERROR"
-              if(max == RV) winner = "R"
-              else if(max == DV) winner = "D"
-              else if (max == GV) winner = "G"
-              else if (max == LV) winner = "L"
-              else if (max == OV) winner = "O"
+              if(max == RV) winner = "Republican"
+              else if(max == DV) winner = "Democrat"
+              else if (max == GV) winner = "Green"
+              else if (max == LV) winner = "Libertarian"
+              else if (max == OV) winner = "Other"
               tempRow = {
                 "state": result[i].name,
                 "shortName":result[i].shortName,
