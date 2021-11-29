@@ -8,6 +8,7 @@ export default function Favorite ({ isFav, candidateId }) {
     const { baseURL, user } = useContext(AppContext);
 
     const addFav = () => {
+        console.log("maybe?")
         axios.post(baseURL + '/favorites/candidates', { params: { accountNumber: user.accountNumber, candidateId: candidateId } }).then((res) => {
             isFav = true;
         })

@@ -20,7 +20,7 @@ export default function Search() {
         loadCandidates(1);
         loadFavorites();
         setLoad(true);
-    }, [])
+    }, [user])
 
     const loadCandidates = loadWho => { 
         axios.post(baseURL + '/users/search_user', { allUsers: loadWho }).then((res) => {
