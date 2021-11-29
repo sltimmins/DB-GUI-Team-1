@@ -9,6 +9,15 @@
     overflow: hidden;
 }
 
+.favoriteButton {
+    position: relative;
+}
+
+.favorite {
+    position: absolute;
+    right: 0px; bottom: 0px;
+}
+
 .candidateCard {
     border : 1px solid lightgray;
     margin: .5rem;

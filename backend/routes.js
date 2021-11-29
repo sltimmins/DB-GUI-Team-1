@@ -245,15 +245,15 @@ module.exports = function routes(app, logger) {
     pool.getConnection(function(err,connection) {
       const getWho = req.body.allUsers;
       if(getWho === 1) {
-        connection.query("Select username, firstName, lastName, uuid, party FROM users", function(err,result,fields) {
+        connection.query("Select accountNumber, username, firstName, candidateId, lastName, uuid, party FROM users", function(err,result,fields) {
           res.send(result);
         })
       } else if(getWho === 2) {
-        connection.query("Select firstName, lastName, party, uuid FROM candidates", function(err,result,fields){
+        connection.query("Select candidateId, firstName, lastName, party, uuid FROM candidates", function(err,result,fields){
           res.send(result);
         })
       } else {
-        connection.query("Select username, firstName, lastName, uuid, party FROM users WHERE candidateId is NULL", function(err,result,fields){
+        connection.query("Select accountNumber, username, firstName, lastName, uuid, party FROM users WHERE candidateId is NULL", function(err,result,fields){
           res.send(result);
         })
       }

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../AppContext'
 import Scroll from '../components/scroll.js'
 import ProfileList from './profileList.js';
@@ -8,37 +8,49 @@ import { DropdownButton, Dropdown } from 'react-bootstrap';
 
 export default function Search() {
 
+    const [favCandidates, setFavCandidates] = useState(undefined);
     const [load, setLoad] = useState(false);
     const [searchField, setSearchField] = useState("");
     const [filterParty, setFilterParty] = useState("");
     const [list, setList] = useState([]);
 
-    const { baseURL } = useContext(AppContext);
+    const { baseURL, user } = useContext(AppContext);
+
+    useEffect(() => {
+        loadCandidates(1);
+        loadFavorites();
+        setLoad(true);
+    }, [])
 
     const loadCandidates = loadWho => { 
         axios.post(baseURL + '/users/search_user', { allUsers: loadWho }).then((res) => {
             setList(res.data);
         });
     }
-
-    if(!load) {
-        loadCandidates(1);
-        setLoad(true);
+    const loadFavorites = () => { 
+        axios.get(baseURL + '/favorites/candidates', { params: { accountNumber: user.accountNumber } }).then((res) => {
+            const favs = [];
+            res.data.forEach((x, i) => favs.push(x.candidateID));
+            setFavCandidates(favs);
+        });
     }
-
-    const filteredCandidates = list.filter(user => {
-            let name = user.firstName + " " + user.lastName;
-            if(filterParty !== "") {   
-                return (
-                    name.toLowerCase().includes(searchField.toLowerCase()) && user.party === filterParty
-                );
-            } else {
-                return (
-                    name.toLowerCase().includes(searchField.toLowerCase())
-                );
+    
+    var filteredCandidates = [];
+    if(load && user) {
+        filteredCandidates = list.filter(user => {
+                let name = user.firstName + " " + user.lastName;
+                if(filterParty !== "") {   
+                    return (
+                        name.toLowerCase().includes(searchField.toLowerCase()) && user.party === filterParty
+                    );
+                } else {
+                    return (
+                        name.toLowerCase().includes(searchField.toLowerCase())
+                    );
+                }
             }
-        }
-    );
+        );
+    }
 
     const handleChange = e => {
         setSearchField(e.target.value);
@@ -56,10 +68,10 @@ export default function Search() {
     }
 
     function searchList() {
-        if(filteredCandidates.length > 0) {
+        if(filteredCandidates.length > 0 && favCandidates) {
             return (
                 <Scroll>
-                    <ProfileList filteredCandidates={filteredCandidates} />
+                    <ProfileList filteredCandidates={filteredCandidates} favoriteCandidates={favCandidates}/>
                 </Scroll>
             )
         } else {
