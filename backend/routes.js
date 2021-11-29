@@ -340,7 +340,7 @@ app.put('/user/bio', async(req,res) => {
   {
     "year":"2020"
   }
-  EX. 0.0.0.0:8000/favorites/elections?accountNumber=119
+  EX link: 0.0.0.0:8000/favorites/elections?accountNumber=119
   */
 
   app.get('/favorites/elections', (req,res) => {
@@ -358,16 +358,17 @@ app.put('/user/bio', async(req,res) => {
   })
   /*
   Inserts users favorite election into database
-  Input is accountNumber and electionId as params
-  ex. 0.0.0.0:8000/favorites/elections?accountNumber=119&electionId=1
+  Input is accountNumber and electionId as body
+  ex body: {"electionId":"1", "accountNumber":"119"}
+  ex. link: 0.0.0.0:8000/favorites/elections
   */
   app.post('/favorites/elections', async(req,res) => {
     pool.getConnection(function(err,connection) {
       if(err){
         res.status(300).send()
       }
-      const accountNumber = req.param('accountNumber')
-      const electionId = req.param('electionId')
+      const accountNumber = req.body.accountNumber
+      const electionId = req.body.electionId
       console.log(accountNumber + '    ' + electionId)
       connection.query("INSERT INTO favorites (accountNumber, electionID) VALUES (?, ?)", [accountNumber, electionId], function(err,result,fields) {
         if(err){
@@ -375,6 +376,25 @@ app.put('/user/bio', async(req,res) => {
         }
         res.send(result)
       })     
+      connection.release();
+    })
+  })
+    /*
+  Removes a users favorite elections
+  Input is accountNumber and electionID as body
+  EX body input: {"electionID":"1", "accountNumber":"119"}
+  */
+
+  app.delete('/favorites/elections', (req,res) => {
+    pool.getConnection(function(err,connection) {
+      if(err){
+        res.status(300).send()
+      }
+      connection.query("DELETE FROM favorites WHERE electionID = ? AND accountNumber = ?", [req.body.electionID, req.body.accountNumber], 
+      function(err,result,fields) {
+        res.send(result);
+      })
+            
       connection.release();
     })
   })
