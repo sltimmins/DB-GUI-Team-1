@@ -12,7 +12,28 @@ module.exports = function routes(app, logger) {
     res.status(200).send('Go to 0.0.0.0:3000.');
   });
 
+/*
+accepts formatting candidateID in params and returns all the years that the candidate was in an election
+*/
+  app.get('/candidate/years', (req,res)=>{
+    ID = req.param('candidateID');
 
+    pool.getConnection(function(err,connection) {
+      try {
+        connection.query('select year from elections where name = \"official\" and (democraticCandidate = ? or republicanCandidate = ? or libertarianCandidate = ? or greenCandidate = ?);', [ID,ID,ID,ID], function(err,result,fields) {
+          if(err) {
+            throw 'Error in SQL syntax';
+          }
+          res.send(JSON.parse(JSON.stringify(result)));
+        })
+      } catch {
+        logger.error('Error querying database for year given candidate ID: ', ID);
+        res.status(400).send('Something went Wrong!')
+      }
+
+      connection.release();
+    })
+  })
   /*
   route to create a new user account and add it to the database
   Uses bcrypt to encrypt the user's password
@@ -98,11 +119,11 @@ module.exports = function routes(app, logger) {
       connection.release()
     })
   })
-  app.get('/validElectionYears', (req,res) => {
+  app.get('/customElectionYears', (req,res) => {
     pool.getConnection(function(err,connection) {
-      connection.query("select accountNumber from users where username = ?", req.param('username'), function(err,result,fields) {
+      
         try {
-        connection.query("select year from elections where createdBy = ?",JSON.parse(JSON.stringify(result))[0]['accountNumber'],function(err,result,fields) {
+        connection.query("select electionId,year from elections where name = \"official\"",function(err,result,fields) {
           try {
           if(err) {
             logger.error(err)
@@ -111,21 +132,29 @@ module.exports = function routes(app, logger) {
             res.send(JSON.parse(JSON.stringify(result)))
           }
         } catch(e) {
-          logger.error('No years associated with that account')
+          logger.error('Error getting valid years')
         }
         })
       } catch(e) {
         logger.error('No elections associated with that username')
         res.send("No elections associated with the username: " + req.param('username'))
       }
-      })
+      
       connection.release()
     })
   })
-  app.get('/saveCSV',authenticateToken, async(req,res) => {
-    const ws = fs.createWriteStream("Temp.csv");
+  /*
+    accepts formatting year,[electionName] in params. SHOULD send a file to frontend
+  */
+  app.get('/saveCSV', async(req,res) => {
+    electionName = req.param('electionName')
+    if(!electionName) {
+      electionName = "official"
+    }
+    const ws = fs.createWriteStream("Election.csv");
+    console.log(req.param('year'), req.param('electionName'))
     pool.getConnection( function(err,connection) {
-      connection.query('select s.name, ed.republicanVotes, ed.democraticVotes, ed.greenVotes, ed.libertarianVotes, ed.otherVotes from electionData ed join elections e on e.electionId = ed.electionId join states s on s.stateId = ed.stateId join users u on u.accountNumber = e.createdBy where u.username = ? and e.name = ?; ', [req.user.username, req.param('electionName')],function(err,result,fields) {
+      connection.query('select s.name, ed.republicanVotes, ed.democraticVotes, ed.greenVotes, ed.libertarianVotes, ed.otherVotes from electionData ed join elections e on e.electionId = ed.electionId join states s on s.stateId = ed.stateId join users u on u.accountNumber = e.createdBy where e.year = ? and e.name = ?; ', [req.param('year'), electionName],function(err,result,fields) {
 
         const jsonData = JSON.parse(JSON.stringify(result))
         console.log(jsonData)
@@ -134,7 +163,7 @@ module.exports = function routes(app, logger) {
         .on("finish", function() {
         console.log("Write to Temp.csv successfully!");
         }).pipe(ws)
-        res.sendFile(path.join(__dirname, '/Temp.csv'))
+        res.sendFile(path.join(__dirname, '/Election.csv'))
           // try {
           //   fs.unlinkSync(path.join(__dirname,'/Temp.csv'))
           //   console.log('file Deleted')
@@ -164,6 +193,19 @@ module.exports = function routes(app, logger) {
       connection.release()
     })
   })
+  app.get("/elections/candidates", (req,res) =>{
+    pool.getConnection(function(err,connection) {
+      connection.query("select firstName,lastName,party from candidates c join elections e on (e.democraticCandidate = c.candidateId or e.republicanCandidate = c.candidateId or e.greenCandidate = c.candidateId or e.libertarianCandidate = c.candidateId) where year = ? and name = \'official\'", req.param('year'),function(err,result,fields) {
+       if(err) {
+         logger.error("Something went wrong!",err);
+         res.status(400).send("Something went wrong!");
+       } else {
+         res.send(JSON.parse(JSON.stringify(result)))
+       }
+       connection.release();
+      })
+    })
+  })
   /*Route to login, accepts formatting:
      {"username":"ashockley66","password":"alex66"} passed in Body
 
@@ -178,11 +220,13 @@ module.exports = function routes(app, logger) {
     //TODO figure out how to pass the JWT to frontend without displaying it to the user
     //TODO handle the case where the user enters the incorrect password better
     //TODO if the username is correct, move them back to homepage using the JWT
+
   app.post('/users/login', async(req,res) => {
     
     pool.getConnection(async function(err,connection) {
       const userToFind = {username:req.body.username, password:req.body.password}
       console.log("user: ", userToFind)
+      
       connection.query("select username, password, accountNumber, candidateId, firstName, lastName, uuid FROM users WHERE username = ?",userToFind.username , async function(err,result,fields){
         if(!result) {
           logger.error("Invalid username or Password")
@@ -353,52 +397,66 @@ app.put('/user/bio', async(req,res) => {
 
   /*
   Returns an array of all a users favorite election years
-  No input params but user must be logged in
+  Input is account number passed by param
   output:
   {
     "year":"2020"
   }
+  EX link: 0.0.0.0:8000/favorites/elections?accountNumber=119
   */
-  app.get('/favorites/elections', authenticateToken, (req,res) => {
+
+  app.get('/favorites/elections', (req,res) => {
     pool.getConnection(function(err,connection) {
       if(err){
         res.status(300).send()
       }
-      connection.query("SELECT accountNumber FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
-        connection.query("SELECT year FROM favorites INNER JOIN elections e on favorites.electionID = e.electionId WHERE favorites.accountNumber = ? ORDER BY year DESC;", result[0].accountNumber, function(err,result2,fields) {
-          res.send(result2);
-        })
+      connection.query("SELECT year FROM favorites INNER JOIN elections e on favorites.electionID = e.electionId WHERE favorites.accountNumber = ? ORDER BY year DESC", [req.param('accountNumber')], 
+      function(err,result,fields) {
+        res.send(result);
       })
-      
+            
       connection.release();
     })
   })
-  app.post('/favorites/elections', authenticateToken, (req,res) => {
+  /*
+  Inserts users favorite election into database
+  Input is accountNumber and electionId as body
+  ex body: {"electionId":"1", "accountNumber":"119"}
+  ex. link: 0.0.0.0:8000/favorites/elections
+  */
+  app.post('/favorites/elections', async(req,res) => {
     pool.getConnection(function(err,connection) {
       if(err){
         res.status(300).send()
       }
-      connection.query("SELECT accountNumber FROM users WHERE username = ?", [req.user.username], function(err,result,fields) {
+      const accountNumber = req.body.accountNumber
+      const electionId = req.body.electionId
+      console.log(accountNumber + '    ' + electionId)
+      connection.query("INSERT INTO favorites (accountNumber, electionID) VALUES (?, ?)", [accountNumber, electionId], function(err,result,fields) {
         if(err){
-          res.status(400).send("Account not found")
+          res.status(400).send("Can't insert into favorites!")
         }
-        accountNumber = result[0].accountNumber
-        console.log(accountNumber)
-        connection.query("SELECT electionId FROM elections WHERE year = ?", [req.body.year], function(err2,result2,fields) {
-          if(err2){
-            res.send(400).send("Election not found")
-          }
-          console.log(result2[0])
-          connection.query("INSERT INTO favorites (accountNumber, electionID) VALUES (?, ?)", [result[0].accountNumber, result2[0].electionId], function(err3,result3,fields) {
-            if(err3){
-              res.send(400).send()
-            }
-            console.log(result3);
-            res.send("Candidate added to favorites")
-          })
-        })
-      })
+        res.send(result)
+      })     
+      connection.release();
+    })
+  })
+    /*
+  Removes a users favorite elections
+  Input is accountNumber and electionID as body
+  EX body input: {"electionID":"1", "accountNumber":"119"}
+  */
 
+  app.delete('/favorites/elections', (req,res) => {
+    pool.getConnection(function(err,connection) {
+      if(err){
+        res.status(300).send()
+      }
+      connection.query("DELETE FROM favorites WHERE electionID = ? AND accountNumber = ?", [req.body.electionID, req.body.accountNumber], 
+      function(err,result,fields) {
+        res.send(result);
+      })
+            
       connection.release();
     })
   })
@@ -411,24 +469,32 @@ app.put('/user/bio', async(req,res) => {
         "EV": 3
     } 
     where EV = electoral Votes, R = republican, D = democrat, G = green, L = libertarian, O = other
-  accepts formatting {"year":<yearToFind>} in body
+  accepts formatting {"year":<yearToFind>, [name: elecitonName]} in params
   */
   app.get('/electionData',(req,res) => {
+    electionName = req.param('name')
+    if(!electionName) {
+      electionName = "official";
+    }
     pool.getConnection(async function(err,connection) {
+      if(err){
+        res.status(300).send()
+      }
       let year = req.query.year;
       let electionId = -1
-      connection.query("SELECT electionId FROM elections where year = ?",[year], function(err,result,fields) {
+      connection.query("SELECT electionId FROM elections where year = ? and name = ?",[year,electionName], function(err,result,fields) {
         if(err) {
           logger.error("Error querying Database\n", err)
         } else {
            console.log("result", result)
           electionId = result.length > 0 ? result[0].electionId : -1
+          console.log(result)
         }
       })
       await sleep(250)
       
       if(electionId != -1) {
-        connection.query("SELECT * FROM electionData JOIN states on electionData.stateId = states.stateId WHERE electionId = ? ", [electionId], function(err,result,fields) {
+        connection.query("SELECT * FROM electionData JOIN states on electionData.stateId = states.stateId WHERE electionId = ?", [electionId], function(err,result,fields) {
 
           if(err) {
             logger.error("Something went wrong...")
@@ -444,11 +510,11 @@ app.put('/user/bio', async(req,res) => {
 
               max = Math.max(RV,DV,GV,LV,OV)
               winner = "ERROR"
-              if(max == RV) winner = "R"
-              else if(max == DV) winner = "D"
-              else if (max == GV) winner = "G"
-              else if (max == LV) winner = "L"
-              else if (max == OV) winner = "O"
+              if(max == RV) winner = "Republican"
+              else if(max == DV) winner = "Democrat"
+              else if (max == GV) winner = "Green"
+              else if (max == LV) winner = "Libertarian"
+              else if (max == OV) winner = "Other"
               tempRow = {
                 "state": result[i].name,
                 "shortName":result[i].shortName,
@@ -466,7 +532,7 @@ app.put('/user/bio', async(req,res) => {
         logger.error("No elections found with that year...")
         res.status(400).send({
           "success":false,
-          "reason":"No such year found"
+          "reason":"No such election found"
         })
       }
       connection.release()
