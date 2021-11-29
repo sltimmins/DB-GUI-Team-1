@@ -12,7 +12,28 @@ module.exports = function routes(app, logger) {
     res.status(200).send('Go to 0.0.0.0:3000.');
   });
 
+/*
+accepts formatting candidateID in params and returns all the years that the candidate was in an election
+*/
+  app.get('/candidate/years', (req,res)=>{
+    ID = req.param('candidateID');
 
+    pool.getConnection(function(err,connection) {
+      try {
+        connection.query('select year from elections where name = \"official\" and (democraticCandidate = ? or republicanCandidate = ? or libertarianCandidate = ? or greenCandidate = ?);', [ID,ID,ID,ID], function(err,result,fields) {
+          if(err) {
+            throw 'Error in SQL syntax';
+          }
+          res.send(JSON.parse(JSON.stringify(result)));
+        })
+      } catch {
+        logger.error('Error querying database for year given candidate ID: ', ID);
+        res.status(400).send('Something went Wrong!')
+      }
+
+      connection.release();
+    })
+  })
   /*
   route to create a new user account and add it to the database
   Uses bcrypt to encrypt the user's password
@@ -122,10 +143,18 @@ module.exports = function routes(app, logger) {
       connection.release()
     })
   })
-  app.get('/saveCSV',authenticateToken, async(req,res) => {
+  /*
+    accepts formatting year,[electionName] in params. SHOULD send a file to frontend
+  */
+  app.get('/saveCSV', async(req,res) => {
+    electionName = req.param('electionName')
+    if(!electionName) {
+      electionName = "official"
+    }
     const ws = fs.createWriteStream("Election.csv");
+    console.log(req.param('year'), req.param('electionName'))
     pool.getConnection( function(err,connection) {
-      connection.query('select s.name, ed.republicanVotes, ed.democraticVotes, ed.greenVotes, ed.libertarianVotes, ed.otherVotes from electionData ed join elections e on e.electionId = ed.electionId join states s on s.stateId = ed.stateId join users u on u.accountNumber = e.createdBy where u.username = ? and e.name = ?; ', [req.user.username, req.param('electionName')],function(err,result,fields) {
+      connection.query('select s.name, ed.republicanVotes, ed.democraticVotes, ed.greenVotes, ed.libertarianVotes, ed.otherVotes from electionData ed join elections e on e.electionId = ed.electionId join states s on s.stateId = ed.stateId join users u on u.accountNumber = e.createdBy where e.year = ? and e.name = ?; ', [req.param('year'), electionName],function(err,result,fields) {
 
         const jsonData = JSON.parse(JSON.stringify(result))
         console.log(jsonData)
@@ -387,13 +416,17 @@ app.put('/user/bio', async(req,res) => {
         "EV": 3
     } 
     where EV = electoral Votes, R = republican, D = democrat, G = green, L = libertarian, O = other
-  accepts formatting {"year":<yearToFind>} in body
+  accepts formatting {"year":<yearToFind>, [name: elecitonName]} in params
   */
   app.get('/electionData',(req,res) => {
+    electionName = req.param('name')
+    if(!electionName) {
+      electionName = "official";
+    }
     pool.getConnection(async function(err,connection) {
       let year = req.query.year;
       let electionId = -1
-      connection.query("SELECT electionId FROM elections where year = ?",[year], function(err,result,fields) {
+      connection.query("SELECT electionId FROM elections where year = ? and name = ?",[year,electionName], function(err,result,fields) {
         if(err) {
           logger.error("Error querying Database\n", err)
         } else {
@@ -404,7 +437,7 @@ app.put('/user/bio', async(req,res) => {
       await sleep(250)
       
       if(electionId != -1) {
-        connection.query("SELECT * FROM electionData JOIN states on electionData.stateId = states.stateId WHERE electionId = ? ", [electionId], function(err,result,fields) {
+        connection.query("SELECT * FROM electionData JOIN states on electionData.stateId = states.stateId WHERE electionId = ?", [electionId], function(err,result,fields) {
 
           if(err) {
             logger.error("Something went wrong...")
@@ -442,7 +475,7 @@ app.put('/user/bio', async(req,res) => {
         logger.error("No elections found with that year...")
         res.status(400).send({
           "success":false,
-          "reason":"No such year found"
+          "reason":"No such election found"
         })
       }
       connection.release()
