@@ -98,7 +98,7 @@ module.exports = function routes(app, logger) {
       connection.release()
     })
   })
-  app.get('/validElectionYears', (req,res) => {
+  app.get('/customElectionYears', (req,res) => {
     pool.getConnection(function(err,connection) {
       connection.query("select accountNumber from users where username = ?", req.param('username'), function(err,result,fields) {
         try {
