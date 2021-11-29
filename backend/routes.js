@@ -335,52 +335,46 @@ app.put('/user/bio', async(req,res) => {
 
   /*
   Returns an array of all a users favorite election years
-  No input params but user must be logged in
+  Input is account number passed by param
   output:
   {
     "year":"2020"
   }
+  EX. 0.0.0.0:8000/favorites/elections?accountNumber=119
   */
-  app.get('/favorites/elections', authenticateToken, (req,res) => {
+
+  app.get('/favorites/elections', (req,res) => {
     pool.getConnection(function(err,connection) {
       if(err){
         res.status(300).send()
       }
-      connection.query("SELECT accountNumber FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
-        connection.query("SELECT year FROM favorites INNER JOIN elections e on favorites.electionID = e.electionId WHERE favorites.accountNumber = ? ORDER BY year DESC;", result[0].accountNumber, function(err,result2,fields) {
-          res.send(result2);
-        })
+      connection.query("SELECT year FROM favorites INNER JOIN elections e on favorites.electionID = e.electionId WHERE favorites.accountNumber = ? ORDER BY year DESC", [req.param('accountNumber')], 
+      function(err,result,fields) {
+        res.send(result);
       })
-      
+            
       connection.release();
     })
   })
-  app.post('/favorites/elections', authenticateToken, (req,res) => {
+  /*
+  Inserts users favorite election into database
+  Input is accountNumber and electionId as params
+  ex. 0.0.0.0:8000/favorites/elections?accountNumber=119&electionId=1
+  */
+  app.post('/favorites/elections', async(req,res) => {
     pool.getConnection(function(err,connection) {
       if(err){
         res.status(300).send()
       }
-      connection.query("SELECT accountNumber FROM users WHERE username = ?", [req.user.username], function(err,result,fields) {
+      const accountNumber = req.param('accountNumber')
+      const electionId = req.param('electionId')
+      console.log(accountNumber + '    ' + electionId)
+      connection.query("INSERT INTO favorites (accountNumber, electionID) VALUES (?, ?)", [accountNumber, electionId], function(err,result,fields) {
         if(err){
-          res.status(400).send("Account not found")
+          res.status(400).send("Can't insert into favorites!")
         }
-        accountNumber = result[0].accountNumber
-        console.log(accountNumber)
-        connection.query("SELECT electionId FROM elections WHERE year = ?", [req.body.year], function(err2,result2,fields) {
-          if(err2){
-            res.send(400).send("Election not found")
-          }
-          console.log(result2[0])
-          connection.query("INSERT INTO favorites (accountNumber, electionID) VALUES (?, ?)", [result[0].accountNumber, result2[0].electionId], function(err3,result3,fields) {
-            if(err3){
-              res.send(400).send()
-            }
-            console.log(result3);
-            res.send("Candidate added to favorites")
-          })
-        })
-      })
-
+        res.send(result)
+      })     
       connection.release();
     })
   })
