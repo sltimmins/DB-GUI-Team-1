@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/header.css';
 const hamburger = ["/assets/images/1024px-Hamburger_icon_white.svg.png", "/assets/images/Hamburger_icon.svg.png"]
-const Header = ({routes, mainTitle, mainImage, baseColor}) => {
+const Header = ({routes, mainTitle, mainImage, baseColor, showImage}) => {
     const calcFontColor = () => {
         if(baseColor.length === 4){
             baseColor+= baseColor.substring(1, 4);
@@ -66,7 +66,7 @@ const Header = ({routes, mainTitle, mainImage, baseColor}) => {
                 </div>
                 <div className = {"titleContainer"}>
                     <div className =  {["titleChild", "titleRight"].join(" ")} >
-                        <div className = {"helper"}>
+                        <div className = {"helper"} style={{display: showImage ? 'block' : 'none'}}>
                             <div className = {"headerLogoDiv"} style={{width: mainImage.width}}>
                                 <img src={mainImage.src} className = {"headerImage"} alt="logo" style={{width: mainImage.width, height: mainImage.height}} onClick={() => {
                                     let refP = mainImage.onClick();
