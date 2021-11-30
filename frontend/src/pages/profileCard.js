@@ -17,7 +17,14 @@ export default function ProfileCard ({ candidate }) {
             <div class="info">
                 <h2 class="no-wrap">{name}</h2>
                 <p class="party">{candidate.party}</p>
+                <Link className="btn btn-outline-success btn-block w-25 py-2 mb-3">View Profile</Link>
             </div>
+            {
+                favorite !== null && 
+                    <div className="favorite">
+                        <Favorite isFav={favorite} candidateId={candidate.candidateId}/>   
+                    </div>
+            }
             <div class="clear"></div>
         </div>
     )
