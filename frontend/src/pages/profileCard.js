@@ -1,7 +1,9 @@
-import React from 'react'
+import React, {useEffect} from 'react'
+import Favorite from '../components/favorite.jsx'
 import '../styles/profileCard.css'
+import { DropdownButton, Dropdown } from 'react-bootstrap';
 
-export default function ProfileCard ({ candidate }) {
+export default function ProfileCard ({ candidate, favorite, baseURL }) {
     let name = candidate.firstName + " " + candidate.lastName;
     let image = ["assets/userImages/default.jpg"]
 
@@ -12,7 +14,7 @@ export default function ProfileCard ({ candidate }) {
 
     return (
         // TODO: Take user to candidate profile page on click
-        <div key={ candidate.id } class="candidateCard">
+        <div key={ candidate.candidateId } class="candidateCard favoriteButton" >
             <img class="candidateImage" alt={name} src={image}/>
             <div class="info">
                 <h2 class="no-wrap">{name}</h2>

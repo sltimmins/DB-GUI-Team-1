@@ -18,6 +18,7 @@
     right: 0px; bottom: 0px;
 }
 
+
 .viewProfile {
     position: absolute;
     bottom: 0px;
@@ -97,11 +98,11 @@
         display: flex;
         flex-direction: column;
     }
-    
+
     .info h2 {
         font-size: 2rem;
     }
-    
+
     .candidateImage {
         margin: .5rem;
         height: 45%;

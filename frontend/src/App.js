@@ -66,6 +66,8 @@ export function App () {
     window.location.pathname = '/';
   }
 
+  console.log(context.user);
+
   let uuid = "";
   if (context.user != undefined && context.user.uuid != null) {
     uuid = context.user.uuid;

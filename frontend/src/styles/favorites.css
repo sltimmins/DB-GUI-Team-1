@@ -1,0 +1,26 @@
+.heart {
+    font-size: 3rem !important;
+    font-style: normal;
+    background: transparent;
+    border-radius: 3rem !important;
+}
+
+.heart:hover {
+    background: lightgray;
+}
+
+.heart i {
+    font-style: normal;
+}
+
+.empty_heart:after {
+    content: "\2661";
+    padding-right: .5rem;
+    padding-left: .5rem;
+}
+
+.full_heart:after {
+    content: "\2665";
+    padding-right: .5rem;
+    padding-left: .5rem;
+}
