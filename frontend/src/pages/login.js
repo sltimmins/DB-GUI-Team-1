@@ -23,7 +23,7 @@ export function Login(props) {
         <input name="password" onChange={handleInputChange} value={values.password} type="password" className="form-control input-lg" id="password" placeholder="Password" />
       </div>
       <div className="text-center">
-        <button type="button" onClick={() => props.doLogin(values.username, values.password)} className="btn btn-primary mx-auto">Submit</button>
+        <button type="button" onClick={() => {props.doLogin(values.username, values.password)}} className="btn btn-primary mx-auto">Submit</button>
       </div>
       <div className="mt-3 text-center">
         <p>

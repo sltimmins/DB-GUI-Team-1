@@ -62,6 +62,9 @@ export function App () {
     loggedIn = true;
     refP = "/UserProfile";
   }
+  if (loggedIn && window.location.pathname == '/login') {
+    window.location.pathname = '/';
+  }
 
   let uuid = "";
   if (context.user != undefined && context.user.uuid != null) {
