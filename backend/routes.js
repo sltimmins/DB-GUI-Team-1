@@ -476,22 +476,22 @@ app.put('/user/changePassword', async(req,res) => {
 })
 
 // creating a custom election
-app.post('/customElections', authenticateToken, async (req,res) => {
-  pool.getConnection(function(err,connection) {
-    try {
-    connection.query("Select accountNumber FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
-      accountNums = JSON.parse(JSON.stringify(result))
-        connection.query('select name,year from elections where createdBy = ?', accountNums[0]['accountNumber'], function(err,result,fields) {
-          res.send(JSON.parse(JSON.stringify(result)))
-        })
+// app.post('/customElections', authenticateToken, async (req,res) => {
+//   pool.getConnection(function(err,connection) {
+//     try {
+//     connection.query("Select accountNumber FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
+//       accountNums = JSON.parse(JSON.stringify(result))
+//         connection.query('select name,year from elections where createdBy = ?', accountNums[0]['accountNumber'], function(err,result,fields) {
+//           res.send(JSON.parse(JSON.stringify(result)))
+//         })
       
-    })
-  } catch(e) {
-    logger.error("Error getting custom election for username: " + req.user.username)
-  }
-    connection.release()
-  })
-})
+//     })
+//   } catch(e) {
+//     logger.error("Error getting custom election for username: " + req.user.username)
+//   }
+//     connection.release()
+//   })
+// })
 
 // USER STORY 4.2
 // As a candidate	I want to be able to update information in my current election so that I can view the possible outcomes of my elections based on custom data
