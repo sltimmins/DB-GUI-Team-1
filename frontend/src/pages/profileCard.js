@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react'
 import Favorite from '../components/favorite.jsx'
 import '../styles/profileCard.css'
-import { DropdownButton, Dropdown } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
 export default function ProfileCard ({ candidate, favorite, baseURL }) {
     let name = candidate.firstName + " " + candidate.lastName;
@@ -19,7 +19,14 @@ export default function ProfileCard ({ candidate, favorite, baseURL }) {
             <div class="info">
                 <h2 class="no-wrap">{name}</h2>
                 <p class="party">{candidate.party}</p>
-                <Link className="btn btn-outline-success btn-block w-25 py-2 mb-3">View Profile</Link>
+                {
+                    candidate.candidateId && <Link to={'/UserProfile/' + (candidate.candidateId || candidate.accountNumber) + '/' + true}
+                        className="btn btn-outline-success btn-block w-25 py-2 mb-3">View Profile</Link>
+                }
+                {
+                    !candidate.candidateId && <Link to={'/UserProfile/' + (candidate.candidateId || candidate.accountNumber) + '/' + false}
+                        className="btn btn-outline-success btn-block w-25 py-2 mb-3">View Profile</Link>
+                }
             </div>
             {
                 favorite !== null && 

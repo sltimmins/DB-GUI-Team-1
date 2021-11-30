@@ -6,12 +6,12 @@ export default function ProfileList({ filteredCandidates, favoriteCandidates, ba
     const filtered = filteredCandidates.map((candidate) => {
         if(candidate.candidateId) {
             if(favoriteCandidates.includes(candidate.candidateId, 0)) {
-                return <ProfileCard key={ candidate.id } candidate={candidate} favorite={true}/>
+                return <ProfileCard key={ candidate.id } candidate={candidate} favorite={true} baseURL={baseURL} />;
             } else {
-                return <ProfileCard key={ candidate.id } candidate={candidate} favorite={false}/>
+                return <ProfileCard key={ candidate.id } candidate={candidate} favorite={false} baseURL={baseURL}/>
             }
         } else {
-            return <ProfileCard key={ candidate.id } candidate={candidate} favorite={null}/>
+            return <ProfileCard key={ candidate.id } candidate={candidate} favorite={null} baseURL={baseURL}/>
         }
     });
 
