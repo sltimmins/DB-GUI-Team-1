@@ -3,17 +3,15 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import "../styles/maps.css"
 import axios from "axios";
-import {DEMOCRAT, months, politicalColors, REPUBLICAN} from "../test_data/test_data_objects";
-import {MAPBOX_API_KEY} from "../constants/constants";
+import {months, politicalColors} from "../test_data/test_data_objects";
+import {DEMOCRAT, MAPBOX_API_KEY, REPUBLICAN, statusMap} from "../constants/constants";
 import Button from "../components/genericButton";
 import {Modal,SaveModal} from '../components/modal'
+import {checkObjectEquality} from "../utils";
+import {getElectionCandidates} from "../api/api";
 
 mapboxgl.accessToken = MAPBOX_API_KEY;
 
-const statusMap = {
-    "D" : "Democrat",
-    "R" : "Republican",
-}
 
 const ChangeRow = ({name, original, change, deleteAction}) => {
     return (
@@ -25,7 +23,7 @@ const ChangeRow = ({name, original, change, deleteAction}) => {
     )
 }
 
-export default function MainMap({place, polygons, affiliations, placesArray}){
+export default function MainMap({place, polygons, affiliations, placesArray, year, candidatesPayload}){
     const copyArr = (source) => {
         return JSON.parse(JSON.stringify(source))
     }
@@ -57,7 +55,14 @@ export default function MainMap({place, polygons, affiliations, placesArray}){
     const [saveOpenModal, setSaveOpenModal] = useState(false)
     const [saveName, setSaveName] = useState("")
     const [savedModal, setSavedModal] = useState(false)
+    const [candidates, setCandidates] = useState(candidatesPayload)
+    const [multiplier, setMultiplier] = useState(1)
+    const [likedElection, setLikedElection] = useState(false)
+    const [viewOption, setViewOption] = useState('map')
     useEffect(async() => {
+        if(viewOption !== 'map') {
+            return
+        }
         const entry = place;
         await axios({
             method: 'get',
@@ -74,7 +79,9 @@ export default function MainMap({place, polygons, affiliations, placesArray}){
                 }
             );
             map.current.on('load', () => {
+                let baseNum = 1;
                 for(const stateJS of polygons){
+                    const calcNumID = baseNum * multiplier;
                     if(setOfStates.has(stateJS.properties.NAME)){
                         return
                     }
@@ -101,19 +108,14 @@ export default function MainMap({place, polygons, affiliations, placesArray}){
                             'fill-opacity': 0.5
                         }
                     });
+                    baseNum++;
                 }
-                setOfStates.clear()
+                setOfStates.clear();
+
             })
         });
-    });
+    }, [deleteEntryModal, chosenChangeLocation, newAffiliation, locationToRemove, saveOpenModal, savedModal, viewOption]);
 
-    const checkObjectEquality = (obj1, obj2) => {
-        for(const key in obj1) {
-            if(obj1[key] != obj2[key])
-                return false
-        }
-        return true
-    }
 
     const votingGradient = () => {
         let gradient = "linear-gradient(to right, "
@@ -140,6 +142,38 @@ export default function MainMap({place, polygons, affiliations, placesArray}){
         return val;
     }
 
+    const getTable = (data) => {
+        let table = <table className={'electionTable'}>
+            <thead>
+                <tr>
+                    <th>
+                        State
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                    <th>
+                        Election Votes
+                    </th>
+                </tr>
+            </thead>
+            {
+                data.map(e => <tr>
+                    <td>
+                        {e.state}
+                    </td>
+                    <td>
+                        {e.status}
+                    </td>
+                    <td>
+                        {e.EV}
+                    </td>
+                </tr>)
+            }
+        </table>
+        return <div className={'electionTableWrapper'}><div className={'electionTableDiv'}>{table}</div></div>
+    }
+
     return (
         <>
             <Modal open={deleteEntryModal} mainTitle={`Deleting ${locationToRemove} Change`} description={""} cancelButtonText={"Cancel"} confirmButtonText={"Confirm"}
@@ -159,14 +193,31 @@ export default function MainMap({place, polygons, affiliations, placesArray}){
                 confirmAction={() => setSavedModal(false)}
             />
             <section className={"assortmentOfMaps"}>
-                {place ?
+                {place && viewOption == 'map' ?
                     [(<div className={"mapWrapper largerMap mapboxgl-map"} id={`id-${place.state}`}>
                             <div ref={(el) => ref.current = el} className={"map-container largerMap mapboxgl-map"}>
 
                             </div>
-                            <h2>{place.state}</h2>
+                            <h2>{place.state} {year} <span style={{cursor: 'pointer'}} onClick={() => setLikedElection(!likedElection)}>{ likedElection ? '❤️' : <>&#128420;</> }</span></h2>
+                            <div className={'toggleDiv'}>
+                                <button type={'button'} className={viewOption == 'map' ? 'activeToggle' : 'inactiveToggle'} onClick={() => {setViewOption('map')}}>Map</button><button type={'button'} className={viewOption == 'map' ? 'inactiveToggle' : 'activeToggle'} onClick={() => {setViewOption('table')}}>Table</button>
+                            </div>
                         </div>)] :
                     []}
+                {
+                    viewOption == 'table' ?
+                     <div>
+                         {
+                            getTable(placesArray ? placesArray : [])
+                         }
+                         <div className={'toggleDiv'}>
+                              <h2>{place.state} {year} <span style={{cursor: 'pointer'}} onClick={() => setLikedElection(!likedElection)}>{ likedElection ? '❤️' : <>&#128420;</> }</span></h2>
+                         </div>
+                         <div className={'toggleDiv'}>
+                            <button type={'button'} className={viewOption == 'map' ? 'activeToggle' : 'inactiveToggle'} onClick={() => {setViewOption('map')}}>Map</button><button type={'button'} className={viewOption == 'map' ? 'inactiveToggle' : 'activeToggle'} onClick={() => {setViewOption('table')}}>Table</button>
+                        </div>
+                     </div>: []
+                }
             </section>
             <section>
                 <section className={"votingBarContainer"}>
@@ -183,11 +234,34 @@ export default function MainMap({place, polygons, affiliations, placesArray}){
                         Object.keys(electionNumbers).map((key, index) =>
                             <div>
                                 <h5>
-                                    {statusMap[key]} - {electionNumbers[key]}
+                                    {statusMap[key]} - {electionNumbers[key]} {"\n"}
+                                    ({candidates[statusMap[key]].firstName} {candidates[statusMap[key]].lastName})
                                 </h5>
                             </div>
                         ) : []
                     }
+                </div>
+                <div className={"resultDiv"}>
+                    {
+                    electionNumbers && candidatesPayload ?
+                        Object.keys(electionNumbers).map((key, index) =>
+                            <div>
+                                <h5>
+                                    {candidates[statusMap[key]].firstName} {candidates[statusMap[key]].lastName}
+                                </h5>
+                            </div>
+                        ) : []
+                    }
+                </div>
+                <div>
+                    {/*<select>*/}
+                    {/*    <option value={'map'}>*/}
+                    {/*        Map*/}
+                    {/*    </option>*/}
+                    {/*    <option value={'table'}>*/}
+                    {/*        Table*/}
+                    {/*    </option>*/}
+                    {/*</select>*/}
                 </div>
             </section>
             <section className={"changeAffiliationSectionContainer"}>

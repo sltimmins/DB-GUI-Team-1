@@ -228,6 +228,89 @@ canvas {
     padding-right: .6rem
 }
 
+.pill {
+    padding: .3rem .5rem;
+    border: 2px solid green;
+    border-radius: 20px;
+    margin-right: 1rem;
+    margin-left: 1rem;
+    color: green;
+    cursor: pointer;
+}
+
+.pill:after {
+    content: " \2715";
+}
+
+.electionTable {
+    width: 100%;
+}
+
+.electionTableDiv {
+    border: 1px solid black;
+    width: 90%;
+    height: 30rem;
+    overflow: auto;
+}
+
+.electionTableWrapper {
+    width: 100%;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+
+}
+
+.electionTable thead {
+    background-color: #b2b2b2;
+}
+
+.electionTable tr td:first-child {
+    border-right: 1px solid black;
+    font-weight: 500;
+}
+
+.electionTable tr *{
+    padding: .3rem 0rem .3rem .2rem;
+}
+
+.electionTable tr td:nth-child(2) {
+    border-right: 1px solid black;
+}
+
+.toggleDiv {
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+}
+
+.activeToggle {
+    border: 3px solid green;
+}
+
+.inactiveToggle {
+    border: 3px solid black;
+}
+
+.toggleDiv button {
+    width: 75px;
+    font-weight: 500;
+    padding: .3rem;
+    margin: .3rem 0;
+    font-size: .8rem;
+}
+
+.toggleDiv button:first-child {
+    border-top-left-radius: 25px;
+    border-bottom-left-radius: 25px;
+}
+
+.toggleDiv button:not(:first-child) {
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+}
 
 @media only screen and (max-width: 768px) {
     .map-container {
