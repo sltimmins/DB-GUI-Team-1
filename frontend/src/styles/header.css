@@ -123,8 +123,18 @@
 @media only screen and (max-width: 768px) {
     /* For mobile phones: */
     .wideHeader {
-        width : 100vw;
+        width : 100%;
         display: inline-flex;
+        padding-right: 0;
+    }
+    .customHeaderLi {
+        flex: 5 0 !important;
+    }
+    .signInOut {
+        flex: 1 0;
+    }
+    .zeroPadding {
+        padding: 0 !important;
     }
     .headerLinks li {
         list-style-type: none;

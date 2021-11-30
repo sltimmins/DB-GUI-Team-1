@@ -40,7 +40,7 @@ export default function Maps(){
     useEffect(async() => {
         console.log(mapID)
         setCurrentlyLoading(true)
-        let res = await getElectionData(chosenYear);
+        let res = await getElectionData(queryYear ? chosenYear : null, queryYear ? null : mapID);
         setRetrievedPayload(res);
         setPlaceSelection(arrToMap(res))
         await axios({
@@ -103,6 +103,10 @@ export default function Maps(){
         });
         setChosenYear(chosenYear)
     }, [retrievedPayload])
+
+    useEffect(async() => {
+
+    })
 
     const isCountry = (name) => {
         return name == 'United States';

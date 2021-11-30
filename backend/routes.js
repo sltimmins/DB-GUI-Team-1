@@ -26,7 +26,7 @@ accepts formatting candidateID in params and returns all the years that the cand
           }
           res.send(JSON.parse(JSON.stringify(result)));
         })
-      } catch {
+      } catch (e) {
         logger.error('Error querying database for year given candidate ID: ', ID);
         res.status(400).send('Something went Wrong!')
       }

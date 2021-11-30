@@ -18,7 +18,7 @@ import { AppContext, useProvideAppContext, setupLogin } from "./AppContext.js";
 import Maps from "./pages/maps";
 import {getElectionData} from "./api/api";
 import {ROUTES} from "./routes";
-require('dotenv').config()
+import './styles/header.css'
 
 // React functional component
 export function App () {
@@ -81,7 +81,7 @@ export function App () {
         <Router>
           <div className={"initialView"}>
             <ul className="nav">
-              <li className="nav-item col">
+              <li className="nav-item col customHeaderLi">
                 <Header baseColor={MAIN_BACKGROUND_COLOR}
                   routes={
                     [
@@ -91,13 +91,14 @@ export function App () {
                       {name: "Search", href: '/search', active: (window.location.pathname == "/search") }
                     ]
                   }
+                        showImage={loggedIn}
                   mainTitle={MAIN_TITLE} mainImage = {{src: imagePath, width: "40px", height: '40px', borderRadius: '50%', onClick: () => {
                     return refP;  
                   }}}
                 />
               </ li>
-              <li className="nav-item border">
-                <a className="nav-link" href=""></a>
+              <li className="nav-item border signInOut" style={{display: loggedIn ? 'none' : 'block'}}>
+                <a className={"nav-link zeroPadding"} href=""></a>
                 {
                   loggedIn && <a className="nav-link" onClick={signout} href="/home">Sign out</a>
                 }

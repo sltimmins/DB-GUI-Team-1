@@ -9,13 +9,13 @@ const transformData = (arr) => {
 
 // Get Election results and data for each state given a year
 // currently only supports year 2020
-export const getElectionData = async(year) => {
+export const getElectionData = async(year, electionName) => {
     let states = [];
     let url = BASE_URL + '/electionData'
     await axios({
         method: 'get',
         url: url,
-        params: {year}
+        params: {year, electionName}
     })
     .then((response) => {
             if(response.status == 200){
@@ -71,4 +71,24 @@ export const downloadCSV = async (year) => {
         candidates = [];
     })
     return candidates;
+}
+
+const getSupportedYears = async() => {
+    let payload = null;
+    let url = BASE_URL + '/elections/years'
+    await axios({
+        method: 'get',
+        url: url,
+    })
+    .then((response) => {
+            if(response.status == 200){
+                payload = response.data;
+            } else {
+                return null;
+            }
+        }
+    ) .catch(e => {
+        payload = [];
+    })
+    return payload;
 }
