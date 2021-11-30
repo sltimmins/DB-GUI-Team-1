@@ -4,7 +4,6 @@ import React, { useContext, useState, useEffect } from 'react';
 import '../styles/favorites.css';
 
 export default function Favorite ({ isFav, candidateId }) {
-    console.log(isFav, candidateId);
     const { baseURL, user } = useContext(AppContext);
     const [fav, setFav] = useState(undefined);
 
@@ -20,7 +19,18 @@ export default function Favorite ({ isFav, candidateId }) {
         })
     }
 
-    return  <button type="button" className="heart btn" onClick={() => addFav()}>
+    const deleteFav = () => {
+        axios.delete(baseURL + '/favorites/candidates/', { data: { accountNumber: user.accountNumber, candidateID: candidateId } }).then((res) => {
+            setFav(!fav);
+        })
+    }
+
+    return  <button type="button" className="heart btn" onClick={() => {
+                    if(!fav) {
+                        addFav()
+                    } else {
+                        deleteFav()
+                    }}}>
                 <i className={fav ? 'full_heart' : 'empty_heart'}/>
             </button>
 }

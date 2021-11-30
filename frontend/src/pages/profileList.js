@@ -1,18 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ProfileCard from './profileCard';
 
-export default function ProfileList({ filteredCandidates, favoriteCandidates }) {
+export default function ProfileList({ filteredCandidates, favoriteCandidates, baseURL }) {
 
-    console.log(favoriteCandidates);
     const filtered = filteredCandidates.map((candidate) => {
         if(candidate.candidateId) {
             if(favoriteCandidates.includes(candidate.candidateId, 0)) {
-                return <ProfileCard key={ candidate.id } candidate={candidate} favorite={true} />
+                return <ProfileCard key={ candidate.id } candidate={candidate} favorite={true}/>
             } else {
-                return <ProfileCard key={ candidate.id } candidate={candidate} favorite={false} />
+                return <ProfileCard key={ candidate.id } candidate={candidate} favorite={false}/>
             }
         } else {
-            return <ProfileCard key={ candidate.id } candidate={candidate} favorite={null} />
+            return <ProfileCard key={ candidate.id } candidate={candidate} favorite={null}/>
         }
     });
 

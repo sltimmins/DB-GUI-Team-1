@@ -1,12 +1,11 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import Favorite from '../components/favorite.jsx'
 import '../styles/profileCard.css'
+import { DropdownButton, Dropdown } from 'react-bootstrap';
 
-export default function ProfileCard ({ candidate, favorite }) {
+export default function ProfileCard ({ candidate, favorite, baseURL }) {
     let name = candidate.firstName + " " + candidate.lastName;
     let image = ["assets/userImages/default.jpg"]
-
-    console.log(favorite, candidate);
 
     if(candidate.uuid) {
         image = [];

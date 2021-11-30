@@ -323,12 +323,12 @@ accepts formatting candidateID in params and returns all the years that the cand
   //       "candidateId": "1"
   //   }
   // ]
-  app.get('/favorites/candidates', (req,res) => {
+  app.get('/favorites/candidates', async(req,res) => {
     pool.getConnection(function(err,connection) {
       if(err){
         res.status(300).send()
       }
-      connection.query("SELECT candidateID FROM favorites WHERE accountNumber = 119 AND candidateID IS NOT NULL;", [req.param('accountNumber')], 
+      connection.query("SELECT candidateID FROM favorites WHERE accountNumber = ? AND candidateID IS NOT NULL;", [req.param('accountNumber')], 
       function(err,result,fields) {
         res.send(result);
       })
@@ -360,7 +360,7 @@ accepts formatting candidateID in params and returns all the years that the cand
   Input is accountNumber and candidateID passed as params
   Ex. {"candidateID":"12", "accountNumber":"125"}
   */
-  app.delete('/favorites/candidates', (req,res) => {
+  app.delete('/favorites/candidates', async(req,res) => {
     pool.getConnection(function(err,connection) {
       if(err){
         res.status(300).send()

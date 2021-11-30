@@ -19,20 +19,30 @@ export default function Search() {
     useEffect(() => {
         loadCandidates(1);
         loadFavorites();
-        setLoad(true);
-    }, [user])
+    }, [user]);
 
-    const loadCandidates = loadWho => { 
-        axios.post(baseURL + '/users/search_user', { allUsers: loadWho }).then((res) => {
+    const loadCandidates = async(loadWho) => { 
+        await axios.post(baseURL + '/users/search_user', { allUsers: loadWho }).then((res) => {
             setList(res.data);
         });
     }
-    const loadFavorites = () => { 
-        axios.get(baseURL + '/favorites/candidates', { params: { accountNumber: user.accountNumber } }).then((res) => {
+    const loadFavorites = async() => { 
+        await axios.get(baseURL + '/favorites/candidates', { params: { accountNumber: user.accountNumber } }).then((res) => {
             const favs = [];
             res.data.forEach((x, i) => favs.push(x.candidateID));
             setFavCandidates(favs);
+            setLoad(true);
         });
+    }
+
+    if(!load) {
+        return (
+            <div class="d-flex justify-content-center">
+                <div class="alert alert-primary banner" role="alert">
+                    <span>Loading...</span>
+                </div>
+            </div>
+        )
     }
     
     var filteredCandidates = [];
@@ -71,7 +81,7 @@ export default function Search() {
         if(filteredCandidates.length > 0 && favCandidates) {
             return (
                 <Scroll>
-                    <ProfileList filteredCandidates={filteredCandidates} favoriteCandidates={favCandidates}/>
+                    <ProfileList filteredCandidates={filteredCandidates} favoriteCandidates={favCandidates} baseURL={baseURL}/>
                 </Scroll>
             )
         } else {
@@ -96,17 +106,18 @@ export default function Search() {
                 </div>
                 <div className="p-2 filterMargin mt-3">
                     <DropdownButton id="dropdown-item-button" title="Filter:" size="lg" variant="secondary">
-                        <DropdownButton id="dropdown-item-button" title="User Type" size="lg" variant="transparent" drop="start">
+                        <DropdownButton id="dropdown-item-button" title="User Type" size="lg" variant="transparent" drop="start" className="w-100">
                             <Dropdown.Item onClick={ event => filter(event) }>All Users</Dropdown.Item>
                             <Dropdown.Item onClick={ event => filter(event) }>Candidates Only</Dropdown.Item>
                             <Dropdown.Item onClick={ event => filter(event) }>Enthusiasts Only</Dropdown.Item>
                         </DropdownButton>
-                        <DropdownButton id="dropdown-item-button" title="Party" size="lg" variant="transparent" drop="start">
+                        <DropdownButton id="dropdown-item-button" title="Party" size="lg" variant="transparent" drop="start" className="w-100">
                             <Dropdown.Item onClick={ event => setFilterParty("") }>All Parties</Dropdown.Item>
                             <Dropdown.Item onClick={ event => setFilterParty("Republican") }>Republican</Dropdown.Item>
                             <Dropdown.Item onClick={ event => setFilterParty("Democrat") }>Democrat</Dropdown.Item>
-                            <Dropdown.Item onClick={ event => setFilterParty("Independent") }>Independent</Dropdown.Item>
+                            <Dropdown.Item onClick={ event => setFilterParty("Libertarian") }>Libertarian</Dropdown.Item>
                             <Dropdown.Item onClick={ event => setFilterParty("Green") }>Green</Dropdown.Item>
+                            <Dropdown.Item onClick={ event => setFilterParty("Other") }>Other</Dropdown.Item>
                         </DropdownButton>
                     </DropdownButton>
                 </div>
