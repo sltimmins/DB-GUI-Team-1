@@ -101,13 +101,13 @@ export function App () {
                   }}}
                 />
               </ li>
-              <li className="nav-item border signInOut" style={{display: loggedIn ? 'none' : 'block'}}>
+              <li className="nav-item border signInOut" style={{display: loggedIn && window.location.pathname != '/UserProfile' ? 'none' : 'block'}}>
                 <a className={"nav-link zeroPadding"} href=""></a>
                 {
                   loggedIn && <a className="nav-link" href="/" onClick={() => {context.signout();}}>Sign out</a>
                 }
                 {
-                  !loggedIn && <a className="nav-link" onClick={() => {console.debug("clicked!")}} href={refP}>Sign in</a>
+                  !loggedIn && <a className="nav-link zeroPadding" onClick={() => {console.debug("clicked!")}} href={refP}>Sign in</a>
                 }
               </li>
             </ul>

@@ -65,10 +65,10 @@ const Header = ({routes, mainTitle, mainImage, baseColor, showImage}) => {
                     </button>
                 </div>
                 <div className = {"titleContainer"}>
-                    <div className =  {["titleChild", "titleRight"].join(" ")} >
-                        <div className = {"helper"} style={{display: showImage ? 'block' : 'none'}}>
-                            <div className = {"headerLogoDiv"} style={{width: mainImage.width}}>
-                                <img src={mainImage.src} className = {"headerImage"} alt="logo" style={{width: mainImage.width, height: mainImage.height}} onClick={() => {
+                    <div className="titleChild titleRight " style={{marginRight: "2rem"}} >
+                        <div className="my-auto" style={{display: showImage ? 'block' : 'none'}}>
+                            <div>
+                                <img src={mainImage.src} className = {"headerImage rounded-circle"} alt="logo" style={{width: '3.5rem', height: '3.5rem'}} onClick={() => {
                                     let refP = mainImage.onClick();
                                     if (window.location.pathname == "/" || "/true") {
                                         window.location.pathname = refP;
@@ -76,7 +76,7 @@ const Header = ({routes, mainTitle, mainImage, baseColor, showImage}) => {
                                 }}/>
                             </div>
                         </div>
-
+                    
                     </div>
                     <div className = {"titleChild"} style = {{cursor : 'pointer'}}
                         onClick = {() => {
