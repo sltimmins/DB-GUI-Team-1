@@ -2,7 +2,8 @@
 import React, {useState} from 'react';
 import '../styles/modal.css';
 import Button from "./genericButton";
-import {GREEN, politicalColors} from "../test_data/test_data_objects";
+import {politicalColors} from "../test_data/test_data_objects";
+import {GREEN} from "../constants/constants";
 
 export const Modal = ({mainTitle, description, confirmButtonText, cancelButtonText, cancelAction, confirmAction, open}) => {
     return (

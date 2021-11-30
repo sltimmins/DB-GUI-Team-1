@@ -9,7 +9,7 @@ import {placesPayload, statesGeoJSON, politicalColors} from "../test_data/test_d
 import Loader from "../components/loader";
 import MainMap from "./mainMap";
 import {MAPBOX_API_KEY} from "../constants/constants";
-import {getElectionData} from "../api/api";
+import {getElectionCandidates, getElectionData} from "../api/api";
 import { useParams } from "react-router-dom";
 import {transformArr} from "../utils";
 mapboxgl.accessToken = MAPBOX_API_KEY;
@@ -20,14 +20,15 @@ export default function Maps(){
     let maps = useRef(placesPayload.map(() => createRef()));
     const {mapID, queryYear} = useParams();
     const [zoom] = useState(4);
-    const [placesCopy, setPlacesCopy] = useState(placesPayload)
-    const [setOfStates] = useState(new Set())
-    const [currentlyLoading, setCurrentlyLoading] = useState(false)
-    const [mapToCoordinates, setMapToCoordinates] = useState({})
-    const [mainMapPayload, setMainMapPayload] = useState(null)
-    const [retrievedPayload, setRetrievedPayload] = useState(null)
-    const [chosenYear, setChosenYear] = useState(queryYear ? queryYear : 2020)
-    const [yearOptions, setYearOptions] = useState([])
+    const [placesCopy, setPlacesCopy] = useState(placesPayload);
+    const [setOfStates] = useState(new Set());
+    const [currentlyLoading, setCurrentlyLoading] = useState(false);
+    const [mapToCoordinates, setMapToCoordinates] = useState({});
+    const [mainMapPayload, setMainMapPayload] = useState(null);
+    const [retrievedPayload, setRetrievedPayload] = useState(null);
+    const [chosenYear, setChosenYear] = useState(queryYear ? queryYear : 2020);
+    const [yearOptions, setYearOptions] = useState([]);
+    const [candidates, setCandidates] = useState(null)
     const arrToMap = (arr) => {
         let mapOfNames = new Set();
         for(const place of arr) {
@@ -39,79 +40,89 @@ export default function Maps(){
     useEffect(async() => {
         console.log(mapID)
         setCurrentlyLoading(true)
-        let res = await getElectionData(chosenYear);
+        let res = await getElectionData(queryYear ? chosenYear : null, queryYear ? null : mapID);
         setRetrievedPayload(res);
         setPlaceSelection(arrToMap(res))
-        for(let i = 0; i < placesCopy.length; i++){
-            const entry = placesCopy[i];
-            if(mapID && entry.state != mapID) {
-                continue;
-            } else if (mapID) {
-                i = 0
-            }
-            await axios({
-                method: 'get',
-                url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${entry.state}.json?types=region&access_token=${MAPBOX_API_KEY}`
+        await axios({
+            method: 'get',
+            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${mapID ? mapID : 'United%20States'}.json?types=country&access_token=${MAPBOX_API_KEY}`
+        })
+        .then(function (response) {
+            let newLat = response.data["features"][0]["center"][0]
+            let newLng = response.data["features"][0]["center"][1]
+            let copy = JSON.parse(JSON.stringify(mapToCoordinates))
+            copy[mapID ? mapID : 'United States'] = [newLat, newLng];
+            setMapToCoordinates(copy)
+            maps.current[0] = new mapboxgl.Map({
+                    container: refs.current[0],
+                    style: 'mapbox://styles/mapbox/streets-v11',
+                    center: [newLat, newLng],
+                    zoom: 2,
+                }
+            );
+            maps.current[0].on('load', () => {
+                for(let entry of (retrievedPayload ? retrievedPayload : placesPayload)){
+                    renderMap(entry)
+                }
             })
-            .then(function (response) {
-                let newLat = response.data["features"][0]["center"][0]
-                let newLng = response.data["features"][0]["center"][1]
-                let copy = JSON.parse(JSON.stringify(mapToCoordinates))
-                copy[entry.state] = [newLat, newLng];
-                setMapToCoordinates(copy)
-                maps.current[i] = new mapboxgl.Map({
-                        container: refs.current[i],
-                        style: 'mapbox://styles/mapbox/streets-v11',
-                        center: [newLat, newLng],
-                        zoom: zoom,
-                    }
-                );
-                maps.current[i].on('load', () => {
-                    for(const stateJS of statesGeoJSON){
-                        let stateName = stateJS.properties.NAME;
-                        if(entry.state === stateName) {
-                            if(setOfStates.has(entry.state)){
-                                return
-                            }
-                            setOfStates.add(entry.state)
-                            maps.current[i].addSource(entry.state.toLowerCase(), {
-                                'type': 'geojson',
-                                'data': {
-                                    'type': 'Feature',
-                                    'geometry': {
-                                        'type': stateJS.geometry.type,
-                                        // These coordinates outline the state.
-                                        'coordinates': stateJS.geometry.coordinates,
-                                    }
-                                }
-                            });
-                            // Add a new layer to visualize the polygon.
-                            maps.current[i].addLayer({
-                                'id': entry.state.toLowerCase(),
-                                'type': 'fill',
-                                'source': entry.state.toLowerCase(), // reference the data source
-                                'layout': {},
-                                'paint': {
-                                    'fill-color': politicalColors[entry.status], // blue color fill
-                                    'fill-opacity': 0.5
-                                }
-                            });
-                        }
-
-                    }
-                })
-            });
-            if (mapID) {
-                break;
-            }
-        }
-        if(mapID == "United States"){
-            console.log("United States")
-            await handleAllSelection()
-        }
+            setPlacesCopy([{"state": mapID ? mapID : 'United States'}]);
+        });
+        setChosenYear(chosenYear)
+        // if(mapID == "United States"){
+        //     console.log("United States")
+        //     await handleAllSelection()
+        // }
         setCurrentlyLoading(false)
 
     }, [chosenYear]);
+
+    useEffect(async () => {
+        await axios({
+            method: 'get',
+            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${mapID ? mapID : 'United%20States'}.json?types=country&access_token=${MAPBOX_API_KEY}`
+        })
+        .then(function (response) {
+            let newLat = response.data["features"][0]["center"][0]
+            let newLng = response.data["features"][0]["center"][1]
+            let copy = JSON.parse(JSON.stringify(mapToCoordinates))
+            copy[mapID ? mapID : 'United States'] = [newLat, newLng];
+            setMapToCoordinates(copy)
+            maps.current[0] = new mapboxgl.Map({
+                    container: refs.current[0],
+                    style: 'mapbox://styles/mapbox/streets-v11',
+                    center: [newLat, newLng],
+                    zoom: 2,
+                }
+            );
+            maps.current[0].on('load', () => {
+                for(let entry of (retrievedPayload ? retrievedPayload : placesPayload)){
+                    renderMap(entry)
+                }
+            })
+            setPlacesCopy([{"state": mapID ? mapID : 'United States'}]);
+        });
+        setChosenYear(chosenYear)
+    }, [retrievedPayload])
+
+    useEffect(async() => {
+
+    })
+
+    const isCountry = (name) => {
+        return name == 'United States';
+    }
+
+    const getCandidates = async () => {
+        let payload = await getElectionCandidates(chosenYear ? chosenYear : 2020);
+        let transformedPayload = {};
+        if (payload) {
+            for(let obj of payload) {
+                transformedPayload[obj.party] = obj;
+            }
+            console.log(transformedPayload)
+        }
+        return transformedPayload;
+    }
 
     const renderMap = (entry) => {
         for(const stateJS of statesGeoJSON){
@@ -141,6 +152,7 @@ export default function Maps(){
                 });
             }
         }
+        setCandidates("Hello")
     }
 
     const handleSelection = async(val) => {
@@ -230,7 +242,7 @@ export default function Maps(){
                                 </select>
                             </div>
                             <div className={"divForButton"} id={"USButton"}>
-                                <Button mainText={"United States"} baseColor={"black"} textColor={"white"} fontWeight={700} onButtonClick={() => {handleAllSelection()}}/>
+                                {/*<Button mainText={"United States"} baseColor={"black"} textColor={"white"} fontWeight={700} onButtonClick={() => {handleAllSelection()}}/>*/}
                             </div>
                         </main>
                         <section className={"assortmentOfMaps"}>
@@ -240,10 +252,10 @@ export default function Maps(){
                                         <div ref={(el) => refs.current[i] = el} className={"map-container "+(placesCopy.length === 1 ? "largerMap mapboxgl-map" : "")}>
 
                                         </div>
-                                        <h2 style={{marginBottom: '1rem'}}>{el.state}</h2>
+                                        <h2 style={{marginBottom: '1rem'}}>{el.state} {chosenYear}</h2>
                                         <div className={"exploreMapButton"}>
                                             <Button mainText={"Explore Map"} baseColor={"#232323"}
-                                                onButtonClick={() => {
+                                                onButtonClick={async() => {
                                                     setCurrentlyLoading(true)
                                                     if (el.state === "United States") {
                                                         let polygons = [];
@@ -262,11 +274,13 @@ export default function Maps(){
                                                             mapToCoordinates : mapToCoordinates,
                                                             place: el,
                                                             polygons: polygons,
-                                                            mapOfAffiliation: mapOfAffiliation
+                                                            mapOfAffiliation: mapOfAffiliation,
+                                                            candidatesPayload: await getCandidates(),
                                                         })
                                                         setCurrentlyLoading(false)
                                                     } else {
                                                         let polygons = [];
+                                                        await getCandidates();
                                                         let mapOfAffiliation = {
                                                             [el.state.toLowerCase()]: el.status
                                                         };
@@ -279,19 +293,27 @@ export default function Maps(){
                                                             mapToCoordinates : mapToCoordinates,
                                                             place: el,
                                                             polygons: polygons,
-                                                            mapOfAffiliation: mapOfAffiliation
+                                                            mapOfAffiliation: mapOfAffiliation,
+                                                            candidatesPayload: await getCandidates(),
                                                         })
                                                         setCurrentlyLoading(false)
                                                     }
                                                 }}
                                             />
                                         </div>
+                                        {
+                                            placesCopy.length == 1 ? (
+                                                <></>
+                                            ) : []
+
+                                        }
                                     </div>
+
                                 ) : []
                             )}
                         </section>
                     </>
-                ) : <MainMap mapToCoordinates={mainMapPayload.mapToCoordinates} place={mainMapPayload.place} polygons={mainMapPayload.polygons} affiliations={mainMapPayload.mapOfAffiliation} placesArray={retrievedPayload}/>
+                ) : <MainMap mapToCoordinates={mainMapPayload.mapToCoordinates} place={mainMapPayload.place} polygons={mainMapPayload.polygons} affiliations={mainMapPayload.mapOfAffiliation} placesArray={retrievedPayload} candidatesPayload={mainMapPayload.candidatesPayload} year={chosenYear}/>
             }
         </>
     );
