@@ -380,6 +380,91 @@ app.put('/user/changePassword', async(req,res) => {
   })
 })
 
+// adding custome election
+// postman test: 0.0.0.0:8000/addCustomElection?year=2020&democraticCandidate=2&republicanCandidate=3&libertarianCandidate=1&greenCandidate=4&otherCandidate=5&createdBy=11&name=2020election
+app.post('/addCustomElection', async(req,res) => {
+  pool.getConnection(function(err,connection) {
+    if(err){
+      res.status(300).send()
+    }
+    console.log(connection)
+    const year = req.param('year')
+    const democraticCandidate = req.param('democraticCandidate')
+    const republicanCandidate = req.param('republicanCandidate')
+    const greenCandidate = req.param('greenCandidate')
+    const libertarianCandidate = req.param('libertarianCandidate')
+    const otherCandidate = req.param('otherCandidate')
+    const createdBy = req.param('createdBy')
+    const name = req.param('name')
+
+    console.log(year + '    ' + democraticCandidate + '    ' + republicanCandidate + '    ' + greenCandidate + '    ' + libertarianCandidate + '    ' + otherCandidate + '    ' + createdBy + '    ' + name)
+
+    myquery = "INSERT INTO elections (year, democraticCandidate, republicanCandidate, greenCandidate, libertarianCandidate, otherCandidate, createdBy, name) VALUES (?, ?, ?, ?, ?, ?, ?, ?);"
+    connection.query(myquery, [year, democraticCandidate, republicanCandidate, greenCandidate, libertarianCandidate, otherCandidate, createdBy, name], function(err,result,fields) {
+      if(err){
+        res.status(400).send("Can't insert custom elections!")
+      }
+      res.send(result)
+    })     
+    connection.release();
+  })
+})
+
+// updating custome election
+// postman route test: 0.0.0.0:8000/updateCustomElection
+// postman body: {"democraticCandidate":2,"createdBy": 11,"name":"election2}
+app.put('/updateCustomElection', async(req,res) => {
+
+  const year = req.body.year
+  const republicanCandidate = req.body.republicanCandidate
+  const democraticCandidate = req.body.democraticCandidate
+  const greenCandidate = req.body.greenCandidate
+  const libertarianCandidate = req.body.libertarianCandidate
+  const otherCandidate = req.body.otherCandidate
+  const createdBy = req.body.createdBy
+  const name = req.body.name
+
+  pool.getConnection(function(err,connection) {
+
+    connection.query("UPDATE elections SET democraticCandidate = ? where createdBy = ? and name = ?", [democraticCandidate,createdBy,name], function(err,result,fields) {
+      if(err){
+        res.status(400).send("Can't update democraticCandidate")
+      }
+      res.send(result);
+    })
+
+    connection.query("UPDATE elections SET republicanCandidate = ? where createdBy = ? and name = ?", [republicanCandidate,createdBy,name], function(err,result,fields) {
+      if(err){
+        res.status(400).send("Can't update republicanCandidate")
+      }
+      res.send(result);
+    })
+
+    connection.query("UPDATE elections SET greenCandidate = ? where createdBy = ? and name = ?", [greenCandidate,createdBy,name], function(err,result,fields) {
+      if(err){
+        res.status(400).send("Can't update greenCandidate")
+      }
+      res.send(result);
+    })
+
+    connection.query("UPDATE elections SET libertarianCandidate = ? where createdBy = ? and name = ?", [libertarianCandidate,createdBy,name], function(err,result,fields) {
+      if(err){
+        res.status(400).send("Can't update libertarianCandidate")
+      }
+      res.send(result);
+    })
+
+    connection.query("UPDATE elections SET otherCandidate = ? where createdBy = ? and name = ?", [otherCandidate,createdBy,name], function(err,result,fields) {
+      if(err){
+        res.status(400).send("Can't update otherCandidate")
+      }
+      res.send(result);
+    })
+
+    connection.release();
+  })
+})
+
   //Returns all a users favorite cadidateID's
   //Input is accountNumber as a param
   //return format:
@@ -401,6 +486,7 @@ app.put('/user/changePassword', async(req,res) => {
       connection.release();
     })
   })
+
   //Inserts a users favorite candidateId
   //Input is accountNumber and candidateId
   app.post('/favorites/candidates', async(req,res) => {
@@ -421,6 +507,7 @@ app.put('/user/changePassword', async(req,res) => {
       connection.release();
     })
   })
+
   // app.get('/showMyEmail', authenticateToken, (req,res) => {
   //   pool.getConnection(function(err,connection) {
   //     connection.query("Select email FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
@@ -439,7 +526,6 @@ app.put('/user/changePassword', async(req,res) => {
   }
   EX link: 0.0.0.0:8000/favorites/elections?accountNumber=119
   */
-
   app.get('/favorites/elections', (req,res) => {
     pool.getConnection(function(err,connection) {
       if(err){
@@ -453,6 +539,7 @@ app.put('/user/changePassword', async(req,res) => {
       connection.release();
     })
   })
+
   /*
   Inserts users favorite election into database
   Input is accountNumber and electionId as body
@@ -476,12 +563,12 @@ app.put('/user/changePassword', async(req,res) => {
       connection.release();
     })
   })
-    /*
+
+  /*
   Removes a users favorite elections
   Input is accountNumber and electionID as body
   EX body input: {"electionID":"1", "accountNumber":"119"}
   */
-
   app.delete('/favorites/elections', (req,res) => {
     pool.getConnection(function(err,connection) {
       if(err){
@@ -495,6 +582,7 @@ app.put('/user/changePassword', async(req,res) => {
       connection.release();
     })
   })
+
   /*
   Returns an array of json objects that contain data in the following format:
   {
@@ -573,11 +661,11 @@ app.put('/user/changePassword', async(req,res) => {
       connection.release()
     })
   })
+
   /*
     Format of token to pass in headers is as follows:
       Authorization: Bearer <token_value>
   */
-
   //Middleware to authenticate the user's token
   //Sends a 401 status if the user token does not match
   function authenticateToken(req, res, next) {
