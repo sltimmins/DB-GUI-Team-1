@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useContext, useState, useEffect } from "react";
+import { AppContext, useProvideAppContext } from "./../AppContext.js";
 import '../styles/header.css';
 const hamburger = ["/assets/images/1024px-Hamburger_icon_white.svg.png", "/assets/images/Hamburger_icon.svg.png"]
 const Header = ({routes, mainTitle, mainImage, baseColor, showImage}) => {
+    const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
     const calcFontColor = () => {
         if(baseColor.length === 4){
             baseColor+= baseColor.substring(1, 4);
@@ -70,8 +72,12 @@ const Header = ({routes, mainTitle, mainImage, baseColor, showImage}) => {
                             <div>
                                 <img src={mainImage.src} className = {"rounded-circle"} alt="logo" style={{width: '3.5rem', height: '3.5rem'}} onClick={() => {
                                     let refP = mainImage.onClick();
+                                    let candId = user.candidateId;
+                                    if (candId == null) {
+                                        candId = false;
+                                    }
                                     if (window.location.pathname == "/" || "/true") {
-                                        window.location.pathname = refP;
+                                        window.location.pathname = refP + '/' + user.accountNumber + '/' + candId;
                                     }
                                 }}/>
                             </div>

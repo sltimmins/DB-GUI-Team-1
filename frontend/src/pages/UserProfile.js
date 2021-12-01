@@ -3,18 +3,18 @@ import { AppContext, useProvideAppContext } from "./../AppContext.js";
 import axios from 'axios';
 import NonUserProfile from "./NonUserProfile.js";
 import { useParams } from "react-router-dom";
-import { getUserInfo } from "../api/api";
 
 
 export default function UserProfile(props) {
 
     const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
-    const [currUser, setCurrUser] = useState(user);
+    const [currUser, setCurrUser] = useState(undefined);
     const [isUser, setIsUser] = useState(true);
     const [loaded, setLoaded] = useState(false);
     var uuid = user.uuid;
+
     const {id, isCandidateString} = useParams();
-    const isCandidate = (isCandidateString == "true")
+    const isCandidate = (isCandidateString == "true");
 
 
     let imagePath = "assets/userImages/default.jpg";
@@ -24,7 +24,7 @@ export default function UserProfile(props) {
     }
 
     useEffect(() => {
-        setState(currUser);
+        setCurrUser(user);
     }, [currUser]);
 
     useEffect(() => {
@@ -35,8 +35,9 @@ export default function UserProfile(props) {
     }, [uuid, imagePath]);
 
     useEffect(() => {
-        if(props.user === undefined) {
-            getUserInfo(id, isCandidateString);
+        if(props.user == undefined) {
+            setCurrUser(user);
+            //getUserInfo(id, isCandidateString);
         }
     }, [isUser])
 
@@ -53,9 +54,9 @@ export default function UserProfile(props) {
     //end temp
 
     if (props.user != undefined) {
-        currUser = props.user;
+        setCurrUser(props.user);
         if (currUser != user) {
-            isUser = false;
+            setIsUser(false);
         }
         uuid = currUser.uuid;
     } else if (props.user === undefined && currUser === undefined && !loaded) {
@@ -70,12 +71,6 @@ export default function UserProfile(props) {
 
     var picChange = false;
     let profilePic = {};
-
-    function updatePic() {
-        if (uuid != undefined) {
-            imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
-        }
-    }
 
     function handleClick() {
         const formData= new FormData();
@@ -92,22 +87,22 @@ export default function UserProfile(props) {
             axios.post(baseURL + "/storage/upload", { id: user.accountNumber, candidateId: user.candidateId, name: uuid});
         }
         if (state.firstName != currUser.firstName) {
-            axios.put(baseURL + '/user/firstname', {firstName: state.firstName, username: state.username});
+            axios.put(baseURL + '/user/firstname', {firstName: user.firstName, username: user.username});
         }
         if (state.lastName != currUser.lastName) {
-            axios.put(baseURL + '/user/lastname', {lastName: state.lastName, username: state.username});
+            axios.put(baseURL + '/user/lastname', {lastName: user.lastName, username: user.username});
         }
         if (state.bio != currUser.bio) {
-            axios.put(baseURL + "/user/bio", { bio: state.bio, username: state.username });
+            axios.put(baseURL + "/user/bio", { bio: user.bio, username: user.username });
         }
         picChange = false;
 
-        setUser(state);
+        setCurrUser(state);
     }
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setState({ ...state, [name]: value });
+        setCurrUser({ ...user, [name]: value });
     };
 
     let changeProfilePic = e => {
