@@ -2,20 +2,71 @@ import React, { useContext, useState, useEffect } from "react";
 import { AppContext, useProvideAppContext } from "./../AppContext.js";
 import axios from 'axios';
 import NonUserProfile from "./NonUserProfile.js";
+import { useParams } from "react-router-dom";
+import { getUserInfo } from "../api/api";
 
 
 export default function UserProfile(props) {
 
     const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
-    var currUser = user;
-    var isUser = true;
+    const [currUser, setCurrUser] = useState(user);
+    const [isUser, setIsUser] = useState(true);
+    const [loaded, setLoaded] = useState(false);
     var uuid = user.uuid;
+    const {id, isCandidateString} = useParams();
+    const isCandidate = (isCandidateString == "true")
+
+
+    let imagePath = "assets/userImages/default.jpg";
+
+    if (uuid != undefined) {
+        imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
+    }
+
+    useEffect(() => {
+        setState(currUser);
+    }, [currUser]);
+
+    useEffect(() => {
+        if (props.user != undefined) {
+            uuid = currUser.uuid;
+        }
+        imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
+    }, [uuid, imagePath]);
+
+    useEffect(() => {
+        if(props.user === undefined) {
+            getUserInfo(id, isCandidateString);
+        }
+    }, [isUser])
+
+    const getUserInfo = (id, isCandidate) => {
+        axios.post(baseURL + '/userReturn', { id: id, isCandidate: isCandidate }).then((res => {
+            setCurrUser(res.data);
+        }))
+    }
 
     const [state, setState] = useState({});
 
     //temp
     // isUser = false;
     //end temp
+
+    if (props.user != undefined) {
+        currUser = props.user;
+        if (currUser != user) {
+            isUser = false;
+        }
+        uuid = currUser.uuid;
+    } else if (props.user === undefined && currUser === undefined && !loaded) {
+        getUserInfo(id, isCandidate);
+        setIsUser(false);
+        setLoaded(true);
+    }
+
+    if(!currUser && !props.user) {
+        return <div>Loading...</div>
+    }
 
     var picChange = false;
     let profilePic = {};
@@ -64,23 +115,6 @@ export default function UserProfile(props) {
         profilePic = e.target.files[0];
         uuid = profilePic.name;
     }
-
-    let imagePath = "assets/userImages/default.jpg";
-
-    if (uuid != undefined) {
-        imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
-    }
-
-    useEffect(() => {
-        setState(currUser);
-    }, [currUser]);
-
-    useEffect(() => {
-        if (props.user != undefined) {
-            uuid = currUser.uuid;
-        }
-        imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
-    }, [uuid, imagePath]);
 
     return (
         <div>
