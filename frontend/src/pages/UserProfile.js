@@ -16,15 +16,15 @@ export default function UserProfile(props) {
 
     const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
     const [currUser, setCurrUser] = useState(undefined);
-    const [isUser, setIsUser] = useState(true);
+    const [isUser, setIsUser] = useState(user);
     const [loaded, setLoaded] = useState(false);
     var uuid = user.uuid;
     const {id, isCandidateString} = useParams();
-    const isCandidate = (isCandidateString == "true")
+    const isCandidate = (isCandidateString == "true");
 
     useEffect(() => {
         if(props.user === undefined) {
-            getUserInfo(id, isCandidateString);
+            getUserInfo(id, isCandidate);
         }
     }, [isUser])
 
@@ -51,16 +51,14 @@ export default function UserProfile(props) {
         redirectToLogin();
     }
 
-    if (props.user != undefined) {
-        currUser = props.user;
-        if (currUser != user) {
-            isUser = false;
+    if (props.user === undefined) {
+        if (id == user.accountNumber && !(isCandidate && user.candidateId)) {
+            console.debug("present");
+        } else if (currUser === undefined && !loaded) {
+            getUserInfo(id, isCandidate);
+            setIsUser(false);
+            setLoaded(true);
         }
-        uuid = currUser.uuid;
-    } else if (props.user === undefined && currUser === undefined && !loaded) {
-        getUserInfo(id, isCandidate);
-        setIsUser(false);
-        setLoaded(true);
     }
 
     if(!currUser && !props.user) {
@@ -103,9 +101,10 @@ export default function UserProfile(props) {
 
     let imagePath = "assets/userImages/default.jpg";
 
-    if (uuid != undefined) {
-        imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
-    }
+    // if (uuid !== undefined) {
+    //     imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
+    // }
+    console.debug(imagePath);
 
     return (
         <div>
@@ -113,7 +112,7 @@ export default function UserProfile(props) {
             {
                 isUser && <div>
                     <header className="text-center bg-secondary p-3 d-static">
-                        <img src={imagePath} alt="" className="rounded-circle" style={{width: "17rem", height: '17rem'}}/>                
+                        <img src={imagePath} className="rounded-circle" style={{width: "17rem", height: '17rem'}}/>                
                         <h1 className="text-white pt-2">{user.firstName + " " + user.lastName}</h1>          
                     </header>
                     <main>      
