@@ -10,53 +10,61 @@ export default function NonUserProfile(props) {
     var [toggleThree, setToggleThree] = useState(false);
 
     useEffect(() => {
-        var myCollapse = document.getElementById('favCands');
-        var bsCollapse = new Collapse(myCollapse, {toggle: toggle[0]});
-        toggle ? bsCollapse.show() : bsCollapse.hide();
+        if(!props.user[0].candidateId) {
+            var myCollapse = document.getElementById('favCands');
+            var bsCollapse = new Collapse(myCollapse, {toggle: toggle[0]});
+            toggle ? bsCollapse.show() : bsCollapse.hide();
+        }
     })
 
     useEffect(() => {
-        var myCollapse = document.getElementById('favElects');
-        var bsCollapse = new Collapse(myCollapse, {toggle: toggle[1]});
-        toggleTwo ? bsCollapse.show() : bsCollapse.hide();
+        if(!props.user[0].candidateId) {
+            var myCollapse = document.getElementById('favElects');
+            var bsCollapse = new Collapse(myCollapse, {toggle: toggle[1]});
+            toggleTwo ? bsCollapse.show() : bsCollapse.hide();
+        }
     })
 
     useEffect(() => {
-        var myCollapse = document.getElementById('custElects');
-        var bsCollapse = new Collapse(myCollapse, {toggle: toggle[2]});
-        toggleThree ? bsCollapse.show() : bsCollapse.hide();
+        if(!props.user[0].candidateId) {
+            var myCollapse = document.getElementById('custElects');
+            var bsCollapse = new Collapse(myCollapse, {toggle: toggle[2]});
+            toggleThree ? bsCollapse.show() : bsCollapse.hide();
+        }
     })
 
-    let favCands = axios.get(baseURL + '/favorites/candidates', props.user).data;
+    let favCands = axios.get(baseURL + '/favorites/candidates', props.user[0]).data;
     let favElects; //axios.get(baseURL + '/favorites/elections', props.user).data;
     let custElects; //axios.get(baseURL + '/customElections', props.user).data;
     let imagePath;
-    if(props.user.uuid == undefined) {
+    if(!props.user[0].uuid) {
         imagePath = "assets/userImages/default.jpg";
     }else {
-        imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + props.user.uuid;
+        imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + props.user[0].uuid;
     }
+
+    console.log(props.user[0])
 
     return(
         <div>
             <header className="text-center bg-secondary p-3 d-static">
                 <img src={imagePath} alt="" className="rounded-circle" style={{width: "17rem", height: '17rem'}}/>                
-                <h1 className="text-white pt-2">{props.user.firstName + " " + props.user.lastName}</h1>          
+                <h1 className="text-white pt-2">{props.user[0].firstName + " " + props.user[0].lastName}</h1>          
             </header>
             <main>
                 <div className="container my-4 bg-light rounded">
                     <div className="row p-3">
                         <div>
                             <label htmlFor="currUserBio">Bio</label>
-                            <p id="currUserBio" className="border ">This is my current bio!</p> 
+                            <p id="currUserBio" className="border ">{props.user[0].bio}</p> 
                         
                         </div>
                         <div></div>
                         {
-                            props.user.candidateId && <div></div>
+                            props.user[0].candidateId && <div></div>
                         }
                         {
-                            !props.user.candidateId && <div>
+                            !props.user[0].candidateId && <div>
                                 <div className="btn-group d-flex" role="group" aria-label="Basic radio toggle button group">
                                     <input type="radio" className="btn-check btn-lg w-100" type="text" name="btnradio" id="btnradio1" autoComplete="off" onClick={() => {
                                         setToggle(toggle => !toggle);

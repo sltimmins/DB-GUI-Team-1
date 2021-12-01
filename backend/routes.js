@@ -591,13 +591,17 @@ app.put('/user/changePassword', async(req,res) => {
       if(err){
         res.status(300).send()
       }
+
+      const isCand = req.body.isCandidate;
+      const id = req.body.id;
+
       try {
-        if (req.body.bool) {
-          connection.query("SELECT * FROM candidates WHERE candidateId = ?", [req.body.ID], 
+        if (isCand) {
+          connection.query("SELECT * FROM candidates WHERE candidateId = ?", [id], 
           function(err,result,fields) {
             if(result.length == 0){
-              logger.error('Candidate does not exist, ID ' + req.body.ID);
-              res.status(400).send('Candidate does not exist, ID ' + req.body.ID);
+              logger.error('Candidate does not exist, ID ' + id);
+              res.status(400).send('Candidate does not exist, ID ' + id);
             }
             else {
               res.send(result)
@@ -605,11 +609,11 @@ app.put('/user/changePassword', async(req,res) => {
           })
         }
         else {
-          connection.query("SELECT * FROM users WHERE accountNumber = ?", [req.body.ID], 
+          connection.query("SELECT * FROM users WHERE accountNumber = ?", [id], 
           function(err,result2,fields) {
             if(result2.length == 0){
-              logger.error('User does not exist, ID ' + req.body.ID);
-              res.status(400).send('User does not exist, ID ' + req.body.ID);
+              logger.error('User does not exist, ID ' + id);
+              res.status(400).send('User does not exist, ID ' + id);
             }
             else {
               res.send(result2)
