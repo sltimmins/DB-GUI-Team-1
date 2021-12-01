@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { AppContext, useProvideAppContext } from "./../AppContext.js";
 import axios from 'axios';
 import NonUserProfile from "./NonUserProfile.js";
@@ -7,25 +7,24 @@ import NonUserProfile from "./NonUserProfile.js";
 export default function UserProfile(props) {
 
     const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
-    var currUser = {};
+    var currUser = user;
     var isUser = true;
     var uuid = user.uuid;
 
+    const [state, setState] = useState({});
+
     //temp
-    // currUser = user;
     // isUser = false;
     //end temp
 
-    if (props.user != undefined) {
-        currUser = props.user;
-        if (currUser != user) {
-            isUser = false;
-        }
-        uuid = currUser.uuid;
-    }
-
     var picChange = false;
     let profilePic = {};
+
+    function updatePic() {
+        if (uuid != undefined) {
+            imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
+        }
+    }
 
     function handleClick() {
         const formData= new FormData();
@@ -41,15 +40,23 @@ export default function UserProfile(props) {
         }else {
             axios.post(baseURL + "/storage/upload", { id: user.accountNumber, candidateId: user.candidateId, name: uuid});
         }
-        axios.put(baseURL + "/user/bio", { bio: user.bio, username: user.username });
+        if (state.firstName != currUser.firstName) {
+            axios.put(baseURL + '/user/firstname', {firstName: state.firstName, username: state.username});
+        }
+        if (state.lastName != currUser.lastName) {
+            axios.put(baseURL + '/user/lastname', {lastName: state.lastName, username: state.username});
+        }
+        if (state.bio != currUser.bio) {
+            axios.put(baseURL + "/user/bio", { bio: state.bio, username: state.username });
+        }
         picChange = false;
 
-        setUser({firstName: user.firstName, lastName: user.lastName, bio: user.bio});
+        setUser(state);
     }
 
-    const handleInputChange = (e) => {
+    const handleChange = (e) => {
         const { name, value } = e.target;
-        setUser({ ...user, [name]: value });
+        setState({ ...state, [name]: value });
     };
 
     let changeProfilePic = e => {
@@ -64,6 +71,17 @@ export default function UserProfile(props) {
         imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
     }
 
+    useEffect(() => {
+        setState(currUser);
+    }, [currUser]);
+
+    useEffect(() => {
+        if (props.user != undefined) {
+            uuid = currUser.uuid;
+        }
+        imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + uuid;
+    }, [uuid, imagePath]);
+
     return (
         <div>
             <div></div> 
@@ -77,13 +95,9 @@ export default function UserProfile(props) {
                         <div className="container my-4 bg-light rounded">
                             <form>
                                 <div className="row pt-2">
-                                    <div className="form-group col">
-                                        <label htmlFor="username">Username</label>  
-                                        <input type="text" id="username" className="form-control p-2" onChange={handleInputChange} defaultValue={user.username}></input>   
-                                    </div>
                                     <div className="from-group col">
-                                        <label className="custom-file-label" htmlFor="imageFile">Profile picture</label>
-                                        <input className="file form-control" type="file" id="imageFile" name="img[]" accept="image/*" onChange={changeProfilePic}/>
+                                        <label className="custom-file-label" htmlFor="imageFile">Profile picture <label htmlFor="imageFile" className="text-primary">(reload after save)</label></label>
+                                        <input className="file form-control text-secondary" name="uuid" type="file" id="imageFile" name="img[]" accept="image/*" onChange={changeProfilePic}/>
                                     </div>
                                     <div className="form-group col mt-auto">
                                         <button className="btn btn-outline-primary form-control p-2" type="button" onClick={() => {window.location.pathname = '/NewPassword'}}>Set New Password</button>   
@@ -92,21 +106,21 @@ export default function UserProfile(props) {
                                 <div className="row pt-2">
                                     <div className="form-group col">
                                         <label htmlFor="fName">First Name</label>  
-                                        <input type="text" id="fName" className="form-control p-2" onChange={handleInputChange} defaultValue={user.firstName}></input>   
+                                        <input type="text" id="fName" name="firstName" className="form-control p-2 text-secondary" onChange={handleChange} defaultValue={user.firstName}></input>   
                                     </div>
                                     <div className="form-group col">
                                         <label htmlFor="lName">Last Name</label>
-                                        <input type="text" id="lName" className="form-control p-2" onChange={handleInputChange} defaultValue={user.lastName}></input>
+                                        <input type="text" id="lName" name="lastName" className="form-control p-2 text-secondary" onChange={handleChange} defaultValue={user.lastName}></input>
                                     </div>
                                 </div>
                                 <div className="row my-1">
                                     <div className="form-group">
                                         <label htmlFor="bio">Bio</label>
-                                        <textarea type="text" id="bio" className="form-control" maxLength="1000" onChange={handleInputChange} style={{minHeight: '10rem', maxHeight: '30rem', minWidth: "0"}} defaultValue={user.bio}></textarea>
+                                        <textarea type="text" id="bio" name="bio" className="form-control text-secondary" maxLength="1000" onChange={handleChange} style={{minHeight: '10rem', maxHeight: '30rem'}} defaultValue={user.bio}></textarea>
                                     </div>
                                 </div>
                                 <div className="form-group py-3">
-                                    <button className="btn btn-outline-success form-control col p-3" onClick={handleClick}>Save</button>   
+                                    <button className="btn btn-outline-success form-control col p-3" type="button" onClick={handleClick}>Save</button>   
                                 </div>
                             </form>
                         </div>
