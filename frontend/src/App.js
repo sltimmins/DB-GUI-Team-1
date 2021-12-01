@@ -97,7 +97,7 @@ export function App () {
                       {name: "Home", href: '/', active: (window.location.pathname === "/"), exact: true},
                       {name: "Maps", href: '/maps', active: (window.location.pathname === "/maps")},
                       {name: "Search", href: '/search', active: (window.location.pathname == "/search") },
-                      {name: isLoggedIn ? "Sign Out" : '', href: '/', onClick: signout}
+                      loggedIn ? {name: "Sign Out", href: '/', onClick: signout} : null
                     ]
                   }
 

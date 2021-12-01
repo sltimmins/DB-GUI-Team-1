@@ -2,14 +2,13 @@ import React, { useState, useEffect, useContext } from 'react';
 import '../styles/header.css';
 import {NavLink, Link} from "react-router-dom";
 import { AppContext } from "./../AppContext.js";
-import logo_control from "mapbox-gl/src/ui/control/logo_control";
 
 const hamburger = ["/assets/images/1024px-Hamburger_icon_white.svg.png", "/assets/images/Hamburger_icon.svg.png"]
 const Header = ({routes, mainTitle, mainImage, baseColor, showImage, signInFunc, signOutFunc, signInHREF}) => {
     
     const {user} = useContext(AppContext);
-    const {isCand, setIsCand} = useState(false);
-    
+    const [isCand, setIsCand] = useState(false);
+    const [garbage, setGarbage] = useState(false)
     useEffect(() => {
         if(user.candidateId) {
             setIsCand(true);
@@ -28,6 +27,11 @@ const Header = ({routes, mainTitle, mainImage, baseColor, showImage, signInFunc,
             return "white"
         }
     }
+
+    useEffect(() => {
+        setRouteElems(getRoutes());
+    }, [showImage])
+
     const [fontColor] = useState(calcFontColor())
     let getRoutes = () => {
         if(!Array.isArray(routes)){
@@ -35,14 +39,22 @@ const Header = ({routes, mainTitle, mainImage, baseColor, showImage, signInFunc,
         }
         let elems = [];
         for(const route of routes){
-            if(route) {
+            if(route && route.name != 'Sign Out') {
                 elems.push(
-                <li key={route.name + route.href}>
-                    <NavLink exact={route.exact} key={route.name} to={route.href} activeClassName={"activeLink"} style={{color: fontColor}} onClick={route.onClick}>
-                        {route.name}
-                    </NavLink>
-                </li>
-            );
+                    <li key={route.name + route.href}>
+                        <NavLink exact={route.exact} key={route.name} to={route.href} activeClassName={"activeLink"} style={{color: fontColor}} onClick={route.onClick}>
+                            {route.name}
+                        </NavLink>
+                    </li>
+                );
+            } else if (route) {
+                elems.push(
+                    <li key={route.name + route.href}>
+                        <NavLink exact={route.exact} key={route.name} to={route.href} style={{color: fontColor}} onClick={route.onClick}>
+                            {route.name}
+                        </NavLink>
+                    </li>
+                );
             }
         }
         // if(showImage) {
@@ -58,7 +70,7 @@ const Header = ({routes, mainTitle, mainImage, baseColor, showImage, signInFunc,
     }
 
     const [open, openClose] = useState(true);
-    const [routeElems] = useState(getRoutes());
+    const [routeElems, setRouteElems] = useState(getRoutes());
 
     let slideDownDiv = () => {
         if(open){
