@@ -34,6 +34,7 @@ accepts formatting candidateID in params and returns all the years that the cand
       connection.release();
     })
   })
+
   /*
   route to create a new user account and add it to the database
   Uses bcrypt to encrypt the user's password
@@ -103,6 +104,7 @@ accepts formatting candidateID in params and returns all the years that the cand
     })
   });
   
+  // route to get customElections
   app.get('/customElections', authenticateToken, async (req,res) => {
     pool.getConnection(function(err,connection) {
       try {
@@ -119,6 +121,8 @@ accepts formatting candidateID in params and returns all the years that the cand
       connection.release()
     })
   })
+
+  // route to get customElectionYears
   app.get('/customElectionYears', (req,res) => {
     pool.getConnection(function(err,connection) {
       
@@ -143,6 +147,7 @@ accepts formatting candidateID in params and returns all the years that the cand
       connection.release()
     })
   })
+
   /*
     accepts formatting year,[electionName] in params. SHOULD send a file to frontend
   */
@@ -193,6 +198,8 @@ accepts formatting candidateID in params and returns all the years that the cand
       connection.release()
     })
   })
+
+  // route to get candidate's firstName, lastName, party
   app.get("/elections/candidates", (req,res) =>{
     pool.getConnection(function(err,connection) {
       connection.query("select firstName,lastName,party from candidates c join elections e on (e.democraticCandidate = c.candidateId or e.republicanCandidate = c.candidateId or e.greenCandidate = c.candidateId or e.libertarianCandidate = c.candidateId) where year = ? and name = \'official\'", req.param('year'),function(err,result,fields) {
@@ -206,6 +213,7 @@ accepts formatting candidateID in params and returns all the years that the cand
       })
     })
   })
+
   /*Route to login, accepts formatting:
      {"username":"ashockley66","password":"alex66"} passed in Body
     Querys server to select the users where the username = username,
@@ -219,7 +227,6 @@ accepts formatting candidateID in params and returns all the years that the cand
     //TODO figure out how to pass the JWT to frontend without displaying it to the user
     //TODO handle the case where the user enters the incorrect password better
     //TODO if the username is correct, move them back to homepage using the JWT
-
   app.post('/users/login', async(req,res) => {
     
     pool.getConnection(async function(err,connection) {
@@ -304,6 +311,7 @@ accepts formatting candidateID in params and returns all the years that the cand
     })
   })
 
+  // route to get user's info
   app.get('/users/get_user', async(req,res) => {  
     pool.getConnection(function(err,connection) {
       const userName = req.body.userName
@@ -506,9 +514,7 @@ app.put('/updateCustomElection', async(req,res) => {
       connection.release();
     })
   })
-<<<<<<< HEAD
 
-=======
   /*
   Removes a users favorite candidate
   Input is accountNumber and candidateID passed as params
@@ -528,7 +534,7 @@ app.put('/updateCustomElection', async(req,res) => {
       connection.release();
     })
   })
->>>>>>> 06e6292f5e3330a46aa8d5c61252d1442dc68dea
+
   // app.get('/showMyEmail', authenticateToken, (req,res) => {
   //   pool.getConnection(function(err,connection) {
   //     connection.query("Select email FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
@@ -646,6 +652,7 @@ app.put('/updateCustomElection', async(req,res) => {
       connection.release();
     })
   })
+  
   /*
   Returns an array of json objects that contain data in the following format:
   {
