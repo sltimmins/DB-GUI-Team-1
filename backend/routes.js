@@ -80,12 +80,12 @@ accepts formatting candidateID in params and returns all the years that the cand
         try {
           const salt = await bcrypt.genSalt()
           const hashedPassword = await bcrypt.hash(req.body.password, salt)
-          const user = {username:req.body.username, password:hashedPassword, firstName:req.body.firstName, lastName:req.body.lastName, email:req.body.email, candidate:req.body.candidate, party: req.body.party};
+          const user = {username:req.body.username, password:hashedPassword, firstName:req.body.firstName, lastName:req.body.lastName, email:req.body.email, candidate:req.body.candidate};
           
           if(candidateId == -1) {
             candidateId = null;
           }
-          connection.query("insert into users (firstName, lastName, email, candidateId, username, password, party) VALUES (?, ?, ?, ?, ?, ?, ?)", [user.firstName,user.lastName,user.email,candidateId,user.username,user.password, user.party], function(err,result,fields) {
+          connection.query("insert into users (firstName, lastName, email, candidateId, username, password) VALUES (?, ?, ?, ?, ?, ?)", [user.firstName,user.lastName,user.email,candidateId,user.username,user.password], function(err,result,fields) {
             if(err) {
               logger.error("Error creating user\n",err)
             }
@@ -285,19 +285,16 @@ accepts formatting candidateID in params and returns all the years that the cand
   })
 
   //Route to search and get information for a user
-  app.post('/users/search_user', async(req,res) => {
+  app.get('/users/search_user', async(req,res) => {
     pool.getConnection(function(err,connection) {
-      const getWho = req.body.allUsers;
-      if(getWho === 1) {
-        connection.query("Select username, firstName, lastName, uuid, party FROM users", function(err,result,fields) {
+      const bool = req.body.bool;
+      if(bool){
+        connection.query("Select username, firstName, lastName, uuid FROM users", function(err,result,fields) {
           res.send(result);
         })
-      } else if(getWho === 2) {
+      }
+      else {
         connection.query("Select firstName, lastName, party, uuid FROM candidates", function(err,result,fields){
-          res.send(result);
-        })
-      } else {
-        connection.query("Select username, firstName, lastName, uuid, party FROM users WHERE candidateId is NULL", function(err,result,fields){
           res.send(result);
         })
       }
@@ -315,6 +312,7 @@ accepts formatting candidateID in params and returns all the years that the cand
       connection.release();
     })
   })
+
   //Returns all a users favorite cadidateID's
   //Input is accountNumber as a param
   //return format:
@@ -364,20 +362,8 @@ accepts formatting candidateID in params and returns all the years that the cand
   //     connection.release()
   //   })
   // })
-// users/{username}: update bio
-// ex: update users set bio = 'testing' where username = 'mh';
-app.put('/user/bio', async(req,res) => {
-  const bio = req.body.bio
-  const username = req.body.username
-  pool.getConnection(function(err,connection) {
-    connection.query("update users set bio = ? where username = ?", [bio,username], function(err,result,fields) {
-      res.send(result);
-    })
-    connection.release();
-  })
-})
 
-  /*
+    /*
   Returns an array of all a users favorite election years
   Input is account number passed by param
   output:
@@ -386,7 +372,6 @@ app.put('/user/bio', async(req,res) => {
   }
   EX link: 0.0.0.0:8000/favorites/elections?accountNumber=119
   */
-
   app.get('/favorites/elections', (req,res) => {
     pool.getConnection(function(err,connection) {
       if(err){
@@ -400,7 +385,8 @@ app.put('/user/bio', async(req,res) => {
       connection.release();
     })
   })
-  /*
+
+   /*
   Inserts users favorite election into database
   Input is accountNumber and electionId as body
   ex body: {"electionId":"1", "accountNumber":"119"}
@@ -423,6 +409,129 @@ app.put('/user/bio', async(req,res) => {
       connection.release();
     })
   })
+
+// user can update their bio 
+// ex: update users set bio = 'testing' where username = 'mh';
+app.put('/user/bio', async(req,res) => {
+  const bio = req.body.bio
+  const username = req.body.username
+  pool.getConnection(function(err,connection) {
+    connection.query("update users set bio = ? where username = ?", [bio,username], function(err,result,fields) {
+      res.send(result);
+    })
+    connection.release();
+  })
+})
+
+// user can update their firstName 
+// ex: update users set firstName = 'hii' where username = 'mh';
+app.put('/user/firstname', async(req,res) => {
+  const firstName = req.body.firstName
+  const username = req.body.username
+  pool.getConnection(function(err,connection) {
+    connection.query("update users set firstName = ? where username = ?", [firstName,username], function(err,result,fields) {
+      res.send(result);
+    })
+    connection.release();
+  })
+})
+
+// user can update their lastName 
+// ex: update users set lastName = 'bye' where username = 'mh';
+app.put('/user/lastname', async(req,res) => {
+  const lastName = req.body.lastName
+  const username = req.body.username
+  pool.getConnection(function(err,connection) {
+    connection.query("update users set lastName = ? where username = ?", [lastName,username], function(err,result,fields) {
+      res.send(result);
+    })
+    connection.release();
+  })
+})
+
+// user can update their email 
+// ex: update users set email = 'hi@bye.come' where username = 'mh';
+app.put('/user/email', async(req,res) => {
+  const email = req.body.email
+  const username = req.body.username
+  pool.getConnection(function(err,connection) {
+    connection.query("update users set email = ? where username = ?", [email,username], function(err,result,fields) {
+      res.send(result);
+    })
+    connection.release();
+  })
+})
+
+// user can update their password 
+// ex: update users set password = 'newpassword' where username = 'mh';
+app.put('/user/changePassword', async(req,res) => {
+  const password = req.body.password
+  const username = req.body.username
+  pool.getConnection(function(err,connection) {
+    connection.query("update users set password = ? where username = ?", [password,username], function(err,result,fields) {
+      res.send(result);
+    })
+    connection.release();
+  })
+})
+
+// creating a custom election
+// app.post('/customElections', authenticateToken, async (req,res) => {
+//   pool.getConnection(function(err,connection) {
+//     try {
+//     connection.query("Select accountNumber FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
+//       accountNums = JSON.parse(JSON.stringify(result))
+//         connection.query('select name,year from elections where createdBy = ?', accountNums[0]['accountNumber'], function(err,result,fields) {
+//           res.send(JSON.parse(JSON.stringify(result)))
+//         })
+      
+//     })
+//   } catch(e) {
+//     logger.error("Error getting custom election for username: " + req.user.username)
+//   }
+//     connection.release()
+//   })
+// })
+
+// USER STORY 4.2
+// As a candidate	I want to be able to update information in my current election so that I can view the possible outcomes of my elections based on custom data
+// ex: UPDATE electionData SET greenVotes = 1 where stateID = 1;
+// app.put('/updateCustomElectionData', async(req,res) => {
+
+//   const republicanVotes = req.body.republicanVotes
+//   const democraticVotes = req.body.democraticVotes
+//   const greenVotes = req.body.greenVotes
+//   const libertarianVotes = req.body.libertarianVotes
+//   const otherVotes = req.body.otherVotes
+//   const stateID = req.body.stateID
+
+//   pool.getConnection(function(err,connection) {
+
+//     connection.query("UPDATE electionData SET republicanVotes = ? where stateID = ?", [republicanVotes,stateID], function(err,result,fields) {
+//       res.send(result);
+//     })
+
+//     connection.query("UPDATE electionData SET democraticVotes = ? where stateID = ?", [democraticVotes,stateID], function(err,result,fields) {
+//       res.send(result);
+//     })
+
+//     connection.query("UPDATE electionData SET greenVotes = ? where stateID = ?", [greenVotes,stateID], function(err,result,fields) {
+//       res.send(result);
+//     })
+
+//     connection.query("UPDATE electionData SET libertarianVotes = ? where stateID = ?", [libertarianVotes,stateID], function(err,result,fields) {
+//       res.send(result);
+//     })
+
+//     connection.query("UPDATE electionData SET otherVotes = ? where stateID = ?", [otherVotes,stateID], function(err,result,fields) {
+//       res.send(result);
+//     })
+
+//     connection.release();
+
+//   })
+// })
+
     /*
   Removes a users favorite elections
   Input is accountNumber and electionID as body
