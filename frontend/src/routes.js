@@ -45,7 +45,7 @@ export const ROUTES = [
         component: (routeData, getRouteData) => <Maps routeData = {routeData} getRouteData={getRouteData}/>
     },
     {
-        path: "/UserProfile",
+        path: "/UserProfile/:id/:isCandidate",
         exact: true,
         component: (routeData, getRouteData) => <UserProfile routeData = {routeData} getRouteData={getRouteData}/>
     }

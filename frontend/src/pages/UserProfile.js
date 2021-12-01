@@ -1,15 +1,29 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { AppContext, useProvideAppContext } from "./../AppContext.js";
 import axios from 'axios';
 import NonUserProfile from "./NonUserProfile.js";
+import { useParams } from "react-router-dom";
+import { getUserInfo } from "../api/api";
 
 
 export default function UserProfile(props) {
 
     const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
-    var currUser = {};
+    const [currUser, setCurrUser] = useState(undefined);
     var isUser = true;
     var uuid = user.uuid;
+    const {id, isCandidateString} = useParams();
+    const isCandidate = (isCandidateString === "true")
+
+
+    useEffect(() => {
+        let tempUser = getUserInfo(id, isCandidate);
+        setCurrUser(tempUser);
+    }, [])
+
+    if(!currUser) {
+        return <div>Loading...</div>
+    }
 
     //temp
     // currUser = user;
