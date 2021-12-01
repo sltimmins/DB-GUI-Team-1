@@ -123,6 +123,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    margin-right: 1rem;
 }
 
 .zeroPadding {
@@ -165,6 +166,10 @@
 
     .mobileMenuButton {
         display: block;
+    }
+
+    .signInButton {
+        margin-right: 0;
     }
 
     #wrapper {
