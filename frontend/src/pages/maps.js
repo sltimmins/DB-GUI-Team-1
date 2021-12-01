@@ -45,7 +45,7 @@ export default function Maps(){
         setPlaceSelection(arrToMap(res))
         await axios({
             method: 'get',
-            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${mapID ? mapID : 'United%20States'}.json?types=country&access_token=${MAPBOX_API_KEY}`
+            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/United%20States.json?types=country&access_token=${MAPBOX_API_KEY}`
         })
         .then(function (response) {
             let newLat = response.data["features"][0]["center"][0]

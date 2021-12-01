@@ -118,6 +118,16 @@
     margin-block-end: 0;
 }
 
+.signInButton {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.zeroPadding {
+    padding: 0 !important;
+}
 /* Responsive code replacement for javascript */
 @media only screen and (max-width: 768px) {
     /* For mobile phones: */
@@ -131,9 +141,6 @@
     }
     .signInOut {
         flex: 1 0;
-    }
-    .zeroPadding {
-        padding: 0 !important;
     }
     .headerLinks li {
         list-style-type: none;
