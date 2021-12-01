@@ -10,19 +10,22 @@ export default function UserProfile(props) {
 
     const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
     const [currUser, setCurrUser] = useState(undefined);
-    var isUser = true;
+    const [isUser, setIsUser] = useState(true);
+    const [loaded, setLoaded] = useState(false);
     var uuid = user.uuid;
     const {id, isCandidateString} = useParams();
-    const isCandidate = (isCandidateString === "true")
-
+    const isCandidate = (isCandidateString == "true")
 
     useEffect(() => {
-        let tempUser = getUserInfo(id, isCandidate);
-        setCurrUser(tempUser);
-    }, [])
+        if(props.user === undefined) {
+            getUserInfo(id, isCandidateString);
+        }
+    }, [isUser])
 
-    if(!currUser) {
-        return <div>Loading...</div>
+    const getUserInfo = (id, isCandidate) => {
+        axios.post(baseURL + '/userReturn', { id: id, isCandidate: isCandidate }).then((res => {
+            setCurrUser(res.data);
+        }))
     }
 
     //temp
@@ -36,6 +39,14 @@ export default function UserProfile(props) {
             isUser = false;
         }
         uuid = currUser.uuid;
+    } else if (props.user === undefined && currUser === undefined && !loaded) {
+        getUserInfo(id, isCandidate);
+        setIsUser(false);
+        setLoaded(true);
+    }
+
+    if(!currUser && !props.user) {
+        return <div>Loading...</div>
     }
 
     var picChange = false;
