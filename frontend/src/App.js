@@ -25,12 +25,6 @@ export function App () {
   // Global context
   let context = useProvideAppContext();
 
-  // handle signout
-  const signout = () => {
-    localStorage.setItem('jwt', "");
-
-  }
-
   const [allStates, setAllStates] = useState([])
   const [routeData, setRouteData] = useState(null)
 
@@ -101,13 +95,16 @@ export function App () {
                   }}}
                 />
               </ li>
-              <li className="nav-item border signInOut" style={{display: loggedIn && window.location.pathname != '/UserProfile' ? 'none' : 'block'}}>
-                <a className={"nav-link zeroPadding"} href=""></a>
+              <li className="nav-item signInOut" style={{
+                  display: loggedIn && window.location.pathname != '/UserProfile' ? 'none' : 'block',
+                  backgroundColor: '#f5f5f5'
+                }}>
+                <a className="nav-link"></a>
                 {
-                  loggedIn && <a className="nav-link" href="/" onClick={() => {context.signout();}}>Sign out</a>
+                  loggedIn && <a href="/" className="nav-link" onClick={() => {context.signout();}}>Sign out</a>
                 }
                 {
-                  !loggedIn && <a className="nav-link zeroPadding" onClick={() => {console.debug("clicked!")}} href={refP}>Sign in</a>
+                  !loggedIn && <a className="nav-link" onClick={() => {console.debug("clicked!")}} href={refP}>Sign in</a>
                 }
               </li>
             </ul>

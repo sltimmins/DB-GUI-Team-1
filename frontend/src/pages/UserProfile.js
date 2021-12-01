@@ -41,7 +41,7 @@ export default function UserProfile(props) {
         }else {
             axios.post(baseURL + "/storage/upload", { id: user.accountNumber, candidateId: user.candidateId, name: uuid});
         }
-        //axios.put(baseURL + "/user/bio", {...{}, bio: user.bio});
+        axios.put(baseURL + "/user/bio", { bio: user.bio, username: user.username });
         picChange = false;
 
         setUser({firstName: user.firstName, lastName: user.lastName, bio: user.bio});
@@ -77,9 +77,16 @@ export default function UserProfile(props) {
                         <div className="container my-4 bg-light rounded">
                             <form>
                                 <div className="row pt-2">
+                                    <div className="form-group col">
+                                        <label htmlFor="username">Username</label>  
+                                        <input type="text" id="username" className="form-control p-2" onChange={handleInputChange} defaultValue={user.username}></input>   
+                                    </div>
                                     <div className="from-group col">
                                         <label className="custom-file-label" htmlFor="imageFile">Profile picture</label>
                                         <input className="file form-control" type="file" id="imageFile" name="img[]" accept="image/*" onChange={changeProfilePic}/>
+                                    </div>
+                                    <div className="form-group col mt-auto">
+                                        <button className="btn btn-outline-primary form-control p-2" type="button" onClick={() => {window.location.pathname = '/NewPassword'}}>Set New Password</button>   
                                     </div>
                                 </div>
                                 <div className="row pt-2">
@@ -95,7 +102,7 @@ export default function UserProfile(props) {
                                 <div className="row my-1">
                                     <div className="form-group">
                                         <label htmlFor="bio">Bio</label>
-                                        <textarea type="text" id="bio" className="form-control col w-100" maxLength="1000" onChange={handleInputChange} style={{minHeight: '10rem', maxHeight: '30rem'}} defaultValue={user.bio}></textarea>
+                                        <textarea type="text" id="bio" className="form-control" maxLength="1000" onChange={handleInputChange} style={{minHeight: '10rem', maxHeight: '30rem', minWidth: "0"}} defaultValue={user.bio}></textarea>
                                     </div>
                                 </div>
                                 <div className="form-group py-3">
