@@ -410,7 +410,7 @@ app.post('/addCustomElection', async(req,res) => {
     myquery = "INSERT INTO elections (year, democraticCandidate, republicanCandidate, greenCandidate, libertarianCandidate, otherCandidate, createdBy, name) VALUES (?, ?, ?, ?, ?, ?, ?, ?);"
     connection.query(myquery, [year, democraticCandidate, republicanCandidate, greenCandidate, libertarianCandidate, otherCandidate, createdBy, name], function(err,result,fields) {
       if(err){
-        res.status(400).send("Can't insert custom elections!")
+        res.status(400).send("Can't insert custom election")
       }
       res.send(result)
     })     
@@ -423,7 +423,6 @@ app.post('/addCustomElection', async(req,res) => {
 // postman body: {"democraticCandidate":2,"createdBy": 11,"name":"election2}
 app.put('/updateCustomElection', async(req,res) => {
 
-  const year = req.body.year
   const republicanCandidate = req.body.republicanCandidate
   const democraticCandidate = req.body.democraticCandidate
   const greenCandidate = req.body.greenCandidate
@@ -434,40 +433,55 @@ app.put('/updateCustomElection', async(req,res) => {
 
   pool.getConnection(function(err,connection) {
 
-    connection.query("UPDATE elections SET democraticCandidate = ? where createdBy = ? and name = ?", [democraticCandidate,createdBy,name], function(err,result,fields) {
-      if(err){
-        res.status(400).send("Can't update democraticCandidate")
-      }
-      res.send(result);
-    })
+    if(democraticCandidate)
+    {
+      connection.query("UPDATE elections SET democraticCandidate = ? where createdBy = ? and name = ?", [democraticCandidate,createdBy,name], function(err,result,fields) {
+        if(err){
+          res.status(400).send("Can't update democraticCandidate")
+        }
+        res.send(result);
+      })
+    }
 
-    connection.query("UPDATE elections SET republicanCandidate = ? where createdBy = ? and name = ?", [republicanCandidate,createdBy,name], function(err,result,fields) {
-      if(err){
-        res.status(400).send("Can't update republicanCandidate")
-      }
-      res.send(result);
-    })
+    if(republicanCandidate)
+    {
+      connection.query("UPDATE elections SET republicanCandidate = ? where createdBy = ? and name = ?", [republicanCandidate,createdBy,name], function(err,result,fields) {
+        if(err){
+          res.status(400).send("Can't update republicanCandidate")
+        }
+        res.send(result);
+      })
+    }
 
-    connection.query("UPDATE elections SET greenCandidate = ? where createdBy = ? and name = ?", [greenCandidate,createdBy,name], function(err,result,fields) {
-      if(err){
-        res.status(400).send("Can't update greenCandidate")
-      }
-      res.send(result);
-    })
+    if(greenCandidate)
+    {
+      connection.query("UPDATE elections SET greenCandidate = ? where createdBy = ? and name = ?", [greenCandidate,createdBy,name], function(err,result,fields) {
+        if(err){
+          res.status(400).send("Can't update greenCandidate")
+        }
+        res.send(result);
+      })
+    }
 
-    connection.query("UPDATE elections SET libertarianCandidate = ? where createdBy = ? and name = ?", [libertarianCandidate,createdBy,name], function(err,result,fields) {
-      if(err){
-        res.status(400).send("Can't update libertarianCandidate")
-      }
-      res.send(result);
-    })
+    if(libertarianCandidate)
+    {
+      connection.query("UPDATE elections SET libertarianCandidate = ? where createdBy = ? and name = ?", [libertarianCandidate,createdBy,name], function(err,result,fields) {
+        if(err){
+          res.status(400).send("Can't update libertarianCandidate")
+        }
+        res.send(result);
+      })
+    }
 
-    connection.query("UPDATE elections SET otherCandidate = ? where createdBy = ? and name = ?", [otherCandidate,createdBy,name], function(err,result,fields) {
-      if(err){
-        res.status(400).send("Can't update otherCandidate")
-      }
-      res.send(result);
-    })
+    if(otherCandidate)
+    {
+      connection.query("UPDATE elections SET otherCandidate = ? where createdBy = ? and name = ?", [otherCandidate,createdBy,name], function(err,result,fields) {
+        if(err){
+          res.status(400).send("Can't update otherCandidate")
+        }
+        res.send(result);
+      })
+    }
 
     connection.release();
   })
@@ -652,7 +666,7 @@ app.put('/updateCustomElection', async(req,res) => {
       connection.release();
     })
   })
-  
+
   /*
   Returns an array of json objects that contain data in the following format:
   {
