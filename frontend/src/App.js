@@ -92,20 +92,15 @@ export function App () {
                     ]
                   }
                         showImage={loggedIn}
+                        signInHREF={refP}
+                        signOutFunc={signout}
+                        signInFunc={() => {console.debug('clicked')}}
                   mainTitle={MAIN_TITLE} mainImage = {{src: imagePath, width: "40px", height: '40px', borderRadius: '50%', onClick: () => {
                     return refP;  
                   }}}
+
                 />
               </ li>
-              <li className="nav-item border signInOut" style={{display: loggedIn ? 'none' : 'block'}}>
-                <a className={"nav-link zeroPadding"} href=""></a>
-                {
-                  loggedIn && <a className="nav-link" onClick={signout} href="/home">Sign out</a>
-                }
-                {
-                  !loggedIn && <a className="nav-link" onClick={() => {console.debug("clicked!")}} href={refP}>Sign in</a>
-                }
-              </li>
             </ul>
               <Switch>
               {
