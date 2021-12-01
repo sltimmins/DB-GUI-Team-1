@@ -460,6 +460,45 @@ app.put('/user/bio', async(req,res) => {
       connection.release();
     })
   })
+
+  app.post('/userReturn', (req,res) => {
+    pool.getConnection(function(err,connection) {
+      if(err){
+        res.status(300).send()
+      }
+      try {
+        if (req.body.bool == "TRUE") {
+          connection.query("SELECT * FROM candidates WHERE candidateId = ?", [req.body.ID], 
+          function(err,result,fields) {
+            if(result.length == 0){
+              logger.error('Candidate does not exist, ID ' + req.body.ID);
+              res.status(400).send('Candidate does not exist, ID ' + req.body.ID);
+            }
+            else {
+              res.send(result)
+            }
+          })
+        }
+        else {
+          connection.query("SELECT * FROM users WHERE accountNumber = ?", [req.body.ID], 
+          function(err,result2,fields) {
+            if(result2.length == 0){
+              logger.error('User does not exist, ID ' + req.body.ID);
+              res.status(400).send('User does not exist, ID ' + req.body.ID);
+            }
+            else {
+              res.send(result2)
+            }
+          })
+        }
+
+      } catch (error) {
+        logger.error('Could not find ID: ');
+        res.status(400).send('Something went Wrong!')
+      }  
+      connection.release();
+    })
+  })
   /*
   Returns an array of json objects that contain data in the following format:
   {
