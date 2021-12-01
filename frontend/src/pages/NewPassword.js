@@ -1,8 +1,10 @@
+import React, { useContext, useState } from "react";
+import { AppContext, useProvideAppContext } from "./../AppContext.js";
 import axios from "axios";
-import React, { useState } from 'react';
 
 export default function NewPassword(props) {
     const [state, setState] = useState({ firstPswrd: "", secPswrd: "", same: false, wasClicked: false });
+    const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -12,6 +14,7 @@ export default function NewPassword(props) {
     function handleClick() {
         setState({...state, wasClicked: true});
         if (state.firstPswrd == state.secPswrd && state.firstPswrd != '') {
+            axios.put(baseURL + '/user/changePassword', {password: state.firstPswrd, username: user.username});
             setState({firstPswrd: "", secPswrd: "", same: true, wasClicked: true});
         }else if (state.same != false) {
             setState({...state, same: false});
