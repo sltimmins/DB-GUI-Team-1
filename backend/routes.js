@@ -388,9 +388,210 @@ app.put('/user/changePassword', async(req,res) => {
   })
 })
 
+
+// CREATING NEW CUSTOM ELECTION
+/*
+  Returns an array of json objects that contain data in the following format:
+  {
+        "state": "Vermont",
+        "shortName": "VT",
+        "winner": "D",
+        "EV": 3
+    } 
+    - where EV = electoral Votes, R = republican, D = democrat, G = green, L = libertarian, O = other
+    - accepts formatting {"createdBy":<accountNumber>, [name: electionName]} in params
+  */
+
+/*
+[
+  { stateId: 1, republicanVotes: 0,  democraticVotes: 0, greenVotes: 0, libertarianVotes: 0, otherVotes: 0, electionId: 1, year: 2020, createdBy: 11, name: "official"}
+]
+*/
+app.post('/addCustomElection',(req,res) => {
+
+  pool.getConnection(async function(err,connection) {
+
+    if(err) {
+      res.status(300).send()
+    }
+
+    // variables
+    const stateId = req.body.stateId;
+    const republicanVotes = req.body.republicanVotes;
+    const democraticVotes = req.body.democraticVotes;
+    const greenVotes = req.body.greenVotes;
+    const libertarianVotes = req.body.libertarianVotes;
+    const otherVotes = req.body.otherVotes;
+    const electionId = req.body.electionId;
+    const year = req.body.year;
+    const democraticCandidate = req.body.democraticCandidate;
+    const republicanCandidate = req.body.republicanCandidate;
+    const greenCandidate = req.body.greenCandidate;
+    const libertarianCandidate = req.body.libertarianCandidate;
+    const otherCandidate = req.body.otherCandidate;
+    const createdBy = req.body.createdBy;
+    const name = req.body.name;
+
+    // list of object 
+    var payload = [] 
+
+    // populating the payload
+    for(let i = 0; i < 50; i ++) {
+
+      //getting the payload & formatting properly
+      tempRow = {
+        "stateId": stateId,
+        "republicanVotes": republicanVotes,
+        "democraticVotes": democraticVotes,
+        "greenVotes": greenVotes,
+        "libertarianVotes": libertarianVotes,
+        "otherVotes": otherVotes,
+        "electionId": electionId,
+        "year": year,
+        "democraticCandidate": democraticCandidate,
+        "republicanCandidate": republicanCandidate,
+        "greenCandidate": greenCandidate,
+        "libertarianCandidate": libertarianCandidate,
+        "otherCandidate": otherCandidate,
+        "createdBy": createdBy,
+        "name": name
+      }
+
+      payload.push(tempRow)
+    }
+    // printing what its getting from the frontend
+    console.log(payload)
+
+    // elections table query
+    electionsQuery = "INSERT INTO elections (year, democraticCandidate, republicanCandidate, greenCandidate, libertarianCandidate, otherCandidate, createdBy, name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+    
+    // electionData table query
+    electionDataQuery = "INSERT INTO electionData (stateId, republicanVotes , democraticVotes , greenVotes , libertarianVotes , otherVotes , electionId) VALUES (?, ?, ?, ?, ?, ?, ?)"
+
+    for(let i = 0; i < 1; i ++) {
+
+      // insert into electionsData table
+      connection.query(electionsQuery, [payload[i].year, payload[i].democraticCandidate, payload[i].republicanCandidate, payload[i].greenCandidate, payload[i].libertarianCandidate, payload[i].otherCandidate, payload[i].createdBy, payload[i].name], function(err,result,fields) {
+        if(err){
+          res.status(400).send("Can't insert elections table")
+        }
+        res.send(result)
+      }) 
+
+      // insert into elections table
+      connection.query(electionDataQuery, [payload[i].year, payload[i].democraticCandidate, payload[i].republicanCandidate, payload[i].greenCandidate, payload[i].libertarianCandidate, payload[i].otherCandidate, payload[i].createdBy, payload[i].name], function(err,result,fields) {
+        if(err){
+          res.status(400).send("Can't insert elections table")
+        }
+        res.send(result)
+      }) 
+
+    }    
+
+    connection.release();
+
+  })
+})
+
+
+app.put('/updatingCustomElection',(req,res) => {
+
+  pool.getConnection(async function(err,connection) {
+
+    if(err) {
+      res.status(300).send()
+    }
+
+    // variables
+    const stateId = req.body.stateId;
+    const republicanVotes = req.body.republicanVotes;
+    const democraticVotes = req.body.democraticVotes;
+    const greenVotes = req.body.greenVotes;
+    const libertarianVotes = req.body.libertarianVotes;
+    const otherVotes = req.body.otherVotes;
+    const electionId = req.body.electionId;
+    const year = req.body.year;
+    const democraticCandidate = req.body.democraticCandidate;
+    const republicanCandidate = req.body.republicanCandidate;
+    const greenCandidate = req.body.greenCandidate;
+    const libertarianCandidate = req.body.libertarianCandidate;
+    const otherCandidate = req.body.otherCandidate;
+    const createdBy = req.body.createdBy;
+    const name = req.body.name;
+
+    // list of object 
+    var payload = [] 
+
+    // populating the payload
+    for(let i = 0; i < 50; i ++) {
+
+      //getting the payload & formatting properly
+      tempRow = {
+        "stateId": stateId,
+        "republicanVotes": republicanVotes,
+        "democraticVotes": democraticVotes,
+        "greenVotes": greenVotes,
+        "libertarianVotes": libertarianVotes,
+        "otherVotes": otherVotes,
+        "electionId": electionId,
+        "year": year,
+        "democraticCandidate": democraticCandidate,
+        "republicanCandidate": republicanCandidate,
+        "greenCandidate": greenCandidate,
+        "libertarianCandidate": libertarianCandidate,
+        "otherCandidate": otherCandidate,
+        "createdBy": createdBy,
+        "name": name
+      }
+
+      payload.push(tempRow)
+    }
+    // printing what its getting from the frontend
+    console.log(payload)
+
+    // elections table query
+    electionsQuery = "UPDATE elections SET democraticCandidate = ? and republicanCandidate = ? and greenCandidate = ? and libertarianCandidate = ? and otherCandidate = ? WHERE createdBy = ? AND name = ?)"
+    
+    // electionData table query
+    electionDataQuery = "UPDATE electionData set republicanVotes = ? and democraticVotes = ? and greenVotes = ? and libertarianVotes = ? and otherVotes = ? WHERE stateId = ? AND electionId = ?"
+
+    for(let i = 0; i < 50; i ++) {
+
+      // insert into electionsData table
+      connection.query(electionsQuery, [payload[i].democraticCandidate, payload[i].republicanCandidate, payload[i].greenCandidate, payload[i].libertarianCandidate, payload[i].otherCandidate, payload[i].createdBy, payload[i].name], function(err,result,fields) {
+        if(err){
+          res.status(400).send("Can't insert elections table")
+        }
+        res.send(result)
+      }) 
+
+      // insert into elections table
+      connection.query(electionDataQuery, [payload[i].republicanCandidate, payload[i].democraticCandidate, payload[i].greenCandidate, payload[i].libertarianCandidate, payload[i].otherCandidate, payload[i].stateId, payload[i].electionId], function(err,result,fields) {
+        if(err){
+          res.status(400).send("Can't insert elections table")
+        }
+        res.send(result)
+      }) 
+
+    }    
+
+    connection.release();
+
+  })
+})
+
+
+
+
+
+
+
+
+
+
 // adding custome election
 // postman test: 0.0.0.0:8000/addCustomElection?year=2020&democraticCandidate=2&republicanCandidate=3&libertarianCandidate=1&greenCandidate=4&otherCandidate=5&createdBy=11&name=2020election
-app.post('/addCustomElection', async(req,res) => {
+app.post('/addCE', async(req,res) => {
   pool.getConnection(function(err,connection) {
     if(err){
       res.status(300).send()
@@ -421,7 +622,7 @@ app.post('/addCustomElection', async(req,res) => {
 // updating custome election
 // postman route test: 0.0.0.0:8000/updateCustomElection
 // postman body: {"democraticCandidate":2,"createdBy": 11,"name":"election2}
-app.put('/updateCustomElection', async(req,res) => {
+app.put('/updateCE', async(req,res) => {
 
   const republicanCandidate = req.body.republicanCandidate
   const democraticCandidate = req.body.democraticCandidate
@@ -486,6 +687,12 @@ app.put('/updateCustomElection', async(req,res) => {
     connection.release();
   })
 })
+
+
+
+
+
+
 
 // return a candidate's bio
 // route link ex: 0.0.0.0:8000/candidate/bio?candidateID=2
@@ -579,14 +786,14 @@ app.put('/candidate/updateBio', async(req,res) => {
     })
   })
 
-  // app.get('/showMyEmail', authenticateToken, (req,res) => {
-  //   pool.getConnection(function(err,connection) {
-  //     connection.query("Select email FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
-  //       res.send(result);
-  //     })
-  //     connection.release()
-  //   })
-  // })
+  app.get('/showMyEmail', authenticateToken, (req,res) => {
+    pool.getConnection(function(err,connection) {
+      connection.query("Select email FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
+        res.send(result);
+      })
+      connection.release()
+    })
+  })
 
   /*
   Returns an array of all a users favorite election years
