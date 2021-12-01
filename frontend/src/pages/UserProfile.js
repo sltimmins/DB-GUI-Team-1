@@ -8,6 +8,8 @@ import { getUserInfo } from "../api/api";
 
 export default function UserProfile(props) {
 
+    console.log(props);
+
     const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
     const [currUser, setCurrUser] = useState(undefined);
     const [isUser, setIsUser] = useState(true);
