@@ -31,6 +31,7 @@ export default function Favorite ({ isFav, candidateId }) {
                     } else {
                         deleteFav()
                     }}}>
+                        {fav}
                 <i className={fav ? 'full_heart' : 'empty_heart'}/>
             </button>
 }

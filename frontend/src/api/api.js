@@ -92,3 +92,10 @@ const getSupportedYears = async() => {
     })
     return payload;
 }
+
+export const getUserInfo = async(id, isCandidate) => {
+    let url = BASE_URL + '/userReturn';
+    await axios.post(url, {ID: id, bool: isCandidate}).then((res => {
+        return res.data;
+    }))
+}

@@ -3,6 +3,7 @@ import { AppContext, useProvideAppContext } from "./../AppContext.js";
 import axios from 'axios';
 import NonUserProfile from "./NonUserProfile.js";
 import { useParams } from "react-router-dom";
+import { getUserInfo } from "../api/api";
 
 
 export default function UserProfile(props) {
@@ -13,6 +14,16 @@ export default function UserProfile(props) {
     var uuid = user.uuid;
     const {id, isCandidateString} = useParams();
     const isCandidate = (isCandidateString === "true")
+
+
+    useEffect(() => {
+        let tempUser = getUserInfo(id, isCandidate);
+        setCurrUser(tempUser);
+    }, [])
+
+    if(!currUser) {
+        return <div>Loading...</div>
+    }
 
     //temp
     // currUser = user;

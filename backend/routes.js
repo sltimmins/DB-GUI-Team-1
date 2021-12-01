@@ -467,7 +467,7 @@ app.put('/user/bio', async(req,res) => {
         res.status(300).send()
       }
       try {
-        if (req.body.bool == "TRUE") {
+        if (req.body.bool) {
           connection.query("SELECT * FROM candidates WHERE candidateId = ?", [req.body.ID], 
           function(err,result,fields) {
             if(result.length == 0){
