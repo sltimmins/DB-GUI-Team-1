@@ -8,6 +8,7 @@ import UserProfile from './pages/UserProfile';
 import HistoricalMap from "./pages/compareMaps";
 
 export const ROUTES = [
+
     {
         path: "/login",
         exact: true,
@@ -43,6 +44,11 @@ export const ROUTES = [
         path: "/maps/:mapID/:queryYear",
         exact: true,
         component: (routeData, getRouteData) => <Maps routeData = {routeData} getRouteData={getRouteData}/>
+    },
+    {
+        path: "/UserProfile/:id/:isCandidateString",
+        exact: true,
+        component: (routeData, getRouteData) => <UserProfile routeData = {routeData} getRouteData={getRouteData}/>
     },
     {
         path: "/UserProfile",

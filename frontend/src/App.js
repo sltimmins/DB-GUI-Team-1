@@ -66,6 +66,8 @@ export function App () {
     window.location.pathname = '/';
   }
 
+  console.log(context.user);
+
   let uuid = "";
   if (context.user != undefined && context.user.uuid != null) {
     uuid = context.user.uuid;
@@ -88,10 +90,10 @@ export function App () {
                   }}}
                   routes={
                     [
-                      {name: "Home", href: '/', active: (window.location.pathname === "/")},
+                      {name: "Home", href: '/', active: (window.location.pathname === "/"), onCLick: () => {console.log("HOME")}},
                       {name: "Maps", href: '/maps', active: (window.location.pathname === "/maps")},
                       {name: "Search", href: '/search', active: (window.location.pathname == "/search") },
-                      loggedIn ? {name: "Sign Out", href: '/search' } : null
+                      loggedIn ? {name: "Sign Out", href: '/', onClick: signout} : null
                     ]
                   }
 
