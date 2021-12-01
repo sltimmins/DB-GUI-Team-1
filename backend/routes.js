@@ -288,15 +288,15 @@ accepts formatting candidateID in params and returns all the years that the cand
     pool.getConnection(function(err,connection) {
       const getWho = req.body.allUsers;
       if(getWho === 1) {
-        connection.query("Select username, firstName, lastName, uuid, party FROM users", function(err,result,fields) {
+        connection.query("Select accountNumber, username, firstName, candidateId, lastName, uuid, party FROM users", function(err,result,fields) {
           res.send(result);
         })
       } else if(getWho === 2) {
-        connection.query("Select firstName, lastName, party, uuid FROM candidates", function(err,result,fields){
+        connection.query("Select candidateId, firstName, lastName, party, uuid FROM candidates", function(err,result,fields){
           res.send(result);
         })
       } else {
-        connection.query("Select username, firstName, lastName, uuid, party FROM users WHERE candidateId is NULL", function(err,result,fields){
+        connection.query("Select accountNumber, username, firstName, lastName, uuid, party FROM users WHERE candidateId is NULL", function(err,result,fields){
           res.send(result);
         })
       }
@@ -388,12 +388,12 @@ app.put('/user/changePassword', async(req,res) => {
   //       "candidateId": "1"
   //   }
   // ]
-  app.get('/favorites/candidates', (req,res) => {
+  app.get('/favorites/candidates', async(req,res) => {
     pool.getConnection(function(err,connection) {
       if(err){
         res.status(300).send()
       }
-      connection.query("SELECT f.candidateID FROM favorites  f INNER JOIN candidates c on f.candidateID = c.candidateId WHERE accountNumber = ?", [req.param('accountNumber')], 
+      connection.query("SELECT candidateID FROM favorites WHERE accountNumber = ? AND candidateID IS NOT NULL;", [req.param('accountNumber')], 
       function(err,result,fields) {
         res.send(result);
       })
@@ -408,9 +408,8 @@ app.put('/user/changePassword', async(req,res) => {
       if(err){
         res.status(300).send()
       }
-      console.log(connection)
-      const accountNumber = req.param('accountNumber')
-      const candidateId = req.param('candidateId')
+      const accountNumber = req.body.accountNumber;
+      const candidateId = req.body.candidateId;
       console.log(accountNumber + '    ' + candidateId)
       connection.query("INSERT INTO favorites (accountNumber, candidateID) VALUES (?, ?)", [accountNumber, candidateId], function(err,result,fields) {
         if(err){
@@ -418,6 +417,25 @@ app.put('/user/changePassword', async(req,res) => {
         }
         res.send(result)
       })     
+      connection.release();
+    })
+  })
+  /*
+  Removes a users favorite candidate
+  Input is accountNumber and candidateID passed as params
+  Ex. {"candidateID":"12", "accountNumber":"125"}
+  */
+  app.delete('/favorites/candidates', async(req,res) => {
+    pool.getConnection(function(err,connection) {
+      if(err){
+        res.status(300).send()
+      }
+      console.log(req.body.candidateID+ '     ' + req.body.accountNumber)
+      connection.query("DELETE FROM favorites WHERE candidateID = ? AND accountNumber = ?", [req.body.candidateID, req.body.accountNumber], 
+      function(err,result,fields) {
+        res.send(result);
+      })
+            
       connection.release();
     })
   })
@@ -492,6 +510,49 @@ app.put('/user/changePassword', async(req,res) => {
         res.send(result);
       })
             
+      connection.release();
+    })
+  })
+
+  app.post('/userReturn', (req,res) => {
+    pool.getConnection(function(err,connection) {
+      if(err){
+        res.status(300).send()
+      }
+
+      const isCand = req.body.isCandidate;
+      const id = req.body.id;
+
+      try {
+        if (isCand) {
+          connection.query("SELECT * FROM candidates WHERE candidateId = ?", [id], 
+          function(err,result,fields) {
+            if(result.length == 0){
+              logger.error('Candidate does not exist, ID ' + id);
+              res.status(400).send('Candidate does not exist, ID ' + id);
+            }
+            else {
+              res.send(result)
+            }
+          })
+        }
+        else {
+          connection.query("SELECT * FROM users WHERE accountNumber = ?", [id], 
+          function(err,result2,fields) {
+            if(result2.length == 0){
+              logger.error('User does not exist, ID ' + id);
+              res.status(400).send('User does not exist, ID ' + id);
+            }
+            else {
+              res.send(result2)
+            }
+          })
+        }
+
+      } catch (error) {
+        logger.error('Could not find ID: ');
+        res.status(400).send('Something went Wrong!')
+      }  
       connection.release();
     })
   })
