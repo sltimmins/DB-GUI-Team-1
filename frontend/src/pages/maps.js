@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, createRef } from 'react';
 import Button from "../components/genericButton";
 import SearchBar from "../components/searchBar";
-import mapboxgl from 'mapbox-gl';
+import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import "../styles/maps.css"
 import axios from "axios";
@@ -40,7 +40,7 @@ export default function Maps(){
     useEffect(async() => {
         console.log(mapID)
         setCurrentlyLoading(true)
-        let res = await getElectionData(queryYear ? chosenYear : null, queryYear ? null : mapID);
+        let res = await getElectionData(queryYear || (!queryYear && !mapID) ? chosenYear : null, queryYear || (!queryYear && !mapID) ? null : mapID);
         setRetrievedPayload(res);
         setPlaceSelection(arrToMap(res))
         await axios({
@@ -181,6 +181,7 @@ export default function Maps(){
                     renderMap(entry)
                 })
                 setPlacesCopy([entry]);
+                setCandidates("Hello")
             });
         }
     }
@@ -228,7 +229,7 @@ export default function Maps(){
                         <main className={"mapMain"}>
                             <div className={"divForButton"}>
                                 <div>
-                                    <SearchBar routes={retrievedPayload ? transformArr(retrievedPayload) : transformArr(placesCopy)} placeHolder={"Search for Locations"} baseColor={"white"} textColor={"black"} dropShadow={true} onChangeFunc={val => handleSelection(val.target.value)}/>
+                                    <SearchBar routes={transformArr(placesCopy)} placeHolder={"Search for Locations"} baseColor={"white"} textColor={"black"} dropShadow={true} onChangeFunc={val => {val == 'United States' ? handleAllSelection() : handleSelection(val)}}/>
                                 </div>
                             </div>
                             <div className={"yearDiv"}>
