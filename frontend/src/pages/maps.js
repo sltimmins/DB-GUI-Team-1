@@ -181,6 +181,7 @@ export default function Maps(){
                     renderMap(entry)
                 })
                 setPlacesCopy([entry]);
+                setCandidates("Hello")
             });
         }
     }
@@ -228,7 +229,7 @@ export default function Maps(){
                         <main className={"mapMain"}>
                             <div className={"divForButton"}>
                                 <div>
-                                    <SearchBar routes={retrievedPayload ? transformArr(retrievedPayload) : transformArr(placesCopy)} placeHolder={"Search for Locations"} baseColor={"white"} textColor={"black"} dropShadow={true} onChangeFunc={val => handleSelection(val.target.value)}/>
+                                    <SearchBar routes={transformArr(placesCopy)} placeHolder={"Search for Locations"} baseColor={"white"} textColor={"black"} dropShadow={true} onChangeFunc={val => {val == 'United States' ? handleAllSelection() : handleSelection(val)}}/>
                                 </div>
                             </div>
                             <div className={"yearDiv"}>

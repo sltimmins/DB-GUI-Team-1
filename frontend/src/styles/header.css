@@ -31,7 +31,7 @@
     font-size: calc(1rem + .15vw);
 }
 
-.headerLinks li .active{
+.headerLinks li .activeLink{
     font-weight: 700;
     color: #61dafb;
 }

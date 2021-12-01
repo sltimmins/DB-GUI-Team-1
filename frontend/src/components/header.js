@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/header.css';
+import {NavLink} from "react-router-dom";
 const hamburger = ["/assets/images/1024px-Hamburger_icon_white.svg.png", "/assets/images/Hamburger_icon.svg.png"]
 const Header = ({routes, mainTitle, mainImage, baseColor, showImage, signInFunc, signOutFunc, signInHREF}) => {
     const calcFontColor = () => {
@@ -21,13 +22,15 @@ const Header = ({routes, mainTitle, mainImage, baseColor, showImage, signInFunc,
         }
         let elems = [];
         for(const route of routes){
-            elems.push(
+            if(route) {
+                elems.push(
                 <li key={route.name + route.href}>
-                    <a key={route.name} href={route.href} className={(route.active ? " active" : "")} style={{color: fontColor}}>
+                    <NavLink exact key={route.name} to={route.href} activeClassName={"activeLink"} style={{color: fontColor}}>
                         {route.name}
-                    </a>
+                    </NavLink>
                 </li>
             );
+            }
         }
         return elems;
     }

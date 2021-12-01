@@ -90,8 +90,8 @@ export function App () {
                     [
                       {name: "Home", href: '/', active: (window.location.pathname === "/")},
                       {name: "Maps", href: '/maps', active: (window.location.pathname === "/maps")},
-                      {name: "About", href: '/', active: (window.location.pathname === "/about") },
-                      {name: "Search", href: '/search', active: (window.location.pathname == "/search") }
+                      {name: "Search", href: '/search', active: (window.location.pathname == "/search") },
+                      loggedIn ? {name: "Sign Out", href: '/search' } : null
                     ]
                   }
 
