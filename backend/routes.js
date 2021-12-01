@@ -517,7 +517,6 @@ app.put('/candidate/updateBio', async(req,res) => {
   })
 })
 
-
   //Returns all a users favorite cadidateID's
   //Input is accountNumber as a param
   //return format:
