@@ -487,6 +487,37 @@ app.put('/updateCustomElection', async(req,res) => {
   })
 })
 
+// return a candidate's bio
+// route link ex: 0.0.0.0:8000/candidate/bio?candidateID=2
+app.get('/candidate/bio', async(req,res) => {
+  pool.getConnection(function(err,connection) {
+    if(err){
+      res.status(300).send()
+    }
+    connection.query("select bio from candidates where candidateID = ?", [req.param('candidateID')], 
+    function(err,result,fields) {
+      res.send(result);
+    })
+          
+    connection.release();
+  })
+})
+
+// update a candidate's bio
+// route link: 0.0.0.0:8000/candidate/updateBio
+// route body: {"candidateID":2,"bio": "hello!"}
+app.put('/candidate/updateBio', async(req,res) => {
+  const bio = req.body.bio
+  const candidateID = req.body.candidateID
+  pool.getConnection(function(err,connection) {
+    connection.query("update candidates set bio = ? where candidateID = ?", [bio,candidateID], function(err,result,fields) {
+      res.send(result);
+    })
+    connection.release();
+  })
+})
+
+
   //Returns all a users favorite cadidateID's
   //Input is accountNumber as a param
   //return format:
