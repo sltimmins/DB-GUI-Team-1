@@ -8,6 +8,7 @@ import UserProfile from './pages/UserProfile';
 import HistoricalMap from "./pages/compareMaps";
 
 export const ROUTES = [
+
     {
         path: "/login",
         exact: true,
