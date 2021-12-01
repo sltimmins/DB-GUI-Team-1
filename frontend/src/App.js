@@ -90,7 +90,7 @@ export function App () {
                   }}}
                   routes={
                     [
-                      {name: "Home", href: '/', active: (window.location.pathname === "/"), onCLick: () => {console.log("HOME")}},
+                      {name: "Home", href: '/', active: (window.location.pathname === "/")},
                       {name: "Maps", href: '/maps', active: (window.location.pathname === "/maps")},
                       {name: "Search", href: '/search', active: (window.location.pathname == "/search") },
                       loggedIn ? {name: "Sign Out", href: '/', onClick: signout} : null
