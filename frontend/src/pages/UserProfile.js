@@ -4,6 +4,10 @@ import axios from 'axios';
 import NonUserProfile from "./NonUserProfile.js";
 import { useParams } from "react-router-dom";
 import { getUserInfo } from "../api/api";
+import {
+    useHistory,
+    useLocation
+  } from 'react-router-dom'
 
 
 export default function UserProfile(props) {
@@ -34,6 +38,18 @@ export default function UserProfile(props) {
     // currUser = user;
     // isUser = false;
     //end temp
+
+    let history = useHistory();
+    let location = useLocation();
+
+    const redirectToLogin = () => {
+        let { from } = location.state || { from: { pathname: "/login"}};
+        history.replace(from);
+    }
+
+    if(!id) {
+        redirectToLogin();
+    }
 
     if (props.user != undefined) {
         currUser = props.user;
