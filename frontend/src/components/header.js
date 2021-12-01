@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import '../styles/header.css';
 import {NavLink, Link} from "react-router-dom";
 import { AppContext } from "./../AppContext.js";
+import logo_control from "mapbox-gl/src/ui/control/logo_control";
 
 const hamburger = ["/assets/images/1024px-Hamburger_icon_white.svg.png", "/assets/images/Hamburger_icon.svg.png"]
 const Header = ({routes, mainTitle, mainImage, baseColor, showImage, signInFunc, signOutFunc, signInHREF}) => {
@@ -37,13 +38,22 @@ const Header = ({routes, mainTitle, mainImage, baseColor, showImage, signInFunc,
             if(route) {
                 elems.push(
                 <li key={route.name + route.href}>
-                    <NavLink exact key={route.name} to={route.href} activeClassName={"activeLink"} style={{color: fontColor}} onClick={route.onClick}>
+                    <NavLink exact={route.exact} key={route.name} to={route.href} activeClassName={"activeLink"} style={{color: fontColor}} onClick={route.onClick}>
                         {route.name}
                     </NavLink>
                 </li>
             );
             }
         }
+        // if(showImage) {
+        //     elems.push(
+        //         <li key={'signout-li'}>
+        //             <NavLink key={'signout'} to={'/'} style={{color: fontColor}} onClick={() => console.log("Hello")}>
+        //                 {"Sign Out"}
+        //             </NavLink>
+        //         </li>
+        //     );
+        // }
         return elems;
     }
 
@@ -90,7 +100,7 @@ const Header = ({routes, mainTitle, mainImage, baseColor, showImage, signInFunc,
                               !showImage && <a className="nav-link" onClick={signInFunc} href={signInHREF}>Sign in</a>
                             }
                           </li>
-                        <div className = {"helper"} style={{display: showImage ? 'block' : 'none'}}>
+                        <div className = {"helper"} style={{display: showImage ? 'inline-flex' : 'none'}}>
                             <div className = {"headerLogoDiv"} style={{width: mainImage.width}}>
                                 <Link to={'/UserProfile/' + (user.candidateId || user.accountNumber) + '/' + isCand}>
                                     <img src={mainImage.src} className = {"headerImage"} alt="logo" style={{width: mainImage.width, height: mainImage.height}} /> 

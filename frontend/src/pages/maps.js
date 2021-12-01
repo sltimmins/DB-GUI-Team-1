@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, createRef } from 'react';
 import Button from "../components/genericButton";
 import SearchBar from "../components/searchBar";
-import mapboxgl from 'mapbox-gl';
+import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import "../styles/maps.css"
 import axios from "axios";
@@ -40,7 +40,7 @@ export default function Maps(){
     useEffect(async() => {
         console.log(mapID)
         setCurrentlyLoading(true)
-        let res = await getElectionData(queryYear ? chosenYear : null, queryYear ? null : mapID);
+        let res = await getElectionData(queryYear || (!queryYear && !mapID) ? chosenYear : null, queryYear || (!queryYear && !mapID) ? null : mapID);
         setRetrievedPayload(res);
         setPlaceSelection(arrToMap(res))
         await axios({
