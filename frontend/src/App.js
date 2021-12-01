@@ -28,7 +28,7 @@ export function App () {
   // handle signout
   const signout = () => {
     localStorage.setItem('jwt', "");
-
+    window.location.reload();
   }
 
   const [allStates, setAllStates] = useState([])
