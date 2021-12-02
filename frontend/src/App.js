@@ -28,7 +28,7 @@ export function App () {
   // handle signout
   const signout = () => {
     localStorage.setItem('jwt', "");
-    window.location.reload();
+    window.location.pathname = '/';
   }
 
   const [allStates, setAllStates] = useState([])
@@ -47,21 +47,29 @@ export function App () {
       } else {
           copy["/maps/:mapId"] = {to: mapData};
       }
-      console.log(copy)
       setRouteData(copy)
   }
+
+  let refP = "/login";
+  let loggedIn = false;
+
   // tell app to fetch values from db on first load (if initialized)
   useEffect(async() => {
-     let newPayload = await getElectionData(2020);
-     setAllStates(newPayload);
+      if (context.JWT) {
+        loggedIn = true;
+        refP = "/UserProfile";
+      }
+      if (loggedIn && window.location.pathname == '/login') {
+        window.location.pathname = '/';
+      }
+     // let newPayload = await getElectionData(2020);
+     // setAllStates(newPayload);
      setupLogin(context);
      if(context.JWT) {
          setIsLoggedIn(true)
      }
   }, [])
 
-  let refP = "/login";
-  let loggedIn = false;
   if (context.JWT) {
     loggedIn = true;
     refP = "/UserProfile";
@@ -69,8 +77,6 @@ export function App () {
   if (loggedIn && window.location.pathname == '/login') {
     window.location.pathname = '/';
   }
-
-  console.log(context.user);
 
   let uuid = "";
   if (context.user != undefined && context.user.uuid != null) {
@@ -97,18 +103,14 @@ export function App () {
                       {name: "Home", href: '/', active: (window.location.pathname === "/"), exact: true},
                       {name: "Maps", href: '/maps', active: (window.location.pathname === "/maps")},
                       {name: "Search", href: '/search', active: (window.location.pathname == "/search") },
-                      loggedIn ? {name: "Sign Out", href: '/', onClick: signout} : null
+                      loggedIn ? {name: "Sign out", href: '/', onClick: signout} : null
                     ]
                   }
 
                         showImage={loggedIn}
-                        signInHREF={refP}
-                        signOutFunc={signout}
-                        signInFunc={() => {console.debug('clicked')}}
                   mainTitle={MAIN_TITLE} mainImage = {{src: imagePath, width: "40px", height: '40px', borderRadius: '50%', onClick: () => {
                     return refP;  
                   }}}
-
                 />
               </ li>
             </ul>

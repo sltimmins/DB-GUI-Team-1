@@ -6,6 +6,7 @@ import Home from "./pages/home";
 import MainMap from "./pages/mainMap";
 import UserProfile from './pages/UserProfile';
 import HistoricalMap from "./pages/compareMaps";
+import NewPassword from "./pages/NewPassword";
 
 export const ROUTES = [
 
@@ -54,6 +55,11 @@ export const ROUTES = [
         path: "/UserProfile",
         exact: true,
         component: (routeData, getRouteData) => <UserProfile routeData = {routeData} getRouteData={getRouteData}/>
+    },
+    {
+        path: "/NewPassword",
+        exact: true,
+        component: (routeData, getRouteData) => <NewPassword routeData = {routeData} getRouteData={getRouteData}/>
     }
 
 ]

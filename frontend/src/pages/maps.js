@@ -46,9 +46,8 @@ export default function Maps(){
     }
     const [placeSelection, setPlaceSelection] = useState(arrToMap(placesPayload))
     useEffect(async() => {
-        console.log(mapID)
         setCurrentlyLoading(true)
-        let res = await getElectionData(queryYear || (!queryYear && !mapID) ? chosenYear : null, queryYear || (!queryYear && !mapID) ? null : mapID);
+        let res = await getElectionData(chosenYear, mapID);
         setRetrievedPayload(res);
         setPlaceSelection(arrToMap(res));
         let yearRes = await getSupportedYears();
@@ -87,16 +86,17 @@ export default function Maps(){
     }, [chosenYear]);
 
     useEffect(async () => {
+        console.log(retrievedPayload)
         await axios({
             method: 'get',
-            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${mapID ? mapID : 'United%20States'}.json?types=country&access_token=${MAPBOX_API_KEY}`
+            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/United%20States.json?types=country&access_token=${MAPBOX_API_KEY}`
         })
         .then(function (response) {
             let newLat = response.data["features"][0]["center"][0]
             let newLng = response.data["features"][0]["center"][1]
             let copy = JSON.parse(JSON.stringify(mapToCoordinates))
-            copy[mapID ? mapID : 'United States'] = [newLat, newLng];
-            setMapToCoordinates(copy)
+            // copy[mapID ? mapID : 'United States'] = [newLat, newLng];
+            // setMapToCoordinates(copy)
             maps.current[0] = new mapboxgl.Map({
                     container: refs.current[0],
                     style: 'mapbox://styles/mapbox/streets-v11',
@@ -126,11 +126,9 @@ export default function Maps(){
         let payload = await getElectionCandidates(chosenYear ? chosenYear : 2020);
         let transformedPayload = {};
         if (payload) {
-            console.log(payload);
             for(let obj of payload) {
                 transformedPayload[obj.party] = obj;
             }
-            console.log(transformedPayload)
         }
         return transformedPayload;
     }
@@ -139,7 +137,6 @@ export default function Maps(){
         let num = 50 * multiplier;
         for(const stateJS of statesGeoJSON){
             let stateName = stateJS.properties.NAME;
-            console.log(entry.state.toLowerCase() + (num * multiplier))
             if(entry.state === stateName) {
                 maps.current[0].addSource(entry.state.toLowerCase() + (num * multiplier), {
                     'type': 'geojson',
@@ -221,13 +218,12 @@ export default function Maps(){
             );
             maps.current[0].on('load', () => {
                 for(let entry of (retrievedPayload ? retrievedPayload : placesPayload)){
-                    console.log("load")
                     renderMap(entry)
                 }
             })
             setPlacesCopy([{"state": val}]);
         });
-        setChosenYear(chosenYear)
+        // setChosenYear(chosenYear)
     }
 
     const handleYearSelection = (newYear) => {
@@ -253,7 +249,7 @@ export default function Maps(){
                                     handleYearSelection(el.target.value)
                                 })}>
                                     {
-                                        yearOptions.length == 0 ? <option value={2020}>2020</option> : yearOptions.map(opt => (<option value={opt}>{opt}</option>))
+                                        yearOptions.length == 0 ? <option value={2020}>2020</option> : yearOptions.map(opt => (<option value={opt} key={"year_opt_"+opt}>{opt}</option>))
                                     }
                                 </select>
                             </div>
