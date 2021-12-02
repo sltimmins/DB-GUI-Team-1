@@ -503,8 +503,10 @@ app.put('/user/email', async(req,res) => {
 app.put('/user/changePassword', async(req,res) => {
   const password = req.body.password
   const username = req.body.username
+  const salt = await bcrypt.genSalt()
+  const hashedPassword = await bcrypt.hash(req.body.password, salt)
   pool.getConnection(function(err,connection) {
-    connection.query("update users set password = ? where username = ?", [password,username], function(err,result,fields) {
+    connection.query("update users set password = ? where username = ?", [hashedPassword,username], function(err,result,fields) {
       res.send(result);
     })
     connection.release();
