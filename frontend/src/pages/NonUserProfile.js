@@ -1,13 +1,41 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { AppContext, useProvideAppContext } from "./../AppContext.js";
 import axios from 'axios';
 import { Collapse } from "bootstrap";
+import { loadFavorites } from './search.js'; 
 
 export default function NonUserProfile(props) {
     const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
     var [toggle, setToggle] = useState(false, false, false);
     var [toggleTwo, setToggleTwo] = useState(false);
     var [toggleThree, setToggleThree] = useState(false);
+    const [favCandidates, setFavCandidates] = useState(undefined);
+    let candidates = [];
+    const [list, setList] = useState([]);
+    const [loaded, setLoaded] = useState(false);
+
+
+    const loadFavorites = async() => { 
+        await axios.get(baseURL + '/favorites/candidates', { params: { accountNumber: user.accountNumber } }).then(({res}) => {
+            const favs = [];
+            res.data.forEach((x, i) => favs.push(x.candidateID));
+            setFavCandidates(favs);
+        });
+    }
+
+    const isFirstRender = useRef(true);
+
+    useEffect(() => {
+
+        // await axios.get
+
+    }, []);
+
+    const loadCandidates = async(loadWho) => { 
+        await axios.post(baseURL + '/users/search_user', { allUsers: loadWho }).then((res) => {
+            setList(res.data);
+        });
+    }
 
     useEffect(() => {
         if(!props.user[0].candidateId) {
@@ -33,7 +61,7 @@ export default function NonUserProfile(props) {
         }
     })
 
-    let favCands = axios.get(baseURL + '/favorites/candidates', props.user[0]).data;
+
     let favElects; //axios.get(baseURL + '/favorites/elections', props.user).data;
     let custElects; //axios.get(baseURL + '/customElections', props.user).data;
     let imagePath;
@@ -43,8 +71,9 @@ export default function NonUserProfile(props) {
         imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + props.user[0].uuid;
     }
 
-    console.log(props.user[0])
-
+    if(loaded) {
+        console.debug(favCandidates);
+    }
     return(
         <div>
             <header className="text-center bg-secondary p-3 d-static">
@@ -88,7 +117,7 @@ export default function NonUserProfile(props) {
                                         <label htmlFor="list" className="font-weight-bold">Favorite Candidates</label>
                                         <ul className="list-group" style={{listStyleType: "none"}} id="list"></ul>
                                         {
-                                            favCands && favCands.map(cand => {
+                                            favCandidates && loaded && favCandidates.map(cand => {
                                                 <li className="list-group-item">{cand.firstName} {cand.listName}</li>
                                             })
                                         }

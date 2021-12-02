@@ -25,12 +25,6 @@ export function App () {
   // Global context
   let context = useProvideAppContext();
 
-  // handle signout
-  const signout = () => {
-    localStorage.setItem('jwt', "");
-
-  }
-
   const [allStates, setAllStates] = useState([])
   const [routeData, setRouteData] = useState(null)
 
@@ -46,7 +40,6 @@ export function App () {
       } else {
           copy["/maps/:mapId"] = {to: mapData};
       }
-      console.log(copy)
       setRouteData(copy)
   }
   // tell app to fetch values from db on first load (if initialized)
@@ -65,8 +58,6 @@ export function App () {
   if (loggedIn && window.location.pathname == '/login') {
     window.location.pathname = '/';
   }
-
-  console.log(context.user);
 
   let uuid = "";
   if (context.user != undefined && context.user.uuid != null) {
@@ -98,13 +89,9 @@ export function App () {
                   }
 
                         showImage={loggedIn}
-                        signInHREF={refP}
-                        signOutFunc={signout}
-                        signInFunc={() => {console.debug('clicked')}}
                   mainTitle={MAIN_TITLE} mainImage = {{src: imagePath, width: "40px", height: '40px', borderRadius: '50%', onClick: () => {
                     return refP;  
                   }}}
-
                 />
               </ li>
             </ul>
