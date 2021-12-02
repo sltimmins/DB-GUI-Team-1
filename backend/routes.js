@@ -122,6 +122,46 @@ accepts formatting candidateID in params and returns all the years that the cand
     })
   })
 
+  app.put('/saveCustomElection', authenticateToken, (req,res) =>{
+    pool.getConnection( function(err,connection) {
+      console.log(req.body.electionData)
+      console.log(req.user.username)
+      JSONbody = JSON.parse(JSON.stringify(req.body.electionData));
+      connection.query("select accountNumber from users where username = ?", [req.user.username], function(err,result,fields) {
+        if(err) {
+          logger.error(err)
+          res.status(400).send("error finding account number")
+        } else {
+          console.log("elese statement ran")
+          JSONaccountNumber = JSON.parse(JSON.stringify(result[0]));
+          accountNumber = JSONaccountNumber["accountNumber"]
+          
+          console.log("Name:"+ JSONbody["name"])
+          connection.query("select electionId from elections where createdBy = ? and name = ?" [accountNumber, JSONbody["name"]], function(err,result,fields) {
+            if(err) {
+              console.log(err)
+            }
+            if(result) {
+              JSONData = JSON.parse(req.body.electionData)
+              for(value in JSONData["data"]) {
+                repVote = 0;
+                demVotes = 0;
+                libVotes = 0;
+                otherVotes = 0;
+                greenVotes = 0;
+                console.log(value);
+                connection.query("insert into electionData ")
+              }
+              
+            } else {
+              console.log("No election Found for AccountNumber: ", accountNumber)
+            }
+          })
+        }
+      })
+      connection.release();
+    })
+  })
   // route to get customElectionYears
   app.get('/customElectionYears', (req,res) => {
     pool.getConnection(function(err,connection) {
