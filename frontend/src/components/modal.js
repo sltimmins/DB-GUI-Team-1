@@ -28,7 +28,7 @@ export const Modal = ({mainTitle, description, confirmButtonText, cancelButtonTe
 
 
 export const SaveModal = ({placeholder, saveAction, inputLabelText, open, cancelAction}) => {
-    const [saveName, setSaveName] = useState("")
+    const [saveName, setSaveName] = useState(placeholder ? placeholder : '')
     return (
         <section className={"specialModal"} style={{display: open ? 'block' : 'none'}}>
             <div className={"closerDiv"}>
