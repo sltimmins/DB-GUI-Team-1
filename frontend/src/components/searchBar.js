@@ -29,7 +29,7 @@ const SearchBar = ({baseColor, placeHolder, textColor, width, height, fontSize, 
     return (
         <>
             <div className={"queryContainer"}>
-                <input list={"data-list"} className={"searchBar"} style={dynamicStyles} type={"text"} placeholder={placeHolder} onChange={onChangeFunc}/>
+                <input list={"data-list"} className={"searchBar"} style={dynamicStyles} type={"text"} placeholder={placeHolder} onChange={(el) => onChangeFunc(el.target.value)}/>
                 <datalist id={"data-list"} className={"dataList"}>
                     {routes && Array.isArray(routes) ? routes.map(route => (<option key={"datalist-"+ route.name}  value={route.name} onClick={() => {window.location.href = route.href}}/>)) : []}
 

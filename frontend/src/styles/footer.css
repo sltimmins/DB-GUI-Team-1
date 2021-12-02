@@ -6,6 +6,7 @@
     background-color: #1a1a1a;
     min-height: 3rem;
     margin-top: 50vh;
+    align-items: center;
 }
 
 .footerText {

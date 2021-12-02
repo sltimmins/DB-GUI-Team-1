@@ -20,7 +20,7 @@ export default function Home(){
                 <h1 className={"main-description"}>Learn about political races and interact with maps to see how things can play out!</h1>
                 <div className={"divForButton"}>
                     <div>
-                        <SearchBar routes={retrievedPayload ? transformArr(retrievedPayload) : transformArr(placesCopy)} placeHolder={"Search for Locations"} baseColor={"white"} textColor={"black"} dropShadow={true}/>
+                        <SearchBar routes={transformArr(placesCopy)} placeHolder={"Search for Locations"} baseColor={"white"} textColor={"black"} dropShadow={true} onChangeFunc={(val) => {window.location.href = '/maps/'+encodeURIComponent(val) + "/2020"}}/>
                     </div>
                     <Button mainText={"All Maps"} baseColor={"#000"} textColor={"white"} dropShadow={true} onButtonClick={() => {window.location.href = "/maps"}}/>
                 </div>
