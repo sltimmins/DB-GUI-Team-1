@@ -249,7 +249,7 @@ export default function Maps(){
                                     handleYearSelection(el.target.value)
                                 })}>
                                     {
-                                        yearOptions.length == 0 ? <option value={2020}>2020</option> : yearOptions.map(opt => (<option value={opt}>{opt}</option>))
+                                        yearOptions.length == 0 ? <option value={2020}>2020</option> : yearOptions.map(opt => (<option value={opt} key={"year_opt_"+opt}>{opt}</option>))
                                     }
                                 </select>
                             </div>
