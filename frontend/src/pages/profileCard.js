@@ -22,11 +22,11 @@ export default function ProfileCard ({ candidate, favorite, baseURL }) {
                 <p class="party">{candidate.party}</p>
                 {
                     candidate.candidateId && <Link to={'/UserProfile/' + (candidate.candidateId || candidate.accountNumber) + '/' + true}
-                        className="btn btn-outline-success btn-block py-2 mb-3">View Profile</Link>
+                        className="btn btn-outline-success btn-block py-2 mb-5">View Profile</Link>
                 }
                 {
                     !candidate.candidateId && <Link to={'/UserProfile/' + (candidate.candidateId || candidate.accountNumber) + '/' + false}
-                        className="btn btn-outline-success btn-block py-2 mb-3">View Profile</Link>
+                        className="btn btn-outline-success btn-block py-2 mb-5">View Profile</Link>
                 }
             </div>
             {
