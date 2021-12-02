@@ -27,7 +27,7 @@ export default function Search() {
         });
     }
     const loadFavorites = async() => { 
-        await axios.get(baseURL + '/favorites/candidates', { params: { accountNumber: user.accountNumber } }).then((res) => {
+        await axios.get(baseURL + '/favorites/candidates?accountNumber=' + user.accountNumber).then((res) => {
             const favs = [];
             res.data.forEach((x, i) => favs.push(x.candidateID));
             setFavCandidates(favs);
