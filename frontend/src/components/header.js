@@ -39,7 +39,7 @@ const Header = ({routes, mainTitle, mainImage, baseColor, showImage, signInFunc,
         }
         let elems = [];
         for(const route of routes){
-            if(route && route.name != 'Sign Out') {
+            if(route && route.name != 'Sign out') {
                 elems.push(
                     <li key={route.name + route.href}>
                         <NavLink exact={route.exact} key={route.name} to={route.href} activeClassName={"activeLink"} style={{color: fontColor}} onClick={route.onClick}>

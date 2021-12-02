@@ -1,5 +1,12 @@
 import axios from "axios";
 import {BASE_URL, MAPBOX_API_KEY} from "../constants/constants";
+export const axiosJWTHeader = (jwt) => {
+    return {
+        Authorization: "Bearer " + jwt
+    }
+}
+
+let stored = localStorage.getItem('jwt')
 
 const transformData = (arr) => {
     for(let state of arr) {
@@ -7,15 +14,23 @@ const transformData = (arr) => {
     }
 }
 
+const config = {
+    headers: axiosJWTHeader(stored)
+
+}
+
 // Get Election results and data for each state given a year
 // currently only supports year 2020
-export const getElectionData = async(year, electionName) => {
+export const getElectionData = async(year, name) => {
     let states = [];
     let url = BASE_URL + '/electionData'
+    let specialObj = {year}
+    specialObj.name = name ==  'United States' ? null : name;
+    console.log(specialObj)
     await axios({
         method: 'get',
         url: url,
-        params: {year, electionName}
+        params: specialObj
     })
     .then((response) => {
             if(response.status == 200){
@@ -52,25 +67,32 @@ export const getElectionCandidates = async (year) => {
     return candidates;
 }
 
-export const downloadCSV = async (year) => {
-    let candidates = null;
-    let url = BASE_URL + '/elections/candidates'
+export const downloadCSV = async (year, name) => {
+    let linkElem = document.createElement('a');
+    linkElem.target = '_blank';
+    linkElem.download = "election.csv"
+    let csv = null;
+    let url = BASE_URL + '/saveCSV'
     await axios({
         method: 'get',
         url: url,
-        params: {year}
+        params: {year, name},
+        responseType: 'blob'
+
     })
     .then((response) => {
             if(response.status == 200){
-                candidates = response.data;
+                csv = new Blob([response.data], {type: 'text/csv'});
+                linkElem.href = URL.createObjectURL(csv);
+                linkElem.click();
             } else {
                 return null;
             }
         }
     ) .catch(e => {
-        candidates = [];
+        csv = null;
     })
-    return candidates;
+    return csv;
 }
 
 export const getSupportedYears = async() => {
@@ -91,4 +113,22 @@ export const getSupportedYears = async() => {
         payload = [];
     })
     return payload;
+}
+
+export const persistCustomElection = async (payload) => {
+    let resp = null;
+    let url = BASE_URL + '/saveCustomElection'
+    console.log(payload)
+    await axios.put(url, payload, config)
+    .then((response) => {
+            if(response.status == 200){
+                resp = response.data;
+            } else {
+                return null;
+            }
+        }
+    ) .catch(e => {
+        resp = null;
+    })
+    return resp;
 }

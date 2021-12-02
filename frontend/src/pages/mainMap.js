@@ -4,14 +4,15 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import "../styles/maps.css"
 import axios from "axios";
 import {months, politicalColors} from "../test_data/test_data_objects";
-import {DEMOCRAT, MAPBOX_API_KEY, REPUBLICAN, statusMap} from "../constants/constants";
+import {DEMOCRAT, EC2_FRONTEND, EC2_URL, MAPBOX_API_KEY, REPUBLICAN, statusMap} from "../constants/constants";
 import Button from "../components/genericButton";
 import {Modal,SaveModal} from '../components/modal'
 import {checkObjectEquality} from "../utils";
-import {getElectionCandidates} from "../api/api";
+import {downloadCSV, getElectionCandidates, persistCustomElection} from "../api/api";
 
 mapboxgl.accessToken = MAPBOX_API_KEY;
 
+let stored = localStorage.getItem('jwt')
 
 const ChangeRow = ({name, original, change, deleteAction}) => {
     return (
@@ -35,6 +36,18 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                 if(placeObj["EV"]){
                     map[placeObj["status"]] = map[placeObj["status"]] ? map[placeObj["status"]] + placeObj["EV"] : placeObj["EV"]
                 }
+            }
+            if(!map[statusMap.Democrat]){
+                map[statusMap.Democrat] = 0;
+            }
+            if(!map[statusMap.Republican]){
+                map[statusMap.Republican] = 0;
+            }
+            if(!map[statusMap.Green]){
+                map[statusMap.Green] = 0;
+            }
+            if(!map[statusMap.Libertarian]){
+                map[statusMap.Libertarian] = 0;
             }
             return map;
         } else {
@@ -66,7 +79,7 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
         const entry = place;
         await axios({
             method: 'get',
-            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${entry.state}.json?types=${entry.state === "United States" ? "country" : "region"}&access_token=${MAPBOX_API_KEY}`
+            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/United%20States.json?types=country&access_token=${MAPBOX_API_KEY}`
         })
         .then(function (response) {
             let newLat = response.data["features"][0]["center"][0]
@@ -114,10 +127,9 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
 
             })
         });
-    }, [deleteEntryModal, chosenChangeLocation, newAffiliation, locationToRemove, saveOpenModal, savedModal, viewOption, mapOfAffiliation]);
+    }, [viewOption, mapOfAffiliation]);
 
 
-    console.log(candidates)
     const votingGradient = () => {
         let gradient = "linear-gradient(to right, "
         for(const key in electionNumbers) {
@@ -135,6 +147,20 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
             }
         }
         return max;
+    }
+
+    const saveCustomElection = async (name) => {
+        console.log(name);
+        let copy = copyArr(placesArray);
+        for(const specificPlace of copy) {
+            specificPlace.winner = mapOfAffiliation[specificPlace.state.toLowerCase()];
+        }
+        let wholePayload = {
+            data: copy,
+            name,
+            year
+        }
+        let resp = await persistCustomElection(wholePayload);
     }
 
     const getInitialPlaceholder = () => {
@@ -158,19 +184,21 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                     </th>
                 </tr>
             </thead>
-            {
-                data.map(e => <tr>
-                    <td>
-                        {e.state}
-                    </td>
-                    <td>
-                        {e.status}
-                    </td>
-                    <td>
-                        {e.EV}
-                    </td>
-                </tr>)
-            }
+            <tbody>
+                {
+                    data.map(e => <tr>
+                        <td>
+                            {e.state}
+                        </td>
+                        <td>
+                            {mapOfAffiliation[e.state.toLowerCase()]}
+                        </td>
+                        <td>
+                            {e.EV}
+                        </td>
+                    </tr>)
+                }
+            </tbody>
         </table>
         return <div className={'electionTableWrapper'}><div className={'electionTableDiv'}>{table}</div></div>
     }
@@ -179,7 +207,6 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
         <>
             <Modal open={deleteEntryModal} mainTitle={`Deleting ${locationToRemove} Change`} description={""} cancelButtonText={"Cancel"} confirmButtonText={"Confirm"}
                    confirmAction={() => {
-                       console.log("CONFIRM")
                             let copy = JSON.parse(JSON.stringify(mapOfAffiliation))
                             copy[locationToRemove] = affiliations[locationToRemove];
                             setMapOfAffiliation(copy)
@@ -189,9 +216,13 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                        setDeleteEntryModal(false)
                    }}
             />
-            <SaveModal placeholder={getInitialPlaceholder()} inputLabelText={"Saved Map ID"} open={saveOpenModal} cancelAction={() => setSaveOpenModal(false)} saveAction={(val) => {setSaveName(val); setSaveOpenModal(false); setSavedModal(true)}}/>
-            <Modal open={savedModal} mainTitle={"Saved!"} description={"Your changes have been saved and your custom map can be viewed in you profile"} confirmButtonText={"Yay"}
-                confirmAction={() => setSavedModal(false)}
+            <SaveModal placeholder={getInitialPlaceholder()} inputLabelText={"Saved Map ID"} open={saveOpenModal} cancelAction={() => setSaveOpenModal(false)} saveAction={async (val) => {setSaveName(val); console.log(val); await saveCustomElection(val); setSaveOpenModal(false); setSavedModal(true)}}/>
+            <Modal open={savedModal} mainTitle={"Share"} description={"Your changes have been saved and your custom map can be viewed in you profile. Share your custom elections"} confirmButtonText={"Share"}
+                confirmAction={async() => {
+                    await navigator.clipboard.writeText(`${EC2_FRONTEND}/maps/${encodeURIComponent(saveName)}/${year}`)
+                    alert('Copied to clipboard!')
+                }}
+                   cancelAction={() => setSavedModal(false)}
             />
             <section className={"assortmentOfMaps"}>
                 {place && viewOption == 'map' ?
@@ -232,13 +263,16 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                 <div className={"resultDiv"}>
                     {
                     electionNumbers ?
-                        Object.keys(electionNumbers).map((key, index) =>
-                            <div>
-                                <h5>
-                                    {statusMap[key]} - {electionNumbers[key]} {"\n"}
-                                    ({candidates[statusMap[key]].firstName} {candidates[statusMap[key]].lastName})
-                                </h5>
-                            </div>
+                        Object.keys(electionNumbers).map((key, index) => {
+                                if (electionNumbers[key] != 0) {
+                                    return <div>
+                                        <h5>
+                                            {statusMap[key]} - {electionNumbers[key]} {"\n"}
+                                            ({candidates[statusMap[key]].firstName} {candidates[statusMap[key]].lastName})
+                                        </h5>
+                                    </div>
+                                }
+                            }
                         ) : []
                     }
                 </div>
@@ -255,14 +289,7 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                     }
                 </div>
                 <div>
-                    {/*<select>*/}
-                    {/*    <option value={'map'}>*/}
-                    {/*        Map*/}
-                    {/*    </option>*/}
-                    {/*    <option value={'table'}>*/}
-                    {/*        Table*/}
-                    {/*    </option>*/}
-                    {/*</select>*/}
+                    {/*<button onClick={async () => {await downloadCSV('2021')}}>download</button>*/}
                 </div>
             </section>
             <section className={"changeAffiliationSectionContainer"}>
@@ -326,7 +353,6 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                                 let copy = JSON.parse(JSON.stringify(electionNumbers))
                                 for(const placeObj of placesArrayCopy){
                                     if(placeObj["state"].toLowerCase() == chosenChangeLocation.toLowerCase()){
-                                        console.log(mapOfAffiliation[chosenChangeLocation], placeObj["EV"], copy)
                                         copy[mapOfAffiliation[chosenChangeLocation]] -= placeObj["EV"]
                                         copy[newAffiliation] += placeObj["EV"]
                                     }
@@ -382,11 +408,11 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                 </div>
                 <p>*Click on the location name to delete entry</p>
             </section>
-            <section className={"saveButtonDiv"}>
+            <section className={"saveButtonDiv"} style={{display: stored ? 'inline-flex' : 'none'}}>
                 <Button mainText={"Save Map"} baseColor={politicalColors[DEMOCRAT]} textColor={"white"} paddingHorizontal={"15px"} paddingVertical={"12px"} fontSize={'.8rem'} disabled={(!chosenChangeLocation || !newAffiliation)}
                     onButtonClick={() => {
                         setSaveOpenModal(true)
-                        setMapOfAffiliation(affiliations);
+                        // setMapOfAffiliation(affiliations);
                     }}
                 />
             </section>
