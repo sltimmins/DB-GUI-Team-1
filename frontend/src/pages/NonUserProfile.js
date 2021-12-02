@@ -100,7 +100,7 @@ export default function NonUserProfile(props) {
                     <div className="row p-3">
                         <div className="my-2">
                             <label htmlFor="currUserBio">Bio</label>
-                            <p id="currUserBio" className="container border text-secondary my-2">{props.user[0].bio ? props.user[0].bio : 'Candidate has no bio.'}</p> 
+                            <p id="currUserBio" className="container border text-secondary my-2">{props.user[0].bio ? props.user[0].bio : 'User has no bio.'}</p> 
                         
                         </div>
                         <div></div>
@@ -138,7 +138,7 @@ export default function NonUserProfile(props) {
                                             favCandidates && favCandidates.length > 0 && <div>{favCandidates}</div>
                                         }
                                         {
-                                            !favCandidates || favCandidates.length == 0 && <li className="my-2 text-decoration-none">No Favorite Candidates</li>
+                                            !favCandidates || favCandidates.length == 0 && <li className="my-2 text-decoration-none list-unstyled">No Favorite Candidates</li>
                                         }
                                     </div>
                                 </div>
