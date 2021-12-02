@@ -18,6 +18,7 @@ export default function NonUserProfile(props) {
         loadCandidates(2);
         loadFavCandidates();
         loadFavElections();
+        loadCustElections();
     }, [user]);
 
     const loadCandidates = async(loadWho) => { 
@@ -37,7 +38,7 @@ export default function NonUserProfile(props) {
     }
 
     const loadCustElections = async() => {
-        await axios.get(baseURL + '/customElections', {username: props.user[0].username}).then((res) => {
+        await axios.get(baseURL + '/customElections', { params: {username: props.user[0].username} }).then((res) => {
             const custElections = [];
             res.data.forEach((x, i) => custElections.push(
                 <li key={i} className="list-unstyled text-secondary my-2 text-decoration-none">{x.data}</li>
