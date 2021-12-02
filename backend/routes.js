@@ -121,44 +121,127 @@ accepts formatting candidateID in params and returns all the years that the cand
       connection.release()
     })
   })
-
   app.put('/saveCustomElection', authenticateToken, (req,res) =>{
-    pool.getConnection( function(err,connection) {
-      console.log(req.body.electionData)
-      console.log(req.user.username)
+    pool.getConnection(  function  (err,connection) {
+      // console.log(req.body.electionData)
+      // console.log(req.user.username)
       JSONbody = JSON.parse(JSON.stringify(req.body.electionData));
+      
       connection.query("select accountNumber from users where username = ?", [req.user.username], function(err,result,fields) {
         if(err) {
           logger.error(err)
           res.status(400).send("error finding account number")
         } else {
-          console.log("elese statement ran")
           JSONaccountNumber = JSON.parse(JSON.stringify(result[0]));
           accountNumber = JSONaccountNumber["accountNumber"]
           
-          console.log("Name:"+ JSONbody["name"])
-          connection.query("select electionId from elections where createdBy = ? and name = ?" [accountNumber, JSONbody["name"]], function(err,result,fields) {
+          // console.log("Name:"+ JSONbody["name"])
+          // console.log("acctNum:",accountNumber)
+          connection.query("select electionId from elections where createdBy = ? and name = ?",[accountNumber,JSONbody["name"]], function(err,result,fields) {
             if(err) {
+              logger.error(err)
               console.log(err)
-            }
-            if(result) {
-              JSONData = JSON.parse(req.body.electionData)
-              for(value in JSONData["data"]) {
-                repVote = 0;
-                demVotes = 0;
-                libVotes = 0;
-                otherVotes = 0;
-                greenVotes = 0;
-                console.log(value);
-                connection.query("insert into electionData ")
-              }
-              
             } else {
-              console.log("No election Found for AccountNumber: ", accountNumber)
+              
+              JSONelectionId = JSON.parse(JSON.stringify(result));
+              // console.log("election id val: ", JSONelectionId[0]["electionId"])
+              connection.query("delete from electionData where electionId = ?", [JSONelectionId[0]["electionId"]], function(err,result,fields) {
+               if(err) {
+                 console.log(err)
+                 logger.error(err)
+               } else {
+                 connection.query("delete from elections where createdBy = ? and name = ?",[accountNumber,JSONbody["name"]], function(err,result,fields) {
+                   if(err) {
+                     console.log(err)
+                     logger.error(err)
+                   } else {
+                    connection.query("select democraticCandidate,republicanCandidate,greenCandidate,libertarianCandidate,otherCandidate from elections where year = ? and name = \"official\"", [JSONbody["year"]], function(err,result,fields) {
+                      if(err) {
+                        console.log(err)
+                      }
+                      cands = JSON.parse(JSON.stringify(result))
+                      // console.log(cands)
+                        connection.query(`insert into elections (year,democraticCandidate,republicanCandidate,greenCandidate,libertarianCandidate,otherCandidate,createdBy,name)
+                         values (?,?,?,?,?,?,?,?)`,[JSONbody["year"],cands[0]["democraticCandidate"],cands[0]["republicanCandidate"],cands[0]["greenCandidate"],cands[0]["libertarianCandidate"]
+                         ,cands[0]["otherCandidate"],accountNumber,JSONbody["name"]], function(err,result,fields) {
+                            if(err) {
+                              console.log(err)
+                              logger.error(err)
+                            } else {
+                              connection.query("select electionId from elections where createdBy = ? and name = ?",[accountNumber,JSONbody["name"]], function(err,result,fields) {
+                                if(err) {
+                                  console.log(err)
+                                  logger.error(err)
+                                } else {
+                                  electionId = JSON.parse(JSON.stringify(result))["electionId"];
+                            // console.log("electionId:",electionId);
+                            success = true;
+                            for(i = 0; i < JSONbody["data"].length; i ++) {
+                              repVote = 0;
+                              demVotes = 0;
+                              libVotes = 0;
+                              otherVotes = 0;
+                              greenVotes = 0;
+                              switch(JSONbody["data"][i]["winner"]) {
+                                case "Republican":
+                                  repVote = 1;
+                                  break;
+                                case "Democrat":
+                                  demVotes = 1;
+                                  break;
+                                case "Libertarian":
+                                  libVotes = 1;
+                                  break;
+                                case "Other":
+                                  otherVotes = 1;
+                                  break;
+                                case "Green":
+                                  greenVotes = 1;
+                                  break;
+                                default:
+                                  res.status(400).send("Invalid Key for party found, let Alex know")
+                                  
+                              }
+                              // console.log(repVote,demVotes,libVotes,otherVotes,greenVotes)
+                              // console.log("i",i)
+                              // console.log("value:",JSONbody["data"][i]["winner"]);
+                              connection.query("insert into electionData (stateId,republicanVotes,democraticVotes,greenVotes,libertarianVotes,otherVotes,electionId) VALUES (?,?,?,?,?,?,?)", [i + 1,repVote,demVotes,greenVotes,libVotes,otherVotes,JSONelectionId[0]["electionId"] + 1], function(err,result,fields) {
+                                if(err) {
+                                  logger.error(err)
+                                  console.log(err)
+                                  success = false;
+                                  res.status(400).send("Uh oh spghettios")
+                                }
+                              })
+                            }
+                            if(success) {
+                              res.send({
+                                "success":"true"
+                              })
+                            }
+                                }
+                              })
+                              
+                          }
+                         })
+                        
+                        
+                      
+                      
+                        
+                        
+                    })
+                   }
+                 })
+               }
+              })
             }
           })
+          
         }
       })
+      
+      
       connection.release();
     })
   })
