@@ -50,8 +50,19 @@ export function App () {
       console.log(copy)
       setRouteData(copy)
   }
+
+  let refP = "/login";
+  let loggedIn = false;
+
   // tell app to fetch values from db on first load (if initialized)
   useEffect(async() => {
+      if (context.JWT) {
+        loggedIn = true;
+        refP = "/UserProfile";
+      }
+      if (loggedIn && window.location.pathname == '/login') {
+        window.location.pathname = '/';
+      }
      let newPayload = await getElectionData(2020);
      setAllStates(newPayload);
      setupLogin(context);
@@ -60,8 +71,6 @@ export function App () {
      }
   }, [])
 
-  let refP = "/login";
-  let loggedIn = false;
   if (context.JWT) {
     loggedIn = true;
     refP = "/UserProfile";

@@ -125,7 +125,7 @@ accepts formatting candidateID in params and returns all the years that the cand
     pool.getConnection(  function  (err,connection) {
       // console.log(req.body.electionData)
       // console.log(req.user.username)
-      JSONbody = JSON.parse(JSON.stringify(req.body.electionData));
+      JSONbody = JSON.parse(JSON.stringify(req.body));
       
       connection.query("select accountNumber from users where username = ?", [req.user.username], function(err,result,fields) {
         if(err) {

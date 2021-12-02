@@ -46,7 +46,6 @@ export default function Maps(){
     }
     const [placeSelection, setPlaceSelection] = useState(arrToMap(placesPayload))
     useEffect(async() => {
-        console.log(mapID)
         setCurrentlyLoading(true)
         let res = await getElectionData(queryYear || (!queryYear && !mapID) ? chosenYear : null, queryYear || (!queryYear && !mapID) ? null : mapID);
         setRetrievedPayload(res);
@@ -126,11 +125,9 @@ export default function Maps(){
         let payload = await getElectionCandidates(chosenYear ? chosenYear : 2020);
         let transformedPayload = {};
         if (payload) {
-            console.log(payload);
             for(let obj of payload) {
                 transformedPayload[obj.party] = obj;
             }
-            console.log(transformedPayload)
         }
         return transformedPayload;
     }
@@ -139,7 +136,6 @@ export default function Maps(){
         let num = 50 * multiplier;
         for(const stateJS of statesGeoJSON){
             let stateName = stateJS.properties.NAME;
-            console.log(entry.state.toLowerCase() + (num * multiplier))
             if(entry.state === stateName) {
                 maps.current[0].addSource(entry.state.toLowerCase() + (num * multiplier), {
                     'type': 'geojson',
@@ -221,7 +217,6 @@ export default function Maps(){
             );
             maps.current[0].on('load', () => {
                 for(let entry of (retrievedPayload ? retrievedPayload : placesPayload)){
-                    console.log("load")
                     renderMap(entry)
                 }
             })
