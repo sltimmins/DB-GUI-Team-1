@@ -63,8 +63,8 @@ export function App () {
       if (loggedIn && window.location.pathname == '/login') {
         window.location.pathname = '/';
       }
-     let newPayload = await getElectionData(2020);
-     setAllStates(newPayload);
+     // let newPayload = await getElectionData(2020);
+     // setAllStates(newPayload);
      setupLogin(context);
      if(context.JWT) {
          setIsLoggedIn(true)

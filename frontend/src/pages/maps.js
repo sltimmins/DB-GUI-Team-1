@@ -47,7 +47,7 @@ export default function Maps(){
     const [placeSelection, setPlaceSelection] = useState(arrToMap(placesPayload))
     useEffect(async() => {
         setCurrentlyLoading(true)
-        let res = await getElectionData(queryYear || (!queryYear && !mapID) ? chosenYear : null, queryYear || (!queryYear && !mapID) ? null : mapID);
+        let res = await getElectionData(chosenYear, mapID);
         setRetrievedPayload(res);
         setPlaceSelection(arrToMap(res));
         let yearRes = await getSupportedYears();
@@ -86,16 +86,17 @@ export default function Maps(){
     }, [chosenYear]);
 
     useEffect(async () => {
+        console.log(retrievedPayload)
         await axios({
             method: 'get',
-            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${mapID ? mapID : 'United%20States'}.json?types=country&access_token=${MAPBOX_API_KEY}`
+            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/United%20States.json?types=country&access_token=${MAPBOX_API_KEY}`
         })
         .then(function (response) {
             let newLat = response.data["features"][0]["center"][0]
             let newLng = response.data["features"][0]["center"][1]
             let copy = JSON.parse(JSON.stringify(mapToCoordinates))
-            copy[mapID ? mapID : 'United States'] = [newLat, newLng];
-            setMapToCoordinates(copy)
+            // copy[mapID ? mapID : 'United States'] = [newLat, newLng];
+            // setMapToCoordinates(copy)
             maps.current[0] = new mapboxgl.Map({
                     container: refs.current[0],
                     style: 'mapbox://styles/mapbox/streets-v11',
@@ -222,7 +223,7 @@ export default function Maps(){
             })
             setPlacesCopy([{"state": val}]);
         });
-        setChosenYear(chosenYear)
+        // setChosenYear(chosenYear)
     }
 
     const handleYearSelection = (newYear) => {

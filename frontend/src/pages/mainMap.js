@@ -67,7 +67,7 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
         const entry = place;
         await axios({
             method: 'get',
-            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${entry.state}.json?types=${entry.state === "United States" ? "country" : "region"}&access_token=${MAPBOX_API_KEY}`
+            url: `https://api.mapbox.com/geocoding/v5/mapbox.places/United%20States.json?types=country&access_token=${MAPBOX_API_KEY}`
         })
         .then(function (response) {
             let newLat = response.data["features"][0]["center"][0]
@@ -137,14 +137,14 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
         return max;
     }
 
-    const saveCustomElection = async () => {
+    const saveCustomElection = async (name) => {
         let copy = copyArr(placesArray);
         for(const specificPlace of copy) {
             specificPlace.winner = mapOfAffiliation[specificPlace.state.toLowerCase()];
         }
         let wholePayload = {
             data: copy,
-            name: saveName,
+            name,
             year
         }
         let resp = await persistCustomElection(wholePayload);
@@ -201,7 +201,7 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                        setDeleteEntryModal(false)
                    }}
             />
-            <SaveModal placeholder={getInitialPlaceholder()} inputLabelText={"Saved Map ID"} open={saveOpenModal} cancelAction={() => setSaveOpenModal(false)} saveAction={async (val) => {await saveCustomElection(); setSaveName(val); setSaveOpenModal(false); setSavedModal(true)}}/>
+            <SaveModal placeholder={getInitialPlaceholder()} inputLabelText={"Saved Map ID"} open={saveOpenModal} cancelAction={() => setSaveOpenModal(false)} saveAction={async (val) => {await saveCustomElection(val); setSaveName(val); setSaveOpenModal(false); setSavedModal(true)}}/>
             <Modal open={savedModal} mainTitle={"Saved!"} description={"Your changes have been saved and your custom map can be viewed in you profile"} confirmButtonText={"Yay"}
                 confirmAction={() => setSavedModal(false)}
             />

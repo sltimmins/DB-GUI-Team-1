@@ -21,13 +21,16 @@ const config = {
 
 // Get Election results and data for each state given a year
 // currently only supports year 2020
-export const getElectionData = async(year, electionName) => {
+export const getElectionData = async(year, name) => {
     let states = [];
     let url = BASE_URL + '/electionData'
+    let specialObj = {year}
+    specialObj.name = name ==  'United States' ? null : name;
+    console.log(specialObj)
     await axios({
         method: 'get',
         url: url,
-        params: {year, electionName}
+        params: specialObj
     })
     .then((response) => {
             if(response.status == 200){
@@ -114,13 +117,9 @@ export const getSupportedYears = async() => {
 
 export const persistCustomElection = async (payload) => {
     let resp = null;
-    let url = '/saveCustomElection'
-    await axios({
-        method: 'post',
-        url: url,
-        config,
-        body: payload
-    })
+    let url = BASE_URL + '/saveCustomElection'
+    console.log(payload)
+    await axios.put(url, payload, config)
     .then((response) => {
             if(response.status == 200){
                 resp = response.data;
@@ -129,7 +128,6 @@ export const persistCustomElection = async (payload) => {
             }
         }
     ) .catch(e => {
-        console.log("BAD REQUEST")
         resp = null;
     })
     return resp;
