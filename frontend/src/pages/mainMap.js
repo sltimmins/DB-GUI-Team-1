@@ -114,9 +114,10 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
 
             })
         });
-    }, [deleteEntryModal, chosenChangeLocation, newAffiliation, locationToRemove, saveOpenModal, savedModal, viewOption]);
+    }, [deleteEntryModal, chosenChangeLocation, newAffiliation, locationToRemove, saveOpenModal, savedModal, viewOption, mapOfAffiliation]);
 
 
+    console.log(candidates)
     const votingGradient = () => {
         let gradient = "linear-gradient(to right, "
         for(const key in electionNumbers) {
@@ -291,19 +292,10 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                         <label htmlFor={"originalAffiliation"}>
                             Original Affiliation
                         </label>
-                        <select id={"originalAffiliation"} className={"originalSelect"} style={{borderColor: chosenChangeLocation ? politicalColors[affiliations[chosenChangeLocation]] : 'black'}} value={affiliations[chosenChangeLocation]}>
-                            <option value={""}></option>
+                        <select id={"originalAffiliation"} className={"originalSelect"}  disabled={true}>
+                            {/*<option value={""}></option>*/}
                             <option value={"D"}>
-                                Democrat
-                            </option>
-                            <option value={"R"}>
-                                Republican
-                            </option>
-                            <option value={"G"}>
-                                Green Party
-                            </option>
-                            <option value={"L"}>
-                                Libertarian Party
+                                {affiliations[chosenChangeLocation]}
                             </option>
                         </select>
                     </div>
@@ -313,16 +305,16 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                         </label>
                         <select id={"newAffiliation"} onChange={el => {setNewAffiliation(el.target.value)}} style={{borderColor: newAffiliation ? politicalColors[newAffiliation] : 'black', borderWidth: '2px'}}>
                             <option value={""}></option>
-                            <option value={"D"}>
+                            <option value={statusMap.Democrat}>
                                 Democrat
                             </option>
-                            <option value={"R"}>
+                            <option value={statusMap.Republican}>
                                 Republican
                             </option>
-                            <option value={"G"}>
+                            <option value={statusMap.Green}>
                                 Green Party
                             </option>
-                            <option value={"L"}>
+                            <option value={statusMap.Libertarian}>
                                 Libertarian Party
                             </option>
                         </select>
