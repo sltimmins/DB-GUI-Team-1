@@ -25,8 +25,15 @@ export function App () {
   // Global context
   let context = useProvideAppContext();
 
+  // handle signout
+  const signout = () => {
+    localStorage.setItem('jwt', "");
+    window.location.reload();
+  }
+
   const [allStates, setAllStates] = useState([])
   const [routeData, setRouteData] = useState(null)
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   const handleMainMapData = (mapData) => {
       let copy = routeData ? JSON.parse(JSON.stringify(routeData)) : {};
@@ -47,11 +54,14 @@ export function App () {
      let newPayload = await getElectionData(2020);
      setAllStates(newPayload);
      setupLogin(context);
+     if(context.JWT) {
+         setIsLoggedIn(true)
+     }
   }, [])
 
   let refP = "/login";
   let loggedIn = false;
-  if (context.JWT != undefined) {
+  if (context.JWT) {
     loggedIn = true;
     refP = "/UserProfile";
   }
@@ -81,10 +91,10 @@ export function App () {
                   }}}
                   routes={
                     [
-                      {name: "Home", href: '/', active: (window.location.pathname === "/")},
+                      {name: "Home", href: '/', active: (window.location.pathname === "/"), exact: true},
                       {name: "Maps", href: '/maps', active: (window.location.pathname === "/maps")},
-                      {name: "About", href: '/', active: (window.location.pathname === "/about") },
-                      {name: "Search", href: '/search', active: (window.location.pathname == "/search") }
+                      {name: "Search", href: '/search', active: (window.location.pathname == "/search") },
+                      loggedIn ? {name: "Sign Out", href: '/', onClick: signout} : null
                     ]
                   }
 

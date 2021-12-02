@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useEffect, useState, useRef, isValidElement } from "react";
 import { AppContext, useProvideAppContext } from "./../AppContext.js";
 import axios from 'axios';
 import { Collapse } from "bootstrap";
-import { loadFavorites } from './search.js'; 
+import { Link } from 'react-router-dom';
 
 export default function NonUserProfile(props) {
     const { setUser, user, setJWT, JWT, baseURL } = useContext(AppContext);
@@ -10,30 +10,51 @@ export default function NonUserProfile(props) {
     var [toggleTwo, setToggleTwo] = useState(false);
     var [toggleThree, setToggleThree] = useState(false);
     const [favCandidates, setFavCandidates] = useState(undefined);
-    let candidates = [];
     const [list, setList] = useState([]);
-    const [loaded, setLoaded] = useState(false);
-
-
-    const loadFavorites = async() => { 
-        await axios.get(baseURL + '/favorites/candidates', { params: { accountNumber: user.accountNumber } }).then(({res}) => {
-            const favs = [];
-            res.data.forEach((x, i) => favs.push(x.candidateID));
-            setFavCandidates(favs);
-        });
-    }
-
-    const isFirstRender = useRef(true);
+    const [elects, setElects] = useState([]);
+    const [custElects, setCustElects] = useState([]);
 
     useEffect(() => {
-
-        // await axios.get
-
-    }, []);
+        loadCandidates(2);
+        loadFavCandidates();
+        loadFavElections();
+    }, [user]);
 
     const loadCandidates = async(loadWho) => { 
         await axios.post(baseURL + '/users/search_user', { allUsers: loadWho }).then((res) => {
             setList(res.data);
+        });
+    }
+
+    const loadFavElections = async() => {
+        await axios.get(baseURL + '/favorites/elections', {accountNumber: props.user[0].accountNumber}).then((res) => {
+            const elections = [];
+            res.data.forEach((x, i) => elections.push(
+                <li key={i} className="list-unstyled my-2">USA {x.year}</li>
+            ))
+            setElects(elections);
+        })
+    }
+
+    const loadCustElections = async() => {
+        await axios.get(baseURL + '/customElections', {username: props.user[0].username}).then((res) => {
+            const custElections = [];
+            res.data.forEach((x, i) => custElections.push(
+                <li key={i}>{x.data}</li>
+            ))
+            setCustElects(custElections);
+        })
+    }
+
+    const loadFavCandidates = async() => { 
+        await axios.get(baseURL + '/favorites/candidates', { params: { accountNumber: props.user[0].accountNumber } }).then((res) => {
+            const favs = [];
+            res.data.forEach((x, i) => favs.push(
+                <li className="list-unstyled text-primary my-2 text-decoration-none" key={i} target="_blank" onClick={() => {
+                    window.location.pathname = '/UserProfile/' + x.candidateID + '/true';
+                }}>Candidate ID Number: {x.candidateID}</li>  
+            ));
+            setFavCandidates(favs);
         });
     }
 
@@ -61,19 +82,13 @@ export default function NonUserProfile(props) {
         }
     })
 
-
-    let favElects; //axios.get(baseURL + '/favorites/elections', props.user).data;
-    let custElects; //axios.get(baseURL + '/customElections', props.user).data;
     let imagePath;
     if(!props.user[0].uuid) {
         imagePath = "assets/userImages/default.jpg";
     }else {
         imagePath = "https://res.cloudinary.com/stimmins/image/upload/v1636138517/images/" + props.user[0].uuid;
     }
-
-    if(loaded) {
-        console.debug(favCandidates);
-    }
+    
     return(
         <div>
             <header className="text-center bg-secondary p-3 d-static">
@@ -115,42 +130,36 @@ export default function NonUserProfile(props) {
                                 <div className="collapse" id="favCands">
                                     <div className="card card-body mt-3">
                                         <label htmlFor="list" className="font-weight-bold">Favorite Candidates</label>
-                                        <ul className="list-group" style={{listStyleType: "none"}} id="list"></ul>
+                                        <ul className="list-group mt-2" id="list"></ul>
                                         {
-                                            favCandidates && loaded && favCandidates.map(cand => {
-                                                <li className="list-group-item">{cand.firstName} {cand.listName}</li>
-                                            })
+                                            favCandidates && favCandidates.length > 0 && <div>{favCandidates}</div>
                                         }
                                         {
-                                            <li>No Favorite Candidates</li>
+                                            !favCandidates || favCandidates.length == 0 && <li>No Favorite Candidates</li>
                                         }
                                     </div>
                                 </div>
                                 <div className="collapse" id="favElects">
                                     <div className="card card-body mt-3">
                                         <label htmlFor="list" className="font-weight-bold">Favorite Elections</label>
-                                        <ul className="list-group" style={{listStyleType: "none"}} id="list"></ul>
+                                        <ul className="list-group mt-2" id="list"></ul>
                                         {
-                                            favElects && favElects.map(elect => {
-                                                <li className="list-group-item">{elect.electionID}</li>
-                                            })
+                                            elects && elects.length > 0 && <div>{elects}</div>
                                         }
                                         {
-                                            <li>No Favorite Elections</li>
+                                            !elects || elects.length == 0 && <li>No Favorite Elections</li>
                                         }
                                     </div>
                                 </div>
                                 <div className="collapse" id="custElects">
                                     <div className="card card-body mt-3">
                                         <label htmlFor="list" className="font-weight-bold">Custom Elections</label>
-                                        <ul className="list-group" style={{listStyleType: "none"}} id="list"></ul>
+                                        <ul className="list-group mt-2" id="list"></ul>
                                         {
-                                            custElects && custElects.map(elect => {
-                                                <li className="list-group-item">{elect}</li>
-                                            })
+                                            custElects && custElects.length > 0 && <ul className="list-group list-unstyled">{custElects}</ul>
                                         }
                                         {
-                                            <li>No Custom Elections</li>
+                                            !custElects || custElects.length == 0 && <li>No Custom Elections</li>
                                         }
                                     </div>
                                 </div>

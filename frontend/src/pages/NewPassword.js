@@ -11,7 +11,6 @@ export default function NewPassword(props) {
         const { name, value } = e.target;
         setState({ ...state, [name]: value });
     };
-
     const {isCand, setIsCand} = useState(false);
     
     useEffect(() => {

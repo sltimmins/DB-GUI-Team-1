@@ -73,9 +73,9 @@ export const downloadCSV = async (year) => {
     return candidates;
 }
 
-const getSupportedYears = async() => {
+export const getSupportedYears = async() => {
     let payload = null;
-    let url = BASE_URL + '/elections/years'
+    let url = BASE_URL + '/customElectionYears'
     await axios({
         method: 'get',
         url: url,
