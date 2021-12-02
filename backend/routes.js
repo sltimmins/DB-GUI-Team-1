@@ -121,7 +121,7 @@ accepts formatting candidateID in params and returns all the years that the cand
       connection.release()
     })
   })
-  app.put('/saveCustomElection', authenticateToken, (req,res) =>{
+  app.put('/saveCustomElection', authenticateToken, (req,res) => {
     pool.getConnection(  function  (err,connection) {
       // console.log(req.body.electionData)
       // console.log(req.user.username)
@@ -875,7 +875,7 @@ app.put('/candidate/updateBio', async(req,res) => {
             res.send(err)
           } else {
             let vals = []
-            for(let i = 0; i < 50; i ++) {
+            for(let i = 0; i < 51; i ++) {
               RV = Number(result[i].republicanVotes)
               DV = Number(result[i].democraticVotes)
               GV = Number(result[i].greenVotes)
