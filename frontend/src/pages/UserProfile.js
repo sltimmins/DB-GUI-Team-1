@@ -24,7 +24,7 @@ export default function UserProfile(props) {
 
     useEffect(() => {
         if(props.user === undefined) {
-            getUserInfo(id, isCandidateString);
+            getUserInfo(id, isCandidate);
         }
     }, [isUser])
 

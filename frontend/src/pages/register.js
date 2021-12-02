@@ -65,9 +65,10 @@ export function Register(props) {
         <label class="control-label" htmlFor="party">I am a...</label>
         <select className="form-select" name="party" value={values.party} onChange={handleInputChange} >
           <option value="Republican">Republican</option>
-          <option value="Independent">Independent</option>
           <option value="Democrat">Democrat</option>
-          <option value="Prefer Not to Say">Prefer Not to Say</option>
+          <option value="Libertarian">Libertarian</option>
+          <option value="Green">Green</option>
+          <option value="Other">Other</option>
         </select>
       </div>
       <div className="form-group mb-3">
