@@ -106,6 +106,7 @@ export default function Maps(){
                 }
             );
             maps.current[0].on('load', () => {
+                multiplier++;
                 for(let entry of (retrievedPayload ? retrievedPayload : placesPayload)){
                     renderMap(entry)
                 }
@@ -139,7 +140,9 @@ export default function Maps(){
         let num = 50 * multiplier;
         console.log(multiplier)
         for(const stateJS of statesGeoJSON){
+            multiplier++;
             if(tempSet.has(entry.state.toLowerCase() + (num * multiplier)) || entry.state.toLowerCase() + (num * multiplier) == 'united states50') {
+                console.log("EXISTS")
                 return
             }
             console.log(entry.state.toLowerCase() + (num * multiplier))
