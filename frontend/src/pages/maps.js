@@ -29,10 +29,10 @@ export default function Maps(){
     const [chosenYear, setChosenYear] = useState(queryYear ? queryYear : 2020);
     const [yearOptions, setYearOptions] = useState([]);
     const [candidates, setCandidates] = useState(null);
-    const [multiplier, setMultiplier] = useState(1)
+    let multiplier = 1;
     const arrToMap = (arr) => {
         let mapOfNames = new Set();
-        for(const place of arr) {
+        for (const place of arr) {
             mapOfNames.add(place.state);
         }
         return mapOfNames;
@@ -73,6 +73,7 @@ export default function Maps(){
                 for(let entry of (retrievedPayload ? retrievedPayload : placesPayload)){
                     renderMap(entry)
                 }
+                multiplier++;
             })
             setPlacesCopy([{"state": mapID ? mapID : 'United States'}]);
         });
@@ -134,8 +135,14 @@ export default function Maps(){
     }
 
     const renderMap = (entry) => {
+        let tempSet = new Set();
         let num = 50 * multiplier;
+        console.log(multiplier)
         for(const stateJS of statesGeoJSON){
+            if(tempSet.has(entry.state.toLowerCase() + (num * multiplier)) || entry.state.toLowerCase() + (num * multiplier) == 'united states50') {
+                return
+            }
+            console.log(entry.state.toLowerCase() + (num * multiplier))
             let stateName = stateJS.properties.NAME;
             if(entry.state === stateName) {
                 maps.current[0].addSource(entry.state.toLowerCase() + (num * multiplier), {
@@ -160,10 +167,11 @@ export default function Maps(){
                         'fill-opacity': 0.5
                     }
                 });
+                break;
             }
             num++;
+            tempSet.add(entry.state.toLowerCase() + (num * multiplier))
         }
-        setMultiplier(multiplier+1)
     }
 
     const handleSelection = async(val) => {
