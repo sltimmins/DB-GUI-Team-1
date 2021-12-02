@@ -15,9 +15,10 @@ export default function NonUserProfile(props) {
     const [custElects, setCustElects] = useState([]);
 
     useEffect(() => {
-        loadCandidates(2);
+        //loadCandidates(2);
         loadFavCandidates();
         loadFavElections();
+        loadCustElections();
     }, [user]);
 
     const loadCandidates = async(loadWho) => { 
@@ -37,10 +38,12 @@ export default function NonUserProfile(props) {
     }
 
     const loadCustElections = async() => {
-        await axios.get(baseURL + '/customElections', {username: props.user[0].username}).then((res) => {
+        await axios.get(baseURL + '/customElections', { params: {username: props.user[0].username} }).then((res) => {
             const custElections = [];
             res.data.forEach((x, i) => custElections.push(
-                <li key={i} className="list-unstyled text-secondary my-2 text-decoration-none">{x.data}</li>
+                <Link to={'/maps/' + x.name + '/' + x.year}>
+                    <li key={i} className="list-unstyled text-secondary my-2 text-decoration-none"> <label className="text-primary"> Name:</label> {x.name} <label className="text-primary"> <br /> Year:</label> {x.year}</li>
+                </Link>
             ))
             setCustElects(custElections);
         })
