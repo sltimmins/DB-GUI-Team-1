@@ -133,7 +133,8 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
     const votingGradient = () => {
         let gradient = "linear-gradient(to right, "
         for(const key in electionNumbers) {
-            gradient += politicalColors[key] + ", "
+            if(electionNumbers[key] !=  0)
+                gradient += politicalColors[key] + ", "
         }
         gradient = gradient.substring(0, gradient.length - 2) + ")";
         return gradient;
@@ -161,6 +162,9 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
             year
         }
         let resp = await persistCustomElection(wholePayload);
+        if (!resp || resp.success !== 'true' || !resp.success) {
+            alert("Error")
+        }
     }
 
     const getInitialPlaceholder = () => {
