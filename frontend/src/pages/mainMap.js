@@ -190,7 +190,7 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
             </thead>
             <tbody>
                 {
-                    data.map(e => <tr>
+                    data.map(e => <tr key={"tr" + e.state}>
                         <td>
                             {e.state}
                         </td>
@@ -230,7 +230,7 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
             />
             <section className={"assortmentOfMaps"}>
                 {place && viewOption == 'map' ?
-                    [(<div className={"mapWrapper largerMap mapboxgl-map"} id={`id-${place.state}`}>
+                    [(<div className={"mapWrapper largerMap mapboxgl-map"} id={`id-${place.state}`} key={"mainDiv "+place.state}>
                             <div ref={(el) => ref.current = el} className={"map-container largerMap mapboxgl-map"}>
 
                             </div>
@@ -269,7 +269,7 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                     electionNumbers ?
                         Object.keys(electionNumbers).map((key, index) => {
                                 if (electionNumbers[key] != 0) {
-                                    return <div>
+                                    return <div key={"electionInfo"+key}>
                                         <h5>
                                             {statusMap[key]} - {electionNumbers[key]} {"\n"}
                                             ({candidates[statusMap[key]].firstName} {candidates[statusMap[key]].lastName})
@@ -284,7 +284,7 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                     {
                     electionNumbers && candidatesPayload ?
                         Object.keys(electionNumbers).map((key, index) =>
-                            <div>
+                            <div key={"names"+key}>
                                 <h5>
                                     {candidates[statusMap[key]].firstName} {candidates[statusMap[key]].lastName}
                                 </h5>
