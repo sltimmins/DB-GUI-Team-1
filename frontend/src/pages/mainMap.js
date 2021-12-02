@@ -217,7 +217,7 @@ export default function MainMap({place, polygons, affiliations, placesArray, yea
                    }}
             />
             <SaveModal placeholder={getInitialPlaceholder()} inputLabelText={"Saved Map ID"} open={saveOpenModal} cancelAction={() => setSaveOpenModal(false)} saveAction={async (val) => {setSaveName(val); console.log(val); await saveCustomElection(val); setSaveOpenModal(false); setSavedModal(true)}}/>
-            <Modal open={savedModal} mainTitle={"Share"} description={"Your changes have been saved and your custom map can be viewed in you profile. Share your custom elections"} confirmButtonText={"Share"}
+            <Modal open={savedModal} mainTitle={"Share"} description={"Your changes have been saved and your custom map can be viewed in you profile. Share your custom elections. This is your custom election url:"} specialBolded={`${EC2_FRONTEND}/maps/${encodeURIComponent(saveName)}/${year}`} confirmButtonText={"Share"}
                 confirmAction={async() => {
                     await navigator.clipboard.writeText(`${EC2_FRONTEND}/maps/${encodeURIComponent(saveName)}/${year}`)
                     alert('Copied to clipboard!')

@@ -5,7 +5,7 @@ import Button from "./genericButton";
 import {politicalColors} from "../test_data/test_data_objects";
 import {GREEN} from "../constants/constants";
 
-export const Modal = ({mainTitle, description, confirmButtonText, cancelButtonText, cancelAction, confirmAction, open}) => {
+export const Modal = ({mainTitle, description, confirmButtonText, cancelButtonText, cancelAction, confirmAction, open, specialBolded}) => {
     return (
         <section className={"specialModal"} style={{display: open ? 'block' : 'none'}}>
             <div className={"closerDiv"}>
@@ -17,6 +17,9 @@ export const Modal = ({mainTitle, description, confirmButtonText, cancelButtonTe
             </div>
             <p>
                 {description}
+            </p>
+            <p style={{fontWeight: 500}}>
+                {specialBolded}
             </p>
             <div className={"buttonsDiv"}>
                 {cancelButtonText ? <Button mainText={cancelButtonText} baseColor={"#b4b4b4"} textColor={"black"} marginRight={"1rem"} onButtonClick={cancelAction}/> : []}
