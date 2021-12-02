@@ -105,10 +105,10 @@ accepts formatting candidateID in params and returns all the years that the cand
   });
   
   // route to get customElections
-  app.get('/customElections', authenticateToken, async (req,res) => {
+  app.get('/customElections', async (req,res) => {
     pool.getConnection(function(err,connection) {
       try {
-      connection.query("Select accountNumber FROM users WHERE username = ?", req.user.username, function(err,result,fields) {
+      connection.query("Select accountNumber FROM users WHERE username = ?", req.param('username'), function(err,result,fields) {
         accountNums = JSON.parse(JSON.stringify(result))
           connection.query('select name,year from elections where createdBy = ?', accountNums[0]['accountNumber'], function(err,result,fields) {
             res.send(JSON.parse(JSON.stringify(result)))
