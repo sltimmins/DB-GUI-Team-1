@@ -104,9 +104,9 @@ export default function Maps(){
         setChosenYear(chosenYear)
     }, [retrievedPayload])
 
-    useEffect(async() => {
-
-    })
+    // useEffect(async() => {
+    //
+    // })
 
     const isCountry = (name) => {
         return name == 'United States';
@@ -116,6 +116,7 @@ export default function Maps(){
         let payload = await getElectionCandidates(chosenYear ? chosenYear : 2020);
         let transformedPayload = {};
         if (payload) {
+            console.log(payload);
             for(let obj of payload) {
                 transformedPayload[obj.party] = obj;
             }
