@@ -9,7 +9,7 @@ import {placesPayload, statesGeoJSON, politicalColors} from "../test_data/test_d
 import Loader from "../components/loader";
 import MainMap from "./mainMap";
 import {MAPBOX_API_KEY} from "../constants/constants";
-import {getElectionCandidates, getElectionData} from "../api/api";
+import {getElectionCandidates, getElectionData, getSupportedYears} from "../api/api";
 import { useParams } from "react-router-dom";
 import {transformArr} from "../utils";
 mapboxgl.accessToken = MAPBOX_API_KEY;
@@ -28,7 +28,8 @@ export default function Maps(){
     const [retrievedPayload, setRetrievedPayload] = useState(null);
     const [chosenYear, setChosenYear] = useState(queryYear ? queryYear : 2020);
     const [yearOptions, setYearOptions] = useState([]);
-    const [candidates, setCandidates] = useState(null)
+    const [candidates, setCandidates] = useState(null);
+    const [multiplier, setMultiplier] = useState(1)
     const arrToMap = (arr) => {
         let mapOfNames = new Set();
         for(const place of arr) {
@@ -36,13 +37,22 @@ export default function Maps(){
         }
         return mapOfNames;
     }
+    const arrOfYears = (payload) => {
+        let newArr = [];
+        for(const yearPayload of payload) {
+            newArr.push(yearPayload.year);
+        }
+        return newArr;
+    }
     const [placeSelection, setPlaceSelection] = useState(arrToMap(placesPayload))
     useEffect(async() => {
         console.log(mapID)
         setCurrentlyLoading(true)
         let res = await getElectionData(queryYear || (!queryYear && !mapID) ? chosenYear : null, queryYear || (!queryYear && !mapID) ? null : mapID);
         setRetrievedPayload(res);
-        setPlaceSelection(arrToMap(res))
+        setPlaceSelection(arrToMap(res));
+        let yearRes = await getSupportedYears();
+        setYearOptions(arrOfYears(yearRes));
         await axios({
             method: 'get',
             url: `https://api.mapbox.com/geocoding/v5/mapbox.places/United%20States.json?types=country&access_token=${MAPBOX_API_KEY}`
@@ -67,7 +77,7 @@ export default function Maps(){
             })
             setPlacesCopy([{"state": mapID ? mapID : 'United States'}]);
         });
-        setChosenYear(chosenYear)
+        // setChosenYear(chosenYear)
         // if(mapID == "United States"){
         //     console.log("United States")
         //     await handleAllSelection()
@@ -101,7 +111,7 @@ export default function Maps(){
             })
             setPlacesCopy([{"state": mapID ? mapID : 'United States'}]);
         });
-        setChosenYear(chosenYear)
+        // setChosenYear(chosenYear)
     }, [retrievedPayload])
 
     // useEffect(async() => {
@@ -126,10 +136,12 @@ export default function Maps(){
     }
 
     const renderMap = (entry) => {
+        let num = 50 * multiplier;
         for(const stateJS of statesGeoJSON){
             let stateName = stateJS.properties.NAME;
+            console.log(entry.state.toLowerCase() + (num * multiplier))
             if(entry.state === stateName) {
-                maps.current[0].addSource(entry.state.toLowerCase(), {
+                maps.current[0].addSource(entry.state.toLowerCase() + (num * multiplier), {
                     'type': 'geojson',
                     'data': {
                         'type': 'Feature',
@@ -142,9 +154,9 @@ export default function Maps(){
                 });
                 // Add a new layer to visualize the polygon.
                 maps.current[0].addLayer({
-                    'id': entry.state.toLowerCase(),
+                    'id': entry.state.toLowerCase() + (num * multiplier),
                     'type': 'fill',
-                    'source': entry.state.toLowerCase(), // reference the data source
+                    'source': entry.state.toLowerCase() + (num * multiplier), // reference the data source
                     'layout': {},
                     'paint': {
                         'fill-color': politicalColors[entry.status], // blue color fill
@@ -152,8 +164,9 @@ export default function Maps(){
                     }
                 });
             }
+            num++;
         }
-        setCandidates("Hello")
+        setMultiplier(multiplier+1)
     }
 
     const handleSelection = async(val) => {
@@ -218,7 +231,8 @@ export default function Maps(){
     }
 
     const handleYearSelection = (newYear) => {
-        setChosenYear(newYear)
+        window.location.href = '/maps/United%20States/'+newYear
+        // setChosenYear(newYear)
     }
 
     return (
@@ -239,7 +253,7 @@ export default function Maps(){
                                     handleYearSelection(el.target.value)
                                 })}>
                                     {
-                                        yearOptions.length == 0 ? <option value={2020}>2020</option> : yearOptions.map(opt => (<option value={opt}>opt</option>))
+                                        yearOptions.length == 0 ? <option value={2020}>2020</option> : yearOptions.map(opt => (<option value={opt}>{opt}</option>))
                                     }
                                 </select>
                             </div>
