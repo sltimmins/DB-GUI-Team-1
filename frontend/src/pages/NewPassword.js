@@ -38,7 +38,7 @@ export default function NewPassword(props) {
                     </div>
                 </Link>
                 <div className="text-center">
-                    <h1>Create New Password</h1>
+                    <h1>Change Password</h1>
                 </div>
                 <form>
                     <div className="form-group pb-5">

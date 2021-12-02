@@ -30,7 +30,7 @@ export default function NonUserProfile(props) {
         await axios.get(baseURL + '/favorites/elections', {accountNumber: props.user[0].accountNumber}).then((res) => {
             const elections = [];
             res.data.forEach((x, i) => elections.push(
-                <li key={i} className="list-unstyled my-2">USA {x.year}</li>
+                <li key={i} className="list-unstyled text-secondary my-2 text-decoration-none">USA {x.year}</li>
             ))
             setElects(elections);
         })
@@ -40,7 +40,7 @@ export default function NonUserProfile(props) {
         await axios.get(baseURL + '/customElections', {username: props.user[0].username}).then((res) => {
             const custElections = [];
             res.data.forEach((x, i) => custElections.push(
-                <li key={i}>{x.data}</li>
+                <li key={i} className="list-unstyled text-secondary my-2 text-decoration-none">{x.data}</li>
             ))
             setCustElects(custElections);
         })
@@ -98,14 +98,17 @@ export default function NonUserProfile(props) {
             <main>
                 <div className="container my-4 bg-light rounded">
                     <div className="row p-3">
-                        <div>
+                        <div className="my-2">
                             <label htmlFor="currUserBio">Bio</label>
-                            <p id="currUserBio" className="border ">{props.user[0].bio}</p> 
+                            <p id="currUserBio" className="container border text-secondary my-2">{props.user[0].bio ? props.user[0].bio : 'Candidate has no bio.'}</p> 
                         
                         </div>
                         <div></div>
                         {
-                            props.user[0].candidateId && <div></div>
+                            props.user[0].candidateId && <div>
+                                <label htmlFor="party">Political Party</label>
+                                <p id="party" className="container border text-secondary my-2">{props.user[0].party ? props.user[0].party : 'No Party Affiliation.'}</p> 
+                            </div>
                         }
                         {
                             !props.user[0].candidateId && <div>
@@ -135,7 +138,7 @@ export default function NonUserProfile(props) {
                                             favCandidates && favCandidates.length > 0 && <div>{favCandidates}</div>
                                         }
                                         {
-                                            !favCandidates || favCandidates.length == 0 && <li>No Favorite Candidates</li>
+                                            !favCandidates || favCandidates.length == 0 && <li className="my-2 text-decoration-none">No Favorite Candidates</li>
                                         }
                                     </div>
                                 </div>
@@ -147,7 +150,7 @@ export default function NonUserProfile(props) {
                                             elects && elects.length > 0 && <div>{elects}</div>
                                         }
                                         {
-                                            !elects || elects.length == 0 && <li>No Favorite Elections</li>
+                                            !elects || elects.length == 0 && <li className="my-2 text-decoration-none list-unstyled">No Favorite Elections</li>
                                         }
                                     </div>
                                 </div>
@@ -156,10 +159,10 @@ export default function NonUserProfile(props) {
                                         <label htmlFor="list" className="font-weight-bold">Custom Elections</label>
                                         <ul className="list-group mt-2" id="list"></ul>
                                         {
-                                            custElects && custElects.length > 0 && <ul className="list-group list-unstyled">{custElects}</ul>
+                                            custElects && custElects.length > 0 && <div>{custElects}</div>
                                         }
                                         {
-                                            !custElects || custElects.length == 0 && <li>No Custom Elections</li>
+                                            !custElects || custElects.length == 0 && <li className="my-2 text-decoration-none list-unstyled">No Custom Elections</li>
                                         }
                                     </div>
                                 </div>

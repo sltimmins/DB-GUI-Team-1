@@ -114,9 +114,9 @@ const Header = ({routes, mainTitle, mainImage, baseColor, showImage, signInFunc,
                           </li>
                         <div className = {"helper"} style={{display: showImage ? 'inline-flex' : 'none'}}>
                             <div className = {"headerLogoDiv"} style={{width: mainImage.width}}>
-                                <img src={mainImage.src} className = {"headerImage"} alt="logo" onClick={() => {
-                                    window.location.pathname = '/UserProfile/' + (user.candidateId || user.accountNumber) + '/' + isCand;
-                                }} style={{width: mainImage.width, height: mainImage.height}} /> 
+                                <Link to={'/UserProfile/' + (user.candidateId || user.accountNumber) + '/' + isCand}>
+                                    <img src={mainImage.src} className = {"headerImage"} alt="logo" style={{width: mainImage.width, height: mainImage.height}} /> 
+                                </Link>
                             </div>
                         </div>
 
